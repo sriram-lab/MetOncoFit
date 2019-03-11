@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 GNU GENERAL PUBLIC LICENSE
    Version 3, 29 June 2007
 
@@ -674,6 +675,8 @@ the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <https://www.gnu.org/licenses/why-not-lgpl.html>.
 =======
+=======
+>>>>>>> 0b8de1ab0f7ca764bc442664f110f14411d37308
 MIT License
 
 Copyright (c) 2019 sriram-lab
@@ -695,4 +698,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+<<<<<<< HEAD
+>>>>>>> 0b8de1ab0f7ca764bc442664f110f14411d37308
+=======
 >>>>>>> 0b8de1ab0f7ca764bc442664f110f14411d37308
