@@ -1,0 +1,430 @@
+// This is the color gradient for the confusion matrix. conf_max will return the maximum value of the confusion matrix and color_confmatr will return a gradient
+
+var conf_max = d3.max(conf_matr, function(conf_matr) {
+  return d3.max(conf_matr)
+})
+
+var color_confmatr = d3.scaleLinear()
+  .domain([0.0, conf_max])
+  .range(["#f7fbff", "#08306b"]);
+
+var svg = d3.select("svg"),
+  width = 800,
+  height = 800,
+  outerRadius = Math.min(width, height) * 0.5 - 40,
+  innerRadius = outerRadius - 50;
+
+var formatValue = d3.formatPrefix(",.0", 1e3);
+
+var color = d3.scaleOrdinal()
+  .domain(d3.range(4))
+  .range(["#000000", "#FFDD89", "#957244", "#F26223"]);
+
+// This is the orginal color scheme for heatmap, but it doesn't scale well
+// var domain = [-25.0,-20.0,-15.0,-10.0,-8.0,-6,-4.0,-2.0,-0.1,0.0,0.1,2.0,4.0,6.0,8.0,10.0,15.0,20.0,25.0];
+
+// This is the color scheme that accentuates the differences, and is the one that I will use
+var domain = [-9.0, -8.0, -7.0, -6.0, -5.0, -4.0, -3.0, -2.0, -0.1, 0.0, 0.1, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
+
+var range = ["#67000d", "#a50f15", "#cb181d", "#ef3b2c", "#fb6a4a", "#fc9272", "#fcbba1", "#fee0d2", "#fff5f0", "#ffffff", "#fff7fb", "#ece7f2", "#d0d1e6", "#a6bddb", "#74a9cf", "#3690c0", "#0570b0", "#045a8d", "#023858"];
+
+var heat_color = d3.scaleThreshold()
+  .domain(domain)
+  .range(range);
+
+// manipulates barplot containing the feature importance formatting and display
+var chart = svg.append('g')
+  .attr('id', 'bars')
+  .selectAll('rect')
+  .data(feat_imp) // takes the tmparr matrix values
+  .enter()
+  .append('rect')
+  .filter(function(d) {
+    return d.xval < 10
+  })
+  .attr('height', 30)
+  .attr('width', function(d) {
+    return d.yval * 1500;
+  })
+  .style("fill", "#a6cee3")
+  .attr('x', 1320)
+  .attr('y', function(d) {
+    return 1480 + (d.xval * 50);
+  });
+
+// manipulates the text in the barplot
+var chartext = svg.append('g')
+  .attr('id', 'bartext')
+  .selectAll('text')
+  .data(feat_imp)
+  .enter()
+  .append('text')
+  .filter(function(d) {
+    return d.xval < 10
+  })
+  .text(function(d) {
+    return d.name;
+  })
+  .attr('text-anchor', 'end')
+  .attr('x', 790)
+  .style("font-size", "24px")
+  .attr('y', function(d) {
+    return 1500 + (d.xval * 50);
+  });
+
+var heatchart = svg.append('g')
+  .attr('id', 'heatmap')
+  .selectAll('rect')
+
+  // Gets the heatmap values from the ex_heat matrix
+  .data(heatmap_arr)
+  .enter()
+  .append('rect')
+  .filter(function(d) {
+    return d.xval < 10
+  })
+  .attr('height', 45)
+  .attr('width', 45)
+  .attr('stroke', '#A9A9A9')
+  .attr('stroke-width', 1.0)
+  .style("fill", function(d) {
+    return heat_color(10.0 * (d.value - 0.5));
+  })
+  .attr('x', function(d) {
+    return 800 + (d.yval * 50);
+  })
+  .attr('y', function(d) {
+    return 1475 + (d.xval * 50);
+  });
+
+// Manipulates the gene text on the top of the heatmap
+var genetext = svg.append('g')
+  .attr('id', 'genetext')
+  .selectAll('text')
+  .data(gene_names)
+  .enter()
+  .append('text')
+  .text(function(d) {
+    return d.name;
+  })
+  .attr('text-anchor', 'start')
+  .style("font-size", "24px")
+  .attr("transform", function(d) {
+    return "translate (" + parseInt(+825 + +parseInt((d.xval * 50))) + ",1450) rotate(-60)";
+  });
+
+// shows the feature importance predicted for survival
+var squigrect = svg.append('g')
+  .attr('id', 'squigrect')
+  .selectAll('rect')
+  .data(feat_imp)
+  .enter()
+  .append('rect')
+  .filter(function(d) {
+    return d.xval < 10
+  })
+  .style("fill", function(d) {
+    if (d.correl > 0.75) {
+      return "#f1a340"
+    } else if (d.correl < -0.75) {
+      return "#998ec3"
+    } else {
+      return "#D3D3D3"
+    }
+  })
+  .attr('height', 40)
+  .attr('width', 30)
+  .attr('x', 1750)
+  .attr('y', function(d) {
+    return 1480 + (d.xval * 50);
+  });
+
+// shows the correlation value. If it's the top 25%, it will have a positive correlation; else if it is the lowest 25%, it has the negative correlation
+var squigtext = svg.append('g')
+  .attr('id', 'squigrect')
+  .selectAll('text')
+  .data(feat_imp)
+  .enter()
+  .append('text')
+  .filter(function(d) {
+    return d.xval < 10
+  })
+  .text(function(d) {
+    if (d.correl > 0.75) {
+      return "+";
+    } else if (d.correl < -0.75) {
+      return "-";
+    } else {
+      return " ";
+    };
+  })
+  .attr('text-anchor', 'end')
+  .attr('x', 1770)
+  .style("font-size", "28px")
+  .attr('y', function(d) {
+    return 1510 + (d.xval * 50);
+  });
+
+// configures the confusion matrix class and row labels
+var row = svg.selectAll(".row")
+<<<<<<< HEAD
+.data(conf_matr_norm)
+.enter().append("g")
+.attr("class", "row")
+.attr("transform", function(d, i) { return "translate(950," + i*100 + ")"; });
+=======
+  .data(conf_matr)
+  .enter().append("g")
+  .attr("class", "row")
+  .attr("transform", function(d, i) {
+    return "translate(950," + i * 100 + ")";
+  });
+>>>>>>> 1d66593a8d8858106b24038485b9ffd09c2ad391
+
+var cell = row.selectAll(".cell")
+  .data(function(d) {
+    return d;
+  })
+  .enter().append("g")
+  .attr("class", "cell")
+  .attr("transform", function(d, i) {
+    return "translate(" + parseInt(+1050 + i * 100) + ", 1480)";
+  });
+
+// shape of the confusion matrix
+cell.append('rect')
+  .attr("width", 100)
+  .attr("height", 100)
+  .style("stroke-width", 0)
+  .style("fill", colorMap);
+
+// text values in each cell of the confusion matrix
+cell.append("text")
+  .attr("dy", "0.33em")
+  .attr("x", 50)
+  .attr("y", 50)
+  .attr("text-anchor", "middle")
+  .style("font-size", "24px")
+  .style("fill", function(d, i) {
+    return d >= 500.0 / 2 ? 'white' : 'black';
+  })
+  .text(function(d, i) {
+    return parseFloat(d).toFixed(0);
+  });
+
+var labels = svg.append('g')
+  .attr('class', "labels");
+
+var columnLabels = labels.selectAll(".column-label")
+  .data(labelsData)
+  .enter().append("g")
+  .attr("class", "column-label")
+  .attr("transform", function(d, i) {
+    return "translate(" + (2050 + (parseInt(i) * 100)) + ", 1450)";
+  });
+
+columnLabels.append("text")
+  .attr("dy", ".22em")
+  .attr("text-anchor", "start")
+  .attr("transform", "rotate(-60)")
+  .style("font-size", "24px")
+  .text(function(d, i) {
+    return d;
+  });
+
+var rowLabels = labels.selectAll(".row-label")
+  .data(labelsData)
+  .enter().append("g")
+  .attr("class", "row-label")
+  .attr("transform", function(d, i) {
+    return "translate(1970," + ((parseInt(i) * 100) + parseInt(1540)) + ")";
+  });
+
+rowLabels.append("text")
+  .attr("dy", ".32em")
+  .attr("text-anchor", "end")
+  .style("font-size", "24px")
+  .text(function(d, i) {
+    return d;
+  });
+
+// cross validation results
+var precLabels = labels.selectAll(".prec-label")
+  .data(result_vars)
+  .enter().append("g")
+  .attr("class", "prec-label")
+  .attr("transform", function(d, i) {
+    return "translate( 2300," + (1825 + (parseInt(i) * 40)) + ")";
+  });
+
+precLabels.append("text")
+  .attr("dy", ".22em")
+  .attr("text-anchor", "end")
+  .style("font-size", "24px")
+  .text(function(d, i) {
+    if (d.value < 0.00001) {
+      return d.naam + " : " + parseFloat(d.value).toExponential(1);
+    } else if (d.naam == 'Cross validation accuracy (%)') {
+      return d.naam + " : " + parseFloat(d.value).toFixed(1) + ' \xB1 ' + parseFloat(d.value2).toFixed(1);
+    } else {
+      return d.naam + " : " + parseFloat(d.value).toFixed(2)
+    }
+  });
+
+// The heat map scale
+var heat_scale = svg.append('g')
+  .attr('class', 'heat_scale');
+
+var heat_scale_label = heat_scale.selectAll(".heat_scale")
+  .data(range)
+  .enter().append('rect')
+  .attr('height', 20)
+  .attr('width', 20)
+  .attr('y', 2000)
+  .attr('x', function(d, i) {
+    return 850 + (parseInt(i) * 20);
+  })
+  .attr('fill', function(d) {
+    return d
+  });
+
+var width = 700, // width of svg
+  height = 400, // height of svg
+  padding = 100;
+
+var vis = svg.append('g')
+  .attr('class', "axislabels");
+
+var xScale = d3.scaleLinear()
+  .domain([0.0, 0.3])
+  .range([800, 1250]);
+
+// define the x axis
+var xAxis = d3.axisTop()
+  .ticks(5, "")
+  .scale(xScale);
+
+// draw x axis with labels and move to the bottom of the chart area
+vis.append("g")
+  .attr("class", "xaxis axis") // two classes, one for css formatting, one for selection below
+  .attr("transform", "translate(520,1460)")
+  .style("font", "24px times")
+  .call(xAxis);
+
+// now add titles to the axes
+vis.append("text")
+  .attr("text-anchor", "middle") // this makes it easy to centre the text as the transform is applied to the anchor
+  .attr("transform", "translate(1575,1420)") // centre below axis
+  .style("font-size", "24px")
+  .text("Gini score of feature importance");
+
+svg.append("text")
+  .attr("transform", "translate (1870,1700) rotate(-90)")
+  .attr("text-anchor", "start")
+  .style("font-size", "24px")
+  .text("True class");
+
+svg.append("text")
+  .attr("x", 2160)
+  .attr("y", 1350)
+  .attr("text-anchor", "middle")
+  .style("font-size", "24px")
+  .text("Predicted class");
+
+svg.append("text")
+  .attr("x", 840)
+  .attr("y", 2020)
+  .attr("text-anchor", "end")
+  .style("font-size", "24px")
+  .text("Min");
+
+svg.append("text")
+  .attr("x", 1240)
+  .attr("y", 2020)
+  .attr("text-anchor", "start")
+  .style("font-size", "24px")
+  .text("Max");
+
+function wrap(text, width) {
+  text.each(function() {
+    var text = d3.select(this),
+      words = text.text().split(/\s+/).reverse(),
+      word,
+      line = [],
+      lineNumber = 0,
+      lineHeight = 0.3, // ems
+      y = text.attr("y"),
+      dy = parseFloat(text.attr("dy")),
+      tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+    while (word = words.pop()) {
+      line.push(word);
+      tspan.text(line.join(" "));
+      if (tspan.node().getComputedTextLength() > width) {
+        line.pop();
+        tspan.text(line.join(" "));
+        line = [word];
+        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+      }
+    }
+  });
+}
+
+// This influences the file download format. It's supposed to generate an svg file available for download, but unfortunately does not do it. Need to fix this line of code and incorporate it into the figures.
+
+d3.select("#generate").on("click", writeDownloadLink);
+
+function writeDownloadLink() {
+  var html = d3.select("svg")
+    .attr("title", "test2")
+    .attr("version", 1.1)
+    .attr("xmlns", "http://www.w3.org/2000/svg")
+    .node().parentNode.innerHTML;
+
+  d3.select("body").append("div")
+    .attr("id", "download")
+    .style("top", event.clientY + 20 + "px")
+    .style("left", event.clientX + "px")
+    .html("Right-click on this preview and choose Save as <br/>Left-Click to dismiss<br/>")
+    .append("img")
+    .attr("src", "data:image/svg+xml;base64," + btoa(html));
+
+
+  d3.select("#download")
+    .on("click", function() {
+      if (event.button == 0) {
+        d3.select(this).transition()
+          .style("opacity", 0)
+          .remove();
+      }
+    })
+    .transition()
+    .duration(500)
+    .style("opacity", 1);
+};
+
+//get svg element.
+var svg = document.getElementById("svg");
+
+//get svg source.
+var serializer = new XMLSerializer();
+var source = serializer.serializeToString(svg);
+
+//add name spaces.
+if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+  source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+}
+if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
+  source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+}
+
+//add xml declaration
+source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+
+//convert svg source to URI data scheme.
+var url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
+
+//set url value to a element's href attribute.
+document.getElementById("link").href = url;
+//you can download svg file by right click menu.
+</script>
+</body>
