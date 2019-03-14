@@ -614,4 +614,4 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     axarr[2].text(-0.4, 5.0, "Z-score of accuracy: "+(str(zscore).lstrip('[').rstrip(']')), size=7, ha="left")
 
     #figure.tight_layout()
-    figure.savefig(savepath+'/'+filename+'.svg', dpi=600, bbox_inches='tight', pad_inches=0.2)
+    figure.savefig(savepath+'/'+filename+'.svg', dpi=200, bbox_inches='tight', pad_inches=0.2)
