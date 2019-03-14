@@ -452,13 +452,27 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     This module creates .svg files that replicate the figures in Oruganty et al. It will output the dotplot (left), the gini-importance barplot (middle), and the confusion matrix with normalized values (right).
     """
     import matplotlib.gridspec as gridspec
+    from matplotlib import rcParams
+    #rcParams['text.usetex'] = True
+    #rcParams['text.latex.unicode'] = True
+    #rcParams['font.family'] = 'sans-serif'
+    #rcParams['font.sans-serif'] = ['Helvetica', 'Arial']
+
     if targ == False:
         print("ERROR: Need to input targ set name.")
+    #elif targ == "SURV":
+    #    nam = "$\bf{c)}$" + " Cancer Patient Survival"
+    #elif targ == "TCGA_annot":
+    #    nam = "$\bf{a)}$" + " Differential Expression"
+    #elif targ == "CNV":
+    #    nam = "$\bf{b)}$" + " Copy Number Variation"
 
     if canc == "breast":
         canc = "Breast"
+        labels = "a) Breast Cancer"
     elif canc == "cns":
         canc = "CNS"
+        labels = ["a) Differential Expression", "b)"]
     elif canc == "colon":
         canc = "Colorectal"
     elif canc == "complex":
@@ -490,11 +504,6 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     else:
         targ_labels = ["UPREG","NEUTRAL","DOWNREG"]
         class_col = {"UPREG":"#9C3848", "NEUTRAL":"#808080", "DOWNREG": "#1E3888"}
-
-    from matplotlib import rcParams
-    rcParams['font.family'] = 'sans-serif'
-    rcParams['font.sans-serif'] = ['Helvetica', 'Arial']
-
 
     # Create confusion matrix and related variables
     if normalize:
@@ -544,7 +553,7 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     axarr[0].set_xlim((-0.1, 1.1))
     axarr[0].grid(color='gray', axis='y')
     axarr[0].xaxis.grid(False)
-    axarr[0].text(-2.25,0, canc+" Cancer", color='black', fontsize=7)
+    axarr[0].text(-2.25,0, canc, color='black', fontsize=7)
 
     # Create barplot
     sns.set(style="whitegrid")

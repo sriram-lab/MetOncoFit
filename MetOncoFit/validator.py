@@ -1,7 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-`validator.py` contains several tools to assess the performance of the model.
+`validator.py` contains several tools to assess the performance of the modelself.
+
+Python Dependencies:
+    * pandas
+    * numpy
+    * scipy
+    * scikit-learn
+    * imbalanced-learn
+
 @authors: Krishna Oruganty & Scott Campit
 """
 
@@ -9,22 +17,18 @@ import pandas as pd
 import numpy as np
 np.seterr(divide='ignore', invalid='ignore')
 from random import shuffle
-from sklearn.externals import joblib
-
+import scipy
 from scipy import stats, interp
+
+from sklearn.externals import joblib
 from sklearn import preprocessing
 from sklearn.metrics import cohen_kappa_score as coh_kap
-from sklearn.metrics import f1_score, recall_score, precision_score, precision_recall_fscore_support, confusion_matrix, roc_curve, auc, classification_report, roc_auc_score, accuracy_score
-
-from sklearn.model_selection import train_test_split, permutation_test_score, cross_val_score, StratifiedKFold
-
+from sklearn.metrics import f1_score, recall_score, precision_score, precision_recall_fscore_support, confusion_matrix, roc_curve, auc, classification_report, roc_auc_score, accuracy_score, average_precision_score, matthews_corrcoef
+from sklearn.model_selection import train_test_split, permutation_test_score, cross_val_score
 from sklearn.preprocessing import RobustScaler, label_binarize
-from imblearn.over_sampling import RandomOverSampler
-
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
-
-import scipy
+from imblearn.over_sampling import RandomOverSampler
 
 def summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, targ, excl_targ, mean_acc, canc):
     """
@@ -89,8 +93,7 @@ def summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, ta
     std = np.std(dist)
     kap = coh_kap(orig_classes, rfc_pred)
     f1 = f1_score(orig_classes, rfc_pred, average='micro')
-    cv_score = cross_val_score(rfc, data, classes, scoring='accuracy', cv=10)
-    cv_score = np.round(np.mean(cv_score)*100, 2)
+    cv_score = np.round(np.mean(cross_val_score(rfc, data, classes, scoring='accuracy', cv=10))*100, 2)
     mean_acc = np.round(mean_acc*100, 2)
 
     # Calculate the confusion matrix after 10 fold cross validation with new random forest classifier
@@ -112,6 +115,7 @@ def summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, ta
             trees = trees + 1500
         feat = feat + 20
 
+    mcc = matthews_corrcoef(y_test, cm_pred)
     report = classification_report(y_test, cm_pred, output_dict=True)
     report = pd.DataFrame.from_dict(report).round(2)
 
@@ -127,15 +131,16 @@ def summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, ta
         targ_labels = ["GAIN","NEUT","LOSS"]
     else:
         targ_labels = ["UPREG","NEUTRAL","DOWNREG"]
-    dat = {"Hold-Out Accuracy":mean_acc, "Average Precision":(report.loc[['precision'],['micro avg']].values[0]), "UPREG/GAIN Precision":(report.loc[['precision'],[targ_labels[0]]].values[0]), "DOWNREG/LOSS Precision":(report.loc[['precision'],[targ_labels[2]]].values[0]), "Average Recall":(report.loc[['recall'],['micro avg']].values[0]), "UPREG/GAIN Recall":(report.loc[['recall'],[targ_labels[0]]].values[0]), "DOWNREG/LOSS Recall":(report.loc[['recall'],[targ_labels[2]]].values[0]), "10-fold CV Accuracy:":cv_score, "P-value":pvalue, "Z-score":zscore}
+    dat = {"Average Hold-Out Accuracy (%)":mean_acc, "10-fold CV Accuracy (%)":cv_score, "Average Precision":(report.loc[['precision'],['micro avg']].values[0]), "UPREG/GAIN Precision":(report.loc[['precision'],[targ_labels[0]]].values[0]), "DOWNREG/LOSS Precision":(report.loc[['precision'],[targ_labels[2]]].values[0]), "Average Recall":(report.loc[['recall'],['micro avg']].values[0]), "UPREG/GAIN Recall":(report.loc[['recall'],[targ_labels[0]]].values[0]), "DOWNREG/LOSS Recall":(report.loc[['recall'],[targ_labels[2]]].values[0]), "P-value":pvalue, "Z-score":zscore, "F1-Score":(report.loc[['f1-score'],['micro avg']].values[0]), "MCC":mcc}
 
     summary = pd.DataFrame.from_dict(dict([(k, pd.Series(v)) for k,v in dat.items()])).T
-    summary = summary.rename(columns={0:(canc+' Cancer'+' / '+ targ)})
+    summary = summary.rename(columns={0:(canc+' Cancer')})
+    summary = summary.T
     return cm, pvalue, zscore, cv_score, summary
 
-def area_under_curve_calc(genexp, canc, targ):
+def area_under_curve_calc(df1, canc, targ):
     """
-    Calculates the score for the Area Under the Curve and a p-value of the precision for a single model and compares it to a Support Vector Machine.
+    Calculates the score for the Area Under the Curve for MetOncoFit. This is to be compared to Auslander et al., 2016, specifically for
 
     INPUTS:
         data: the training data
@@ -144,16 +149,8 @@ def area_under_curve_calc(genexp, canc, targ):
         orig_classes: the test targets
 
     OUTPUTS:
-        rfc_score_average: the average accuracy for RFC
-        svc_score_average: the average accuracy for SVC
-        t: the T statistic for a two-sample T-test
-        pval: the p-value comparing the two accuracy score distributions
-        c_rfc: the C-index for RFC
-        c_svc: the C-index for SVC
-
+        auroc: the area under the receiever operating characteristic curve comparing the test dataset with the model's predictions.
     """
-
-    global rfc_score_average, svc_score_average, t, pval, c_rfc, c_svc
 
     if canc == "breast":
         canc = "Breast"
@@ -176,22 +173,22 @@ def area_under_curve_calc(genexp, canc, targ):
     elif canc == "renal":
         canc = "Renal"
 
-    # pop out the class set
-    cls = genexp.pop(targ)
+    if(targ == "CNV"):
+        targ_labels = ["GAIN","NEUT","LOSS"]
+    else:
+        targ_labels = ["UPREG","NEUTRAL","DOWNREG"]
 
-    # binarize the classes
-    cls = label_binarize(cls, classes=[0,1,2])
-    n_cls = cls.shape[1]
+    # Pop out the classification labels & binarize the array. This is necessary for calculating the auroc using sklearn.
+    cls = df1.pop(targ)
+    cls = label_binarize(cls, classes=[targ_labels[0], targ_labels[1], targ_labels[2]])
 
-    # Prepare the training and test data that will be used in both models
-    data = np.array(genexp).astype(np.float)
-    data = RobustScaler().fit_transform(data)
+    data = np.array(df1).astype(np.float)
+    #data = RobustScaler().fit_transform(data)
 
-    new_data, orig_data, new_classes, orig_classes = train_test_split(data, cls, test_size=0.3)
-
-    # MetOncoFit Random Forest
-    feat = 130
-    while(feat < 140):
+    # MetOncoFit Random Forest Classifier with specifications to the method used by Auslander et al
+    new_data, orig_data, new_classes, orig_classes = train_test_split(data, cls, test_size=0.2)
+    feat = (data.shape[1]-10)
+    while(feat < data.shape[1]-1):
         trees = 5
         while(trees <= 500):
             rfc = RandomForestClassifier()
@@ -199,44 +196,15 @@ def area_under_curve_calc(genexp, canc, targ):
             trees = trees + 1500
         feat = feat + 20
     rfc_pred = rfc.predict(orig_data)
-    rfc_cv_score = cross_val_score(rfc, data, cls, scoring='accuracy', cv=10)
-    #rfc_score = rfc.predict_proba(orig_data)[:,1]
+    #rfc_score = np.asarray(rfc.predict_proba(orig_data)[:,1])
+    #rfc_score = np.transpose(rfc_score[:,:,0])
 
-    # AUROC with cross validation
-    #cv = StratifiedKFold(n_splits=6)
-    #tprs = []
-    #aurocs = []
-    #mean_fpr = np.linspace(0,1,100)
-
-    #i = 0
-    #for train, test in cv.split(new_data, new_classes):
-    #    probas_ = rfc.fit(new_data[train], new_classes[train]).predict_proba(new_data[test])
-    #    fpr, tpr, _ = roc_curve(new_classes[test], probas_[:,1])
-    #    trps.append(interp(mean_fpr, fpr, tpr))
-    #    tprs[-1][0] = 0.0
-    #    roc_auc = auc(fpr,tpr)
-    #    aurocs.append(roc_auc)
-    #    i += 1
-
-    #mean_tpr = np.mean(tprs, axis=1)
-    #mean_tpr[-1] = 1
-    #mean_auc = auc(mean_fpr, mean_tpr)
-    #print(mean_auc)
-
-    fpr = {}
-    tpr = {}
-    auroc = {}
-    y_score =  rfc.predict_proba(orig_data)
-    print(y_score)
-    y_score = np.array(y_score)
-    print(y_score[:,2])
-    #fpr, tpr, _ = roc_curve(orig_classes, rfc_pred)
-    #auroc = auc(fpr, tpr)
-    for i in range(n_cls):
-        fpr[i], tpr[i], _ = roc_curve(orig_classes[:,i], y_score[:,i])
-        auroc[i] = auc(fpr[i], tpr[i])
-    fpr['micro'], tpr['micro'], _ = roc_curve(orig_classes.ravel(), y_score.ravel())
-    auroc['micro'] = auc(fpr['micro'], tpr['micro'])
+    # Calculate AUROC, averaged by taking into consideration label imbalance
+    fpr, tpr, _ = roc_curve(orig_classes.ravel(), rfc_pred.ravel())
+    auroc = auc(fpr, tpr)
+    dat = {"Cancer":[canc], "Target":[targ], "AUROC":[auroc]}
+    df = pd.DataFrame.from_dict(dat)
+    return df
 
 def leave_one_feat_out(df, canc, targ):
     """

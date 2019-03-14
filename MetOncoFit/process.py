@@ -52,7 +52,7 @@ def preprocess(datapath='',file=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
     if sys.argv[2] == 'TCGA_annot':
         targ = str("TCGA annotation")
 
-    df_names = pd.read_csv("./../html_builder/real_headers.txt", sep='\t')
+    df_names = pd.read_csv("./../labels/real_headers.txt", sep='\t')
     fil=open(datapath+file)
     canc = sys.argv[1].replace(".train.csv","")
     df = pd.read_csv(datapath+file, names=list(df_names.iloc[:,1]), index_col=0, skiprows=1)
@@ -67,7 +67,7 @@ def preprocess(datapath='',file=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
 
     # We will drop a few columns in the cases where we have an exclusion list.
     if(len(sys.argv) > 3):
-        fil=open("./../html_builder/"+sys.argv[3])
+        fil=open("./../labels/"+sys.argv[3])
         drop_col_names = [i.strip() for i in fil.readlines()]
         fil.close()
         df = df.drop(columns=drop_col_names)
