@@ -1,24 +1,16 @@
 # MetOncoFit - Metabolism and Oncogenic Fitness
 
-## What is MetOncoFit?
-Cancer cells rewire normal cellular metabolism to support cellular differentiation and growth. While several pathways have been associated with cancer metabolism and its increased cellular fitness, there have been no methods to date that describe how metabolic rewiring contributes to cancer. MetOncoFit is a hybrid approach that combines constraint-based genome scale modeling and data-driven approaches to identify metabolic pathways and genes associated with specific cancer tissues.
+ MetOncoFit is a data-driven approach that uses biochemical and metabolic attributes to predict tumor differential expression, copy number variation, and patient survival.
 
-The documentation is available online at readthedocs and can also be downloaded.
+Visit the documentation to start using MetOncoFit and explore the API. Feel free to submit bugs, feature requests, and Pull requests.
+
+To support the MetOncoFit project, you can cite our publication:
+Oruganty, K., Campit, S.E., Mamde, S., & Chandrasekaran, S. Common biochemical and topological attributes of metabolic genes recurrently dysregulated in tumors. *in preparation*
 
 ## Installation
-We recommend installing MetOncoFit inside a virtual environment. To install the package, use PyPI:
+
+MetOncoFit is a Python package that takes curated cancer metabolic models to output differential expression, copy number variation, and patient survival classification predictions and ranked metabolic/biochemical feature importances. We recommend installing MetOncoFit inside a virtual environment. To install the package, use PyPI:
 
 ``` Python
 pip install metoncofit
 ```
-
-There are 5 core modules in the MetOncoFit suite:
-  * preprocessing.py
-  * random_forest.py
-  * model_validator.py
-  * html_build.py
-
-For detailed instructions...
-
-## Contributing
-Contributions are welcome! Please read the contributions guide to get started.

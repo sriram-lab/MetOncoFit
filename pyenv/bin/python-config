@@ -1,4 +1,4 @@
-#!/mnt/c/Users/scampit/Desktop/MetOncoFit/version1/metoncofit1/bin/python
+#!/mnt/c/Users/scampit/Desktop/MetOncoFit/pyenv/bin/python
 
 import sys
 import getopt
