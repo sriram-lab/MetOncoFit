@@ -544,7 +544,6 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     handles, labels = axarr[0].get_legend_handles_labels()
     labels, handles = zip(*sorted(zip(labels, handles), key=lambda t: t[0]))
     axarr[0].legend(handles=legend_elements, bbox_to_anchor=(-1.50, -0.1), loc=3, ncol=3, borderaxespad=0.0, frameon=False, fontsize=7)
-    #plt.legend(loc=3)
     axarr[0].yaxis.label.set_visible(False)
     axarr[0].set_xlabel("Feature values", fontsize=7)
     axarr[0].set_ylabel("Top 10 important features", fontsize=7)
@@ -610,8 +609,6 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
                  color="white" if cm[i, j] > thresh else "black")
 
     axarr[2].text(-0.4, 4.8, "Cross validation accuracy: "+str(cv_acc)+'%', size=7, ha="left")
-    #axarr[2].text(-0.4, 3.5, "p-value of accuracy: "+str(pval), size=12, ha="left")
     axarr[2].text(-0.4, 5.0, "Z-score of accuracy: "+(str(zscore).lstrip('[').rstrip(']')), size=7, ha="left")
 
-    #figure.tight_layout()
-    figure.savefig(savepath+'/'+filename+'.svg', dpi=200, bbox_inches='tight', pad_inches=0.2)
+    figure.savefig(savepath+'/'+filename+'.eps', format='eps', dpi=300, bbox_inches='tight', pad_inches=0.2)
