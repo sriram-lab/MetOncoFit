@@ -611,4 +611,4 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     axarr[2].text(-0.4, 4.8, "Cross validation accuracy: "+str(cv_acc)+'%', size=7, ha="left")
     axarr[2].text(-0.4, 5.0, "Z-score of accuracy: "+(str(zscore).lstrip('[').rstrip(']')), size=7, ha="left")
 
-    figure.savefig(savepath+'/'+filename+'.eps', format='eps', dpi=300, bbox_inches='tight', pad_inches=0.2)
+    figure.savefig(savepath+'/'+filename+'.png', format='png', dpi=300, bbox_inches='tight', pad_inches=0.2)
