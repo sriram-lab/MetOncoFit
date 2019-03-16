@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 import flask
 metoncofit = flask.Flask(__name__)
