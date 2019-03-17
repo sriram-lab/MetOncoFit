@@ -1,0 +1,20 @@
+# Configs
+minimal_mistakes_skin     : "default"
+
+# Site Settings
+title                     : "MetOncoFit"
+description               : "Description"
+url                       : #
+baseurl                   : #
+repository                :
+github                    : [metadata]
+theme                     : minimal-mistakes-jekyll
+
+# Defaults
+defaults:
+  # _pages
+  - scope:
+    path: ""
+    type: pages
+  value:
+    layout: single

@@ -90,6 +90,7 @@ ENV/
 env.bak/
 venv.bak/
 pyenv/
+dev/
 
 # Spyder project settings
 .spyderproject
