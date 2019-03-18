@@ -1,7 +1,7 @@
 ---
 title: "About"
 layout: default
-permalink: /About/
+permalink: /about/
 ---
 
 test data

@@ -1,7 +1,7 @@
 ---
 title: "Data Overview"
 layout: default
-permalink: /Data/
+permalink: /data/
 ---
 
 test data
