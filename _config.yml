@@ -9,7 +9,7 @@ url                       : #'https://sriram-lab.github.io/MetOncoFit/'
 baseurl                   : #
 repository                : #
 github                    : [metadata]
-theme                     : minimal-mistakes-jekyll
+#theme                     : minimal-mistakes-jekyll
 
 # Defaults
 defaults:
