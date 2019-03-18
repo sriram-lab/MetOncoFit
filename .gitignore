@@ -93,6 +93,7 @@ pyenv/
 dev/
 beta/
 mysite/
+dat/
 
 # Spyder project settings
 .spyderproject
