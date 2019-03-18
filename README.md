@@ -1,4 +1,4 @@
-# MetOncoFit: A Machine Learning Algorithm to Identify Common Biochemical and Topological Attributes of Metabolic Genes Recurrently Dysregulated in Tumors
+## MetOncoFit: A Machine Learning Algorithm to Identify Common Biochemical and Topological Attributes of Metabolic Genes Recurrently Dysregulated in Tumors
  MetOncoFit is a data-driven approach that uses biochemical and metabolic attributes to predict tumor differential expression, copy number variation, and patient survival.
 
 Visit the documentation to start using MetOncoFit and explore the API. Feel free to submit bugs, feature requests, and Pull requests.
