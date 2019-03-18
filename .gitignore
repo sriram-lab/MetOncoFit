@@ -91,6 +91,8 @@ env.bak/
 venv.bak/
 pyenv/
 dev/
+beta/
+mysite/
 
 # Spyder project settings
 .spyderproject

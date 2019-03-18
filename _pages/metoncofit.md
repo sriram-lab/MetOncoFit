@@ -1,7 +1,7 @@
 ---
 title: "MetOncoFit"
 layout: default
-permalink: /metOncoFit/
+permalink: /MetOncoFit/
 ---
 
 test data
