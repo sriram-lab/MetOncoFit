@@ -5,9 +5,11 @@ The Visualizations module contains the code that can generate the confusion matr
 
 @author: Scott Campit
 """
+
 import sys, operator, copy, itertools
 from random import shuffle
 from itertools import chain
+from math import pi
 
 import numpy as np
 import pandas as pd
@@ -20,6 +22,20 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.colors import ListedColormap
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+from bokeh.io import output_file, show
+from bokeh.models import BasicTicker, ColorBar, ColumnDataSource, LinearColorMapper, PrintfTickFormatter, CustomJS, BoxSelectTool
+from bokeh.plotting import figure
+from bokeh.transform import transform
+from bokeh.layouts import column, row, widgetbox, gridplot
+from bokeh.models.widgets import Button, RadioButtonGroup, Select, Slider
+from bokeh.palettes import brewer
+from bokeh.embed import file_html
+from bokeh.resources import CDN
+
+import holoviews as hv
+hv.extension('bokeh')
+
 
 def conf_matr(orig_classes, pred_class, cv_acc, pval, zscore, targ, canc, normalize=True, cmap=False, savepath=False, filename=False):
     """
@@ -612,3 +628,107 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     axarr[2].text(-0.4, 5.0, "Z-score of accuracy: "+(str(zscore).lstrip('[').rstrip(']')), size=7, ha="left")
 
     figure.savefig(savepath+'/'+filename+'.png', format='png', dpi=300, bbox_inches='tight', pad_inches=0.2)
+
+def heatmap_html(up, neut, down, up_genes, neut_genes, down_genes, targ, canc, savepath=False, filename=False):
+    """
+    Create the heatmap using Bokeh to create html files that will be embedded into the MetOncoFit website.
+    """
+
+    if canc == "breast":
+        canc = "Breast"
+        labels = "a) Breast Cancer"
+    elif canc == "cns":
+        canc = "CNS"
+        labels = ["a) Differential Expression", "b)"]
+    elif canc == "colon":
+        canc = "Colorectal"
+    elif canc == "complex":
+        canc = "Pan"
+    elif canc == "leukemia":
+        canc = "Leukemia"
+    elif canc == "melanoma":
+        canc = "Melanoma"
+    elif canc == "nsclc":
+        canc = "Lung"
+    elif canc == "ovarian":
+        canc = "Ovarian"
+    elif canc == "prostate":
+        canc = "Prostate"
+    elif canc == "renal":
+        canc = "Renal"
+
+    if savepath == False:
+        savepath = '.'
+
+    if filename == False:
+        filename = str(canc+'_'+targ)
+
+    # File specifications
+    output_file(filename+'.html')
+
+    # Create the widget
+    #select = RadioButtonGroup(labels=["Differential Expression", "Copy Number Variation", "Patient Survival"], active=0)
+    #select = Select(title="Cancer Type:", value="", options=["Breast", "CNS", "Colorectal", "B-cell Lymphoma", "Skin", "Lung", "Ovarian", "Prostate", "Renal", "Pan"])
+    tools_in_figure = "hover, save, pan, box_zoom, reset, wheel_zoom"
+
+    # Color range to be used
+    colors = brewer["RdBu"][8]
+    mapper = LinearColorMapper(palette=colors, low=0, high=1)
+
+    # Figure parameters
+    features = up["feature"].to_list()
+    source_up = ColumnDataSource(up)
+    source_neut = ColumnDataSource(neut)
+    source_down = ColumnDataSource(down)
+
+    if targ == 'CNV':
+        targ_labels = ["GAIN", "NEUT", "LOSS"]
+    else:
+        targ_labels = ["UPREGULATED", "NEUTRAL", "DOWNREGULATED"]
+
+    p1 = figure(title=targ_labels[0], x_range=list(set(up_genes)), y_range=list(set(features)), x_axis_location='above', plot_height=400, plot_width=400, tools=tools_in_figure, toolbar_location='right', tooltips=[('Feature', '@feature'), ('Gene', '@Gene'), ('Value', '@value')])
+
+    p2 = figure(title=targ_labels[1], x_range=list(set(neut_genes)), y_range=list(set(features)), x_axis_location='above', plot_height=400, plot_width=10000, tools=tools_in_figure, toolbar_location='right', tooltips=[('Feature', '@feature'), ('Gene', '@Gene'), ('Value', '@value')])
+
+    p3 = figure(title=targ_labels[2], x_range=list(set(down_genes)), y_range=list(set(features)), x_axis_location='above', plot_height=400, plot_width=3000, tools=tools_in_figure, toolbar_location='right', tooltips=[('Feature', '@feature'), ('Gene', '@Gene'), ('Value', '@value')])
+
+    p1.grid.grid_line_color=None
+    p2.grid.grid_line_color=None
+    p3.grid.grid_line_color=None
+
+    p1.axis.axis_line_color=None
+    p2.axis.axis_line_color=None
+    p3.axis.axis_line_color=None
+
+    p1.axis.major_tick_line_color=None
+    p2.axis.major_tick_line_color=None
+    p3.axis.major_tick_line_color=None
+
+    p1.axis.major_label_text_font_size='7pt'
+    p2.axis.major_label_text_font_size='7pt'
+    p3.axis.major_label_text_font_size='7pt'
+
+    p1.yaxis.visible=True
+    p2.yaxis.visible=False
+    p3.yaxis.visible=False
+
+    p1.axis.major_label_standoff=0
+    p2.axis.major_label_standoff=0
+    p3.axis.major_label_standoff=0
+
+    p1.xaxis.major_label_orientation = pi/3
+    p2.xaxis.major_label_orientation = pi/3
+    p3.xaxis.major_label_orientation = pi/3
+
+    # The actual figure itself
+    p1.rect(x="Gene", y="feature", width=1, height=1, source=source_up, line_color=None, fill_color=transform('value', mapper))
+
+    p2.rect(x="Gene", y="feature", width=1, height=1, source=source_neut, line_color=None, fill_color=transform('value', mapper))
+
+    p3.rect(x="Gene", y="feature", width=1, height=1, source=source_down, line_color=None, fill_color=transform('value', mapper))
+
+    color_bar = ColorBar(color_mapper=mapper, major_label_text_font_size="7pt",  border_line_color=None, location=(0,0))
+    p3.add_layout(color_bar, 'left')
+    plots = gridplot([[p1, p2, p3]], sizing_mode='fixed')
+    show(plots)
+    #fig = figure(plot_width=800, plot_height=300, title="title")

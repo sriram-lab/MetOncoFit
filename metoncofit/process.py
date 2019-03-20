@@ -224,5 +224,6 @@ def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_gene
     down["type"] = class_col[2]
 
     df = pd.concat([up, neut, down], axis=0)
+    df = df.sort_values('Gene')
 
     return importance, up, neut, down, df
