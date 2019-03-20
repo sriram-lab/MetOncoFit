@@ -1,6 +1,4 @@
 # Configs
-minimal_mistakes_skin     : "default"
-
 # Site Settings
 title                     : "MetOncoFit"
 description               : >
@@ -9,14 +7,13 @@ url                       : #'https://sriram-lab.github.io/MetOncoFit/'
 baseurl                   : #
 repository                : #
 github                    : [metadata]
-#theme                     : minimal-mistakes-jekyll
 
 # Defaults
-defaults:
+#defaults:
   # _pages
-  -
-    scope:
-      path: ""
-      type: pages
-    values:
-      layout: "default"
+#  -
+#    scope:
+#      path: ""
+#      type: pages
+#    values:
+#      layout: "default"
