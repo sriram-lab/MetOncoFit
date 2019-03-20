@@ -48,4 +48,6 @@ up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, one_gene
 importance, up, neut, down, final_df = process.plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, rfc, header, targ, orig_classes, rfc_pred, one_gene_class)
 
 # Make the figures
-visualizations.make_figure(final_df, importance, cm, orig_classes, rfc_pred, cv_score, pvalue, zscore, canc, targ, normalize=True, savepath=False, filename=False)
+#visualizations.make_figure(final_df, importance, cm, orig_classes, rfc_pred, cv_score, pvalue, zscore, canc, targ, normalize=True, savepath=False, filename=False)
+
+visualizations.heatmap_html(up, neut, down, up_genes, neut_genes, down_genes, targ, canc, savepath=False, filename=False)
