@@ -663,13 +663,10 @@ def heatmap_html(up, neut, down, up_genes, neut_genes, down_genes, targ, canc, s
     if filename == False:
         filename = str(canc+'_'+targ)
 
-    # File specifications
-    output_file(filename+'.html')
-
-    # Create the widget
-    #select = RadioButtonGroup(labels=["Differential Expression", "Copy Number Variation", "Patient Survival"], active=0)
-    #select = Select(title="Cancer Type:", value="", options=["Breast", "CNS", "Colorectal", "B-cell Lymphoma", "Skin", "Lung", "Ovarian", "Prostate", "Renal", "Pan"])
-    tools_in_figure = "hover, save, pan, box_zoom, reset, wheel_zoom"
+    if targ == 'CNV':
+        targ_labels = ["GAIN", "NEUT", "LOSS"]
+    else:
+        targ_labels = ["UPREGULATED", "NEUTRAL", "DOWNREGULATED"]
 
     # Color range to be used
     colors = brewer["RdBu"][8]
@@ -680,11 +677,7 @@ def heatmap_html(up, neut, down, up_genes, neut_genes, down_genes, targ, canc, s
     source_up = ColumnDataSource(up)
     source_neut = ColumnDataSource(neut)
     source_down = ColumnDataSource(down)
-
-    if targ == 'CNV':
-        targ_labels = ["GAIN", "NEUT", "LOSS"]
-    else:
-        targ_labels = ["UPREGULATED", "NEUTRAL", "DOWNREGULATED"]
+    tools_in_figure = "hover, save, pan, box_zoom, reset, wheel_zoom"
 
     p1 = figure(title=targ_labels[0], x_range=list(set(up_genes)), y_range=list(set(features)), x_axis_location='above', plot_height=400, plot_width=400, tools=tools_in_figure, toolbar_location='right', tooltips=[('Feature', '@feature'), ('Gene', '@Gene'), ('Value', '@value')])
 
@@ -730,5 +723,4 @@ def heatmap_html(up, neut, down, up_genes, neut_genes, down_genes, targ, canc, s
     color_bar = ColorBar(color_mapper=mapper, major_label_text_font_size="7pt",  border_line_color=None, location=(0,0))
     p3.add_layout(color_bar, 'left')
     plots = gridplot([[p1, p2, p3]], sizing_mode='fixed')
-    show(plots)
-    #fig = figure(plot_width=800, plot_height=300, title="title")
+    html = file_html(plots, CDN, filename)

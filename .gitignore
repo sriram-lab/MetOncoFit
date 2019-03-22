@@ -93,7 +93,10 @@ pyenv/
 dev/
 beta/
 mysite/
-dat/
+vendor
+.bundle
+.sass-cache
+_site
 
 # Spyder project settings
 .spyderproject

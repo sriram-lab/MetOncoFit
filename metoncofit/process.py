@@ -16,7 +16,7 @@ from sklearn.preprocessing import MinMaxScaler
 from imblearn.over_sampling import RandomOverSampler
 from sklearn.model_selection import train_test_split
 
-def preprocess(datapath='',file=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3]):
+def preprocess(datapath='', file=fil, targ=t, exclude=var_excl):
     """
     preprocess takes in the '*.csv' file and transforms the data that can be
     analyzed or fed into the MetOncoFit classifier.
@@ -45,16 +45,38 @@ def preprocess(datapath='',file=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
 
     if datapath is None:
         datapath = './../data/'
+
+    canc = csv.replace(".train.csv","")
+    if canc == "breast":
+        canc = "Breast"
+    elif canc == "cns":
+        canc = "CNS"
+    elif canc == "colon":
+        canc = "Colorectal"
+    elif canc == "complex":
+        canc = "Pan"
+    elif canc == "leukemia":
+        canc = "Leukemia"
+    elif canc == "melanoma":
+        canc = "Melanoma"
+    elif canc == "nsclc":
+        canc = "Lung"
+    elif canc == "ovarian":
+        canc = "Ovarian"
+    elif canc == "prostate":
+        canc = "Prostate"
+    elif canc == "renal":
+        canc = "Renal"
+
     classes = []
     data = []
     names = []
 
-    if sys.argv[2] == 'TCGA_annot':
+    if targ == 'TCGA_annot':
         targ = str("TCGA annotation")
 
     df_names = pd.read_csv("./../labels/real_headers.txt", sep='\t')
     fil=open(datapath+file)
-    canc = sys.argv[1].replace(".train.csv","")
     df = pd.read_csv(datapath+file, names=list(df_names.iloc[:,1]), index_col=0, skiprows=1)
 
     # We are label encoding the subsystem and datapath labels
@@ -67,7 +89,7 @@ def preprocess(datapath='',file=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
 
     # We will drop a few columns in the cases where we have an exclusion list.
     if(len(sys.argv) > 3):
-        fil=open("./../labels/"+sys.argv[3])
+        fil=open("./../labels/"+var_excl)
         drop_col_names = [i.strip() for i in fil.readlines()]
         fil.close()
         df = df.drop(columns=drop_col_names)
@@ -135,7 +157,7 @@ def one_gene_only(df, target):
 
     return up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, one_gene_class
 
-def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, rfc, header, targ, orig_classes, rfc_pred, one_gene_class):
+def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, rfc, header, targ, orig_classes, rfc_pred, one_gene_class, canc):
     """
     plotting_preprocess formats the data so that it can be used in the visualizations module.
 
@@ -225,5 +247,7 @@ def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_gene
 
     df = pd.concat([up, neut, down], axis=0)
     df = df.sort_values('Gene')
+    df['Cancer'] = canc
+    df = df.reset_index().drop('index', axis=1)
 
     return importance, up, neut, down, df

@@ -50,27 +50,6 @@ def conf_matr(orig_classes, pred_class, cv_acc, pval, zscore, targ, canc, normal
     else:
         targ_labels = ["UPREG","NEUTRAL","DOWNREG"]
 
-    if canc == "breast":
-        canc = "Breast"
-    elif canc == "cns":
-        canc = "CNS"
-    elif canc == "colon":
-        canc = "Colorectal"
-    elif canc == "complex":
-        canc = "Pan"
-    elif canc == "leukemia":
-        canc = "Leukemia"
-    elif canc == "melanoma":
-        canc = "Melanoma"
-    elif canc == "nsclc":
-        canc = "Lung"
-    elif canc == "ovarian":
-        canc = "Ovarian"
-    elif canc == "prostate":
-        canc = "Prostate"
-    elif canc == "renal":
-        canc = "Renal"
-
     if savepath == False:
         savepath = '.'
 
@@ -117,29 +96,6 @@ def plot_heatmap(df, one_gene_class, targ, canc, savepath=False, filename=False)
 
     if targ == False:
         print("ERROR: Need to input targ set name.")
-
-    if canc == "breast":
-        canc = "Breast"
-    elif canc == "cns":
-        canc = "CNS"
-    elif canc == "colon":
-        canc = "Colorectal"
-    elif canc == "complex":
-        canc = "Pan"
-    elif canc == "leukemia":
-        canc = "Leukemia"
-    elif canc == "melanoma":
-        canc = "Melanoma"
-    elif canc == "nsclc":
-        canc = "Lung"
-    elif canc == "ovarian":
-        canc = "Ovarian"
-    elif canc == "prostate":
-        canc = "Prostate"
-    elif canc == "renal":
-        canc = "Renal"
-    else:
-        print("ERROR: Need to input canc tissue name.")
 
     if savepath == False:
         savepath = '.'
@@ -224,29 +180,6 @@ def plot_ECD(up, neut, down, targ, canc, savepath=False, filename=False):
     if targ == False:
         print("ERROR: Need to input targ set name.")
 
-    if canc == "breast":
-        canc = "Breast"
-    elif canc == "cns":
-        canc = "CNS"
-    elif canc == "colon":
-        canc = "Colorectal"
-    elif canc == "complex":
-        canc = "Pan"
-    elif canc == "leukemia":
-        canc = "Leukemia"
-    elif canc == "melanoma":
-        canc = "Melanoma"
-    elif canc == "nsclc":
-        canc = "Lung"
-    elif canc == "ovarian":
-        canc = "Ovarian"
-    elif canc == "prostate":
-        canc = "Prostate"
-    elif canc == "renal":
-        canc = "Renal"
-    else:
-        print("ERROR: Need to input canc tissue name.")
-
     if savepath == False:
         savepath = '.'
 
@@ -320,29 +253,6 @@ def plot_importance(importance, targ, canc, savepath=False, filename=False):
     if targ == False:
         print("ERROR: Need to input targ set name.")
 
-    if canc == "breast":
-        canc = "Breast"
-    elif canc == "cns":
-        canc = "CNS"
-    elif canc == "colon":
-        canc = "Colorectal"
-    elif canc == "complex":
-        canc = "Pan"
-    elif canc == "leukemia":
-        canc = "Leukemia"
-    elif canc == "melanoma":
-        canc = "Melanoma"
-    elif canc == "nsclc":
-        canc = "Lung"
-    elif canc == "ovarian":
-        canc = "Ovarian"
-    elif canc == "prostate":
-        canc = "Prostate"
-    elif canc == "renal":
-        canc = "Renal"
-    else:
-        print("ERROR: Need to input canc tissue name.")
-
     if savepath == False:
         savepath = '.'
 
@@ -397,29 +307,6 @@ def plot_dotplot(df, targ, canc, savepath=False, filename=False):
     """
     if targ == False:
         print("ERROR: Need to input targ set name.")
-
-    if canc == "breast":
-        canc = "Breast"
-    elif canc == "cns":
-        canc = "CNS"
-    elif canc == "colon":
-        canc = "Colorectal"
-    elif canc == "complex":
-        canc = "Pan"
-    elif canc == "leukemia":
-        canc = "Leukemia"
-    elif canc == "melanoma":
-        canc = "Melanoma"
-    elif canc == "nsclc":
-        canc = "Lung"
-    elif canc == "ovarian":
-        canc = "Ovarian"
-    elif canc == "prostate":
-        canc = "Prostate"
-    elif canc == "renal":
-        canc = "Renal"
-    else:
-        print("ERROR: Need to input canc tissue name.")
 
     if savepath == False:
         savepath = '.'
@@ -482,29 +369,6 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     #    nam = "$\bf{a)}$" + " Differential Expression"
     #elif targ == "CNV":
     #    nam = "$\bf{b)}$" + " Copy Number Variation"
-
-    if canc == "breast":
-        canc = "Breast"
-        labels = "a) Breast Cancer"
-    elif canc == "cns":
-        canc = "CNS"
-        labels = ["a) Differential Expression", "b)"]
-    elif canc == "colon":
-        canc = "Colorectal"
-    elif canc == "complex":
-        canc = "Pan"
-    elif canc == "leukemia":
-        canc = "Leukemia"
-    elif canc == "melanoma":
-        canc = "Melanoma"
-    elif canc == "nsclc":
-        canc = "Lung"
-    elif canc == "ovarian":
-        canc = "Ovarian"
-    elif canc == "prostate":
-        canc = "Prostate"
-    elif canc == "renal":
-        canc = "Renal"
 
     if savepath == False:
         savepath = '.'
@@ -629,106 +493,123 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
 
     figure.savefig(savepath+'/'+filename+'.png', format='png', dpi=300, bbox_inches='tight', pad_inches=0.2)
 
-def heatmap_html(up, neut, down, up_genes, neut_genes, down_genes, targ, canc, savepath=False, filename=False):
+def heatmap_html(df, savepath=False, filename=False):
     """
     Create the heatmap using Bokeh to create html files that will be embedded into the MetOncoFit website.
     """
 
-    if canc == "breast":
-        canc = "Breast"
-        labels = "a) Breast Cancer"
-    elif canc == "cns":
-        canc = "CNS"
-        labels = ["a) Differential Expression", "b)"]
-    elif canc == "colon":
-        canc = "Colorectal"
-    elif canc == "complex":
-        canc = "Pan"
-    elif canc == "leukemia":
-        canc = "Leukemia"
-    elif canc == "melanoma":
-        canc = "Melanoma"
-    elif canc == "nsclc":
-        canc = "Lung"
-    elif canc == "ovarian":
-        canc = "Ovarian"
-    elif canc == "prostate":
-        canc = "Prostate"
-    elif canc == "renal":
-        canc = "Renal"
-
     if savepath == False:
         savepath = '.'
 
-    if filename == False:
-        filename = str(canc+'_'+targ)
+    # default params == Pan Cancer and differential expression
+    mask = (df.loc[(df['Cancer'] == "Pan") & (df["Target"] == "TCGA")])
 
-    # File specifications
-    output_file(filename+'.html')
-
-    # Create the widget
-    #select = RadioButtonGroup(labels=["Differential Expression", "Copy Number Variation", "Patient Survival"], active=0)
-    #select = Select(title="Cancer Type:", value="", options=["Breast", "CNS", "Colorectal", "B-cell Lymphoma", "Skin", "Lung", "Ovarian", "Prostate", "Renal", "Pan"])
-    tools_in_figure = "hover, save, pan, box_zoom, reset, wheel_zoom"
-
-    # Color range to be used
-    colors = brewer["RdBu"][8]
-    mapper = LinearColorMapper(palette=colors, low=0, high=1)
-
-    # Figure parameters
-    features = up["feature"].to_list()
-    source_up = ColumnDataSource(up)
-    source_neut = ColumnDataSource(neut)
-    source_down = ColumnDataSource(down)
-
-    if targ == 'CNV':
+    if df["Target"] == 'CNV':
         targ_labels = ["GAIN", "NEUT", "LOSS"]
     else:
         targ_labels = ["UPREGULATED", "NEUTRAL", "DOWNREGULATED"]
 
-    p1 = figure(title=targ_labels[0], x_range=list(set(up_genes)), y_range=list(set(features)), x_axis_location='above', plot_height=400, plot_width=400, tools=tools_in_figure, toolbar_location='right', tooltips=[('Feature', '@feature'), ('Gene', '@Gene'), ('Value', '@value')])
+    # Input controls:
+    # Slider to choose number of genes to show
+    up_gene_select = Slider(start=0, end=len(df.loc[mask["type"] == targ_labels[0]]), value=5, step=5, title="Number of upregulated genes to display")
+    neut_gene_select = Slider(start=0, end=len(df.loc[mask["type"] == targ_labels[1]]), value=5, step=1, title="Number of unregulated genes to display")
+    down_gene_select = Slider(start=0, end=len(df.loc[mask["type"] == targ_labels[2]]), value=5, step=1, title="Number of downregulated genes to display")
 
-    p2 = figure(title=targ_labels[1], x_range=list(set(neut_genes)), y_range=list(set(features)), x_axis_location='above', plot_height=400, plot_width=10000, tools=tools_in_figure, toolbar_location='right', tooltips=[('Feature', '@feature'), ('Gene', '@Gene'), ('Value', '@value')])
+    # Drop down menu to choose cancer and target
+    cancer_type = Select(title="Cancer type:", value="Select cancer type", options=["Select cancer type", "Breast Cancer", "Glioma", "Colorectal Cancer", "Lung Cancer", "Melanoma", "Renal Cancer", "Prostate Cancer", "Ovarian Cancer", "B-cell Lymphoma", "Pan Cancer"])
 
-    p3 = figure(title=targ_labels[2], x_range=list(set(down_genes)), y_range=list(set(features)), x_axis_location='above', plot_height=400, plot_width=3000, tools=tools_in_figure, toolbar_location='right', tooltips=[('Feature', '@feature'), ('Gene', '@Gene'), ('Value', '@value')])
+    target_type = Select(title="MetOncoFit Predictions:", value="Select the cancer prognostic marker", options=["Select the cancer prognostic marker", "Differential Expression", "Copy Number Variation", "Cancer Patient Survival"])
 
-    p1.grid.grid_line_color=None
-    p2.grid.grid_line_color=None
-    p3.grid.grid_line_color=None
+    # Text input box for selecting a custom list of genes from the user
+    gene_list = TextInput(value="Gene symbols (ie: IDH2, TDO2, PDGDH, ...)", title="Enter a list of gene symbols to query")
 
-    p1.axis.axis_line_color=None
-    p2.axis.axis_line_color=None
-    p3.axis.axis_line_color=None
+    # Create source that will be used by the plot
+    source_up = ColumnDataSource(data=dict(Gene=[], feature=[], value=[]))
+    source_neut = ColumnDataSource(data=dict(Gene=[], feature=[], value=[]))
+    source_down = ColumnDataSource(data=dict(Gene=[], feature=[], value=[]))
 
-    p1.axis.major_tick_line_color=None
-    p2.axis.major_tick_line_color=None
-    p3.axis.major_tick_line_color=None
+    # Figure toolbar functions for interactions
+    tools_in_figure = ["hover, save, pan, box_zoom, reset, wheel_zoom"]
+    TOOLTIPS = [('Feature', '@feature'),('Gene', '@Gene'),('Value', '@value')]
 
-    p1.axis.major_label_text_font_size='7pt'
-    p2.axis.major_label_text_font_size='7pt'
-    p3.axis.major_label_text_font_size='7pt'
+    # Set up heat map figure spaces to be filled in
+    hm1 = figure(title=targ_labels[0], x_axis_location='above', plot_height=400, plot_width=400, tools=tools_in_figure, toolbar_location='right', tooltips=TOOLTIPS)
+    hm2 = figure(title=targ_labels[1], x_axis_location='above', plot_height=400, plot_width=10000, tools=tools_in_figure, toolbar_location='right', tooltips=TOOLTIPS)
+    hm3 = figure(title=targ_labels[2], x_axis_location='above', plot_height=400, plot_width=3000, tools=tools_in_figure, toolbar_location='right', tooltips=TOOLTIPS)
 
-    p1.yaxis.visible=True
-    p2.yaxis.visible=False
-    p3.yaxis.visible=False
+    # The actual figure vessels
+    hm1.rect(x="Gene", y="feature", width=1, height=1, source=source_up, line_color=None, fill_color=transform('value', mapper))
+    hm2.rect(x="Gene", y="feature", width=1, height=1, source=source_neut, line_color=None, fill_color=transform('value', mapper))
+    hm3.rect(x="Gene", y="feature", width=1, height=1, source=source_down, line_color=None, fill_color=transform('value', mapper))
 
-    p1.axis.major_label_standoff=0
-    p2.axis.major_label_standoff=0
-    p3.axis.major_label_standoff=0
+    # Custom subfunctions that will only be used in the scope of heatmap_html
+    def usr_changes(df, attr, old, new):
+        """
+        This module will update the number of columns shown in the plot for a single heatmap based on user input via the button widget. If there are genes in the gene list field, it will take a list of genes from user input to show where on the heatmap they are. If there is no match, it needs to print somewhere, and just not show the gene that isn't in the dataset.
+        """
 
-    p1.xaxis.major_label_orientation = pi/3
-    p2.xaxis.major_label_orientation = pi/3
-    p3.xaxis.major_label_orientation = pi/3
+        # Number of genes selected (Default = 5)
+        up_gene_val = up_gene_select.value
+        neut_gene_val = neut_gene_select.value
+        down_gene_val = down_gene_select.value
 
-    # The actual figure itself
-    p1.rect(x="Gene", y="feature", width=1, height=1, source=source_up, line_color=None, fill_color=transform('value', mapper))
+        # The cancer type and target prediction
+        canc_select = cancer_type.value.strip()
+        target_select = target_type.value.strip()
 
-    p2.rect(x="Gene", y="feature", width=1, height=1, source=source_neut, line_color=None, fill_color=transform('value', mapper))
+        # First get the values corresponding to the cancer and target the user wants to query
+        selected = df.loc[(df['Target'] == target_select) & (df['Cancer'] == canc_select)]
 
-    p3.rect(x="Gene", y="feature", width=1, height=1, source=source_down, line_color=None, fill_color=transform('value', mapper))
+        # Second, separate into 3 dataframes that will be used to make the 3 heat maps
+        up_select = selected.loc[(selected["type"] == targ_labels[0])]
+        neut_select = selected.loc[(selected["type"] == targ_labels[1])]
+        down_select = selected.loc[(selected["type"] == targ_labels[2])]
 
-    color_bar = ColorBar(color_mapper=mapper, major_label_text_font_size="7pt",  border_line_color=None, location=(0,0))
-    p3.add_layout(color_bar, 'left')
-    plots = gridplot([[p1, p2, p3]], sizing_mode='fixed')
-    show(plots)
-    #fig = figure(plot_width=800, plot_height=300, title="title")
+        # Third, get the number of genes they want to display.
+        up_select = up_select.sample(up_gene_val)
+        neut_select = neut_select.sample(neut_gene_val)
+        down_select = down_select.sample(down_gene_val)
+
+        # Fourth, if they specified some genes:
+        if gene_list != ("Gene symbols (ie: IDH2, TDO2, PDGDH, ...)" or ""):
+            up_select = up_select.loc[up_select["Gene"].str.contains(gene_list)==True]
+            neut_select = neut_select.loc[neut_select["Gene"].str.contains(gene_list)==True]
+            down_select = down_select.loc[down_select["Gene"].str.contains(gene_list)==True]
+
+        # Finally, load dataframes into source that will be mapped back onto the figure
+        source_up.data = dict(Gene=up_select["Gene"], feature=up_select["feature"], value=up_select["value"])
+        source_neut.data = dict(Gene=neut_select["Gene"], feature=neut_select["feature"], value=neut_select["value"])
+        source_down.data = dict(Gene=down_select["Gene"], feature=down_select["feature"], value=down_select["value"])
+
+        # Figure params
+        hm1.grid.grid_line_color=None
+        hm2.grid.grid_line_color=None
+        hm3.grid.grid_line_color=None
+        hm1.axis.axis_line_color=None
+        hm2.axis.axis_line_color=None
+        hm3.axis.axis_line_color=None
+        hm1.axis.major_tick_line_color=None
+        hm2.axis.major_tick_line_color=None
+        hm3.axis.major_tick_line_color=None
+        hm1.axis.major_label_text_font_size='7pt'
+        hm2.axis.major_label_text_font_size='7pt'
+        hm3.axis.major_label_text_font_size='7pt'
+        hm1.yaxis.visible=True
+        hm2.yaxis.visible=False
+        hm3.yaxis.visible=False
+        hm1.axis.major_label_standoff=0
+        hm2.axis.major_label_standoff=0
+        hm3.axis.major_label_standoff=0
+        hm1.xaxis.major_label_orientation = pi/3
+        hm2.xaxis.major_label_orientation = pi/3
+        hm3.xaxis.major_label_orientation = pi/3
+
+        # Color bar and params
+        colors = brewer["RdBu"][8]
+        mapper = LinearColorMapper(palette=colors, low=0, high=1)
+        color_bar = ColorBar(color_mapper=mapper, major_label_text_font_size="7pt",  border_line_color=None, location=(0,0))
+        p1.add_layout(color_bar, 'left')
+
+    usr_changes()
+    plots = gridplot([[hm1, hm2, hm3]], sizing_mode='fixed')
+    html = file_html(plots, CDN, filename)

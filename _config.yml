@@ -3,7 +3,7 @@
 title                     : "MetOncoFit"
 description               : >
   "A Machine Learning Algorithm to Identify Common Biochemical and Topological Attributes of Metabolic Genes Recurrently Dysregulated in Tumors"
-url                       : #'https://sriram-lab.github.io/MetOncoFit/'
+url                       : 'https://sriram-lab.github.io/MetOncoFit/'
 baseurl                   : #
 repository                : #
 github                    : [metadata]
