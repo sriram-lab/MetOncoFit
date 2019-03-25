@@ -16,7 +16,7 @@ from sklearn.preprocessing import MinMaxScaler
 from imblearn.over_sampling import RandomOverSampler
 from sklearn.model_selection import train_test_split
 
-def preprocess(datapath='', file=fil, targ=t, exclude=var_excl):
+def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3]):
     """
     preprocess takes in the '*.csv' file and transforms the data that can be
     analyzed or fed into the MetOncoFit classifier.
@@ -46,7 +46,7 @@ def preprocess(datapath='', file=fil, targ=t, exclude=var_excl):
     if datapath is None:
         datapath = './../data/'
 
-    canc = csv.replace(".train.csv","")
+    canc = fil.replace(".train.csv","")
     if canc == "breast":
         canc = "Breast"
     elif canc == "cns":
@@ -76,8 +76,7 @@ def preprocess(datapath='', file=fil, targ=t, exclude=var_excl):
         targ = str("TCGA annotation")
 
     df_names = pd.read_csv("./../labels/real_headers.txt", sep='\t')
-    fil=open(datapath+file)
-    df = pd.read_csv(datapath+file, names=list(df_names.iloc[:,1]), index_col=0, skiprows=1)
+    df = pd.read_csv(datapath+fil, names=list(df_names.iloc[:,1]), index_col=0, skiprows=1)
 
     # We are label encoding the subsystem and datapath labels
     le = preprocessing.LabelEncoder()
@@ -89,9 +88,9 @@ def preprocess(datapath='', file=fil, targ=t, exclude=var_excl):
 
     # We will drop a few columns in the cases where we have an exclusion list.
     if(len(sys.argv) > 3):
-        fil=open("./../labels/"+var_excl)
-        drop_col_names = [i.strip() for i in fil.readlines()]
-        fil.close()
+        fil3=open("./../labels/"+exclude)
+        drop_col_names = [i.strip() for i in fil3.readlines()]
+        fil3.close()
         df = df.drop(columns=drop_col_names)
 
     df = df.drop(columns=excl_targ)

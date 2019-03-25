@@ -57,27 +57,6 @@ def summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, ta
 
     """
 
-    if canc == "breast":
-        canc = "Breast"
-    elif canc == "cns":
-        canc = "CNS"
-    elif canc == "colon":
-        canc = "Colorectal"
-    elif canc == "complex":
-        canc = "Pan"
-    elif canc == "leukemia":
-        canc = "Leukemia"
-    elif canc == "melanoma":
-        canc = "Melanoma"
-    elif canc == "nsclc":
-        canc = "Lung"
-    elif canc == "ovarian":
-        canc = "Ovarian"
-    elif canc == "prostate":
-        canc = "Prostate"
-    elif canc == "renal":
-        canc = "Renal"
-
     # Create a distribution to measure the p-value associated with the accuracies obtained from MetOncoFit
     acc_distri = []
     x=0
@@ -103,7 +82,7 @@ def summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, ta
         while(trees <= 500):
             x=0
             while(x < 10):
-                X_train, X_test, y_train, y_test = train_test_split(data, classes, test_size=0.2)
+                X_train, X_test, y_train, y_test = train_test_split(data, classes, test_size=0.3)
                 new_rfc = RandomForestClassifier(n_estimators=trees, max_features=feat)
                 new_rfc.fit(X_train, y_train)
                 cm_pred = new_rfc.predict(X_test)
@@ -152,27 +131,6 @@ def area_under_curve_calc(df1, canc, targ):
         auroc: the area under the receiever operating characteristic curve comparing the test dataset with the model's predictions.
     """
 
-    if canc == "breast":
-        canc = "Breast"
-    elif canc == "cns":
-        canc = "CNS"
-    elif canc == "colon":
-        canc = "Colorectal"
-    elif canc == "complex":
-        canc = "Pan"
-    elif canc == "leukemia":
-        canc = "Leukemia"
-    elif canc == "melanoma":
-        canc = "Melanoma"
-    elif canc == "nsclc":
-        canc = "Lung"
-    elif canc == "ovarian":
-        canc = "Ovarian"
-    elif canc == "prostate":
-        canc = "Prostate"
-    elif canc == "renal":
-        canc = "Renal"
-
     if(targ == "CNV"):
         targ_labels = ["GAIN","NEUT","LOSS"]
     else:
@@ -215,26 +173,6 @@ def leave_one_feat_out(df, canc, targ):
     3. Expression only
     4. Expression and kcat
     """
-    if canc == "breast":
-        canc = "Breast"
-    elif canc == "cns":
-        canc = "CNS"
-    elif canc == "colon":
-        canc = "Colorectal"
-    elif canc == "complex":
-        canc = "Pan"
-    elif canc == "leukemia":
-        canc = "Leukemia"
-    elif canc == "melanoma":
-        canc = "Melanoma"
-    elif canc == "nsclc":
-        canc = "Lung"
-    elif canc == "ovarian":
-        canc = "Ovarian"
-    elif canc == "prostate":
-        canc = "Prostate"
-    elif canc == "renal":
-        canc = "Renal"
 
     # create 4 dataframes that will be used for each of the features after robust scaler
     df1 = df.copy(deep=True)
@@ -246,6 +184,7 @@ def leave_one_feat_out(df, canc, targ):
     topo = df1.drop(df1.columns[53:132], axis=1)
     kexp = df1.drop(df1.columns[132:], axis=1)
     genexp = df1.drop(df1.columns[133:], axis=1)
+    subsys = df1.drop(df1.columns[134], axis=1)
 
     # concatenate the dataframes to a single structure and get accuracies
     dfs = [topo, dynm, kexp, genexp]
@@ -260,6 +199,8 @@ def leave_one_feat_out(df, canc, targ):
             lofo = "Gene expression and kcat"
         elif df is genexp:
             lofo = "Gene expression only"
+        elif df is subsys:
+            lofo = "RECON1 Subsystem only"
         else:
             return("ERROR: Not suitable df input")
 
@@ -286,27 +227,6 @@ def leave_one_cell_out(df2, canc, targ):
     Leave one cell out outputs the mean accuracy obtained after holding out a single NCI-60 cancer cell line from the dataset.
 
     """
-
-    if canc == "breast":
-        canc = "Breast"
-    elif canc == "cns":
-        canc = "CNS"
-    elif canc == "colon":
-        canc = "Colorectal"
-    elif canc == "complex":
-        canc = "Pan"
-    elif canc == "leukemia":
-        canc = "Leukemia"
-    elif canc == "melanoma":
-        canc = "Melanoma"
-    elif canc == "nsclc":
-        canc = "Lung"
-    elif canc == "ovarian":
-        canc = "Ovarian"
-    elif canc == "prostate":
-        canc = "Prostate"
-    elif canc == "renal":
-        canc = "Renal"
 
     # Split the index into Gene symbol and Cell Line
     df2["Gene"], df2["Cell Line"] = df2.index.str.split('_', 1).str
