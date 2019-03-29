@@ -14,11 +14,14 @@ from IPython.display import display, clear_output, Image
 from plotly.widgets import GraphWidget
 plotly.offline.init_notebook_mode()
 
-#import dash
-#from dash.dependencies import Input, Output, Event
-#import dash_core_components as dcc
-#import dash_html_components as html
-#import itertools
+import dash
+from dash.dependencies import Input, Output, Event
+import dash_core_components as dcc
+import dash_html_components as html
+import itertools
+
+import json
+
 
 # Get data from db
 df = pd.read_json("metoncofit.json", orient='columns')
