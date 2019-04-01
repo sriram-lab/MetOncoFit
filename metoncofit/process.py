@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Preprocess module contains functions that will be used as inputs for the random forest classifier and for generating the figures in the manuscript.
+Process module contains functions that will be used as inputs for the random forest classifier and for generating the figures in the manuscript.
 
 @authors: Krishna Dev Oruganty & Scott Campit
 """
-import sys, copy, operator, argparse, re
+import sys
+import copy
+import operator
+import argparse
+import re
 
 import numpy as np
 import pandas as pd
@@ -15,6 +19,7 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import MinMaxScaler
 from imblearn.over_sampling import RandomOverSampler
 from sklearn.model_selection import train_test_split
+
 
 def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3]):
     """
@@ -46,7 +51,7 @@ def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
     if datapath is None:
         datapath = './../data/'
 
-    canc = fil.replace(".train.csv","")
+    canc = fil.replace(".train.csv", "")
     if canc == "breast":
         canc = "Breast"
     elif canc == "cns":
@@ -76,7 +81,8 @@ def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
         targ = str("TCGA annotation")
 
     df_names = pd.read_csv("./../labels/real_headers.txt", sep='\t')
-    df = pd.read_csv(datapath+fil, names=list(df_names.iloc[:,1]), index_col=0, skiprows=1)
+    df = pd.read_csv(
+        datapath+fil, names=list(df_names.iloc[:, 1]), index_col=0, skiprows=1)
 
     # We are label encoding the subsystem and datapath labels
     le = preprocessing.LabelEncoder()
@@ -88,7 +94,7 @@ def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
 
     # We will drop a few columns in the cases where we have an exclusion list.
     if(len(sys.argv) > 3):
-        fil3=open("./../labels/"+exclude)
+        fil3 = open("./../labels/"+exclude)
         drop_col_names = [i.strip() for i in fil3.readlines()]
         fil3.close()
         df = df.drop(columns=drop_col_names)
@@ -96,19 +102,21 @@ def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
     df = df.drop(columns=excl_targ)
     classes = df[targ]
     header = df.columns
-    df1 = df.copy(deep=True) # contains target classes
-    df = df.drop(columns=targ) # doesn't contain target classes
+    df1 = df.copy(deep=True)  # contains target classes
+    df = df.drop(columns=targ)  # doesn't contain target classes
 
     # Robust scaling the dataset with random oversampling
     data = np.array(df).astype(np.float)
     data = RobustScaler().fit_transform(data)
 
-    new_data, orig_data, new_classes, orig_classes = train_test_split(data, classes, test_size=0.3)
+    new_data, orig_data, new_classes, orig_classes = train_test_split(
+        data, classes, test_size=0.3)
 
     ros = RandomOverSampler()
     data, classes = ros.fit_sample(new_data, new_classes)
 
     return df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ
+
 
 def one_gene_only(df, target):
     """
@@ -132,15 +140,16 @@ def one_gene_only(df, target):
     global up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, one_gene_class
 
     if(target == "CNV"):
-        targ_labels = ["GAIN","NEUT","LOSS"]
+        targ_labels = ["GAIN", "NEUT", "LOSS"]
         targ_dict = {'NEUT': 0, 'LOSS': 0, 'GAIN': 0}
     else:
-        targ_labels = ["UPREG","NEUTRAL","DOWNREG"]
+        targ_labels = ["UPREG", "NEUTRAL", "DOWNREG"]
         targ_dict = {'NEUTRAL': 0, 'DOWNREG': 0, 'UPREG': 0}
 
     df = df.reset_index()
     df["Gene"], df["Cell Line"] = df["index"].str.split("_", 1).str
-    one_gene_df = df.drop(columns=["index", "Cell Line"]).groupby(["Gene", target]).median().reset_index().set_index("Gene")
+    one_gene_df = df.drop(columns=["index", "Cell Line"]).groupby(
+        ["Gene", target]).median().reset_index().set_index("Gene")
     one_gene_class = pd.DataFrame(one_gene_df[target])
     one_gene_class = one_gene_class.reset_index()
 
@@ -155,6 +164,7 @@ def one_gene_only(df, target):
     down_genes = down_df.index.values.tolist()
 
     return up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, one_gene_class
+
 
 def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, rfc, header, targ, orig_classes, rfc_pred, one_gene_class, canc):
     """
@@ -178,7 +188,7 @@ def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_gene
         v2 = neut_df[col].median()
         v3 = down_df[col].median()
 
-        correl = np.corrcoef([v1,v2,v3],[1.0,0.0,-1.0])
+        correl = np.corrcoef([v1, v2, v3], [1.0, 0.0, -1.0])
 
         if(np.isnan(correl[0][1]) != True):
             column_squigly[col] = correl[0][1]
@@ -192,7 +202,8 @@ def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_gene
         temp_dict_feat = {}
         for i, j in zip(header, to_be_mapped):
             temp_dict_feat[i] = j
-        sorted_d = sorted(temp_dict_feat.items(), key=operator.itemgetter(1), reverse=True)
+        sorted_d = sorted(temp_dict_feat.items(),
+                          key=operator.itemgetter(1), reverse=True)
         return sorted_d
     sorted_d = idx_change(header, rfc.feature_importances_)
 
@@ -200,15 +211,15 @@ def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_gene
     gini = []
     corr = []
 
-    x=0
-    while(x<10): # Get the first 10 features
+    x = 0
+    while(x < 10):  # Get the first 10 features
         tempa = sorted_d[x]
         feat.append(tempa[0])
         gini.append(tempa[1])
         corr.append(str(column_squigly[tempa[0]]))
         x = x+1
 
-    importance = pd.DataFrame({"Feature":feat, "Gini":gini, "R":corr})
+    importance = pd.DataFrame({"Feature": feat, "Gini": gini, "R": corr})
 
     # Map to label
     if targ == 'CNV':
@@ -230,17 +241,17 @@ def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_gene
 
     features = list(importance['Feature'])
     up = tmparr_up[features].T
-    up = up.reset_index().rename(columns={'index':"feature"})
+    up = up.reset_index().rename(columns={'index': "feature"})
     up = pd.melt(up, id_vars=["feature"])
     up["type"] = class_col[0]
 
     neut = tmparr_neut[features].T
-    neut = neut.reset_index().rename(columns={'index':"feature"})
+    neut = neut.reset_index().rename(columns={'index': "feature"})
     neut = pd.melt(neut, id_vars=["feature"])
     neut["type"] = class_col[1]
 
     down = tmparr_down[features].T
-    down = down.reset_index().rename(columns={'index':"feature"})
+    down = down.reset_index().rename(columns={'index': "feature"})
     down = pd.melt(down, id_vars=["feature"])
     down["type"] = class_col[2]
 

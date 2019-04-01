@@ -350,31 +350,42 @@ def plot_dotplot(df, targ, canc, savepath=False, filename=False):
     plt.tight_layout()
     #plt.savefig(savepath+'/'+filename+'.svg', dpi=600)
 
-def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscore, canc, targ, normalize=True, savepath=False, filename=False):
+def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscore, canc, targ, normalize=True, savepath=False, filename=False, title_name=False, analysis='main'):
     """
-    This module creates .svg files that replicate the figures in Oruganty et al. It will output the dotplot (left), the gini-importance barplot (middle), and the confusion matrix with normalized values (right).
+    This module creates files that replicate the figures in Oruganty et al. It will output the dotplot (left), the gini-importance barplot (middle), and the confusion matrix with normalized values (right).
     """
+
     import matplotlib.gridspec as gridspec
     from matplotlib import rcParams
-    #rcParams['text.usetex'] = True
-    #rcParams['text.latex.unicode'] = True
-    #rcParams['font.family'] = 'sans-serif'
-    #rcParams['font.sans-serif'] = ['Helvetica', 'Arial']
-
-    if targ == False:
-        print("ERROR: Need to input targ set name.")
-    #elif targ == "SURV":
-    #    nam = "$\bf{c)}$" + " Cancer Patient Survival"
-    #elif targ == "TCGA_annot":
-    #    nam = "$\bf{a)}$" + " Differential Expression"
-    #elif targ == "CNV":
-    #    nam = "$\bf{b)}$" + " Copy Number Variation"
+    rcParams['text.usetex'] = True
+    rcParams['text.latex.unicode'] = True
+    rcParams['font.family'] = 'sans-serif'
+    rcParams['font.sans-serif'] = ['Helvetica', 'Arial']
 
     if savepath == False:
         savepath = '.'
 
     if filename == False:
         filename = str(canc+'_'+targ)
+
+    # Figure titles for main text
+    if analysis == ('Main' | "SupplementaryPan"):
+        if canc == "Breast Cancer":
+            title_name = "$\bf{a. }"+canc
+        elif canc == "Lung Cancer":
+            title_name = "$\bf{b. }"+canc
+        elif canc == "Skin Cancer":
+            title_name = "$\bf{b. }"+canc
+    elif analysis == ("Pan Cancer" | "SupplementaryCancer"):
+        if targ == "SURV":
+            title_name = "$\bf{c. )}$" + "Cancer Patient Survival"
+        elif targ == "TCGA_annot":
+            title_name = "$\bf{a)}$" + " Differential Expression"
+        elif targ == "CNV":
+            title_name = "$\bf{b)}$" + " Copy Number Variation"
+    elif analysis == False:
+        print("Default title is used (ie 'Renal Cancer')")
+        title_name = canc
 
     # Define target labels and colors based on the class
     class_col = {}
@@ -432,7 +443,7 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     axarr[0].set_xlim((-0.1, 1.1))
     axarr[0].grid(color='gray', axis='y')
     axarr[0].xaxis.grid(False)
-    axarr[0].text(-2.25,0, canc, color='black', fontsize=7)
+    axarr[0].text(-2.25,0, title_name, color='black', fontsize=7)
 
     # Create barplot
     sns.set(style="whitegrid")
