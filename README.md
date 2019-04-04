@@ -19,4 +19,3 @@ pip install metoncofit
 Contributions are welcome! Please read the contributions guide to get started.
 
 ## MetOncoFit
-{% include Breast_TCGAannotation.html %}
