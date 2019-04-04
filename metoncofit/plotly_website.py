@@ -24,13 +24,16 @@ import dash_html_components as html
 
 # Get data from MetOncoFit database
 df = pd.read_json("metoncofit.json", orient='columns')
+up = df.loc[(df["type"] == "UPREG") | (df["type"] == "GAIN")]
+neut = df.loc[(df["type"] == "NEUTRAL") | (df["type"] == "NEUT")]
+down = df.loc[(df["type"] == "DOWNREG") | (df["type"] == "LOSS")]
 
-# get the unique values that will be used in the widget
+# get values that will be used in the widget
 num_uniq_genes = df["Gene"].nunique()
 cancer_type = df["Cancer"].unique()
 prediction_type = df["Target"].unique()
 
-# Start the application using a css file from someone
+# Start the application using a css file
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
@@ -48,248 +51,185 @@ app.layout = html.Div([
             value='TCGA'
         )
     ],
-    style={'width': '49%', 'display': 'inline-block'}
+    style={'width': '10%', 'display': 'inline-block'}
     ),
 
     # Create the slider
     html.Div(dcc.Slider(
         id='gene-slider',
         min=1,
-        max=df.index.max(),
+        max=num_uniq_genes,
+        step=1,
         value=5,
-        #marks={gene:gene for gene in df['Gene'].unique()}
+        marks={
+            5: {'label':'5'},
+            25: {'label':'25'},
+            100: {'label':'100'},
+            250: {'label':'250'},
+            500: {'label':'500'},
+            750: {'label':'750'},
+            num_uniq_genes: {'label':str(num_uniq_genes)}
+        },
+        updatemode='drag'
     ),
-    style={'width':'49%', 'padding':'0px 20px 20px 20px'}
+    style={'width':'49%', 'padding':'0px 20px 20px 20px'},
     ),
+    html.Div(id='updatemode-output-container', style={'margin-top':20}),
 
-    # Finally, create the heatmap vessel
-    dcc.Graph(
-        id='heatmap',
+    # Finally, create the heatmap vessels
+    html.Div(dcc.Graph(
+        id='up-heatmap',
         figure={
             'data': [(
                 go.Heatmap(
-                    x=df['Gene'],
-                    y=df['feature'],
-                    z=df['value'],
-                    name='heatmap-test',
+                    x=up['Gene'],
+                    y=up['feature'],
+                    z=up['value'],
+                    name='up',
+                    colorscale='RdBu')
+                    )],
+            'layout':go.Layout(
+                title='Increased',
+                xaxis=dict(title='Genes'),
+                yaxis=dict(title='Features', automargin=True)
+            )
+        }
+    ),
+    style={'width':'75%', 'padding':'0px 20px 20px 20px'},
+    ),
+    html.Div(dcc.Graph(
+        id='neut-heatmap',
+        figure={
+            'data': [(
+                go.Heatmap(
+                    x=neut['Gene'],
+                    y=neut['feature'],
+                    z=neut['value'],
+                    name='neut',
                     colorscale='RdBu')
                     )],
             'layout':go.Layout(
                 xaxis=dict(title='Genes'),
-                yaxis=dict(title='Features')
+                yaxis=dict(title='Features', automargin=True)
             )
         }
+    ),
+    style={'width':'75%', 'padding':'0px 20px 20px 20px'},
+    ),
+    html.Div(dcc.Graph(
+        id='down-heatmap',
+        figure={
+            'data': [(
+                go.Heatmap(
+                    x=down['Gene'],
+                    y=down['feature'],
+                    z=down['value'],
+                    name='down',
+                    colorscale='RdBu')
+                    )],
+            'layout':go.Layout(
+                xaxis=dict(title='Genes'),
+                yaxis=dict(title='Features', automargin=True)
+            )
+        }
+    ),
+    style={'width':'75%', 'padding':'0px 20px 20px 20px'},
     )
 ])
 
 # Create callback decorator
 @app.callback(
-    dash.dependencies.Output('heatmap', 'figure'),
+    dash.dependencies.Output('up-heatmap', 'figure'),
     [dash.dependencies.Input('cancer-type', 'value'),
     dash.dependencies.Input('prediction-type', 'value'),
     dash.dependencies.Input('gene-slider', 'value')])
 
-def update_graph(cancer_choice, prediction_choice, slider_amount):
-    dff = df[df['Target'] == prediction_choice]
-    dff = dff[dff['Cancer'] == cancer_choice]
-    dff = dff[dff.index < slider_amount]
+def update_up(cancer_choice, prediction_choice, slider_choice):
+    up_df = up[up['Target'] == prediction_choice]
+    up_df = up_df[up_df['Cancer'] == cancer_choice]
+    up_tmp = up_df['Gene'].unique().tolist()
+    up_tmp = up_tmp[0:slider_choice]
+    up_df = up_df.loc[up_df['Gene'].isin(up_tmp)]
+
     return {
         'data': [(
             go.Heatmap(
-                x=dff['Gene'],
-                y=dff['feature'],
-                z=dff['value'],
-                name='heatmap-test',
+                x=up_df['Gene'],
+                y=up_df['feature'],
+                z=up_df['value'],
+                name='up-heatmap',
                 colorscale='RdBu')
                 )],
         'layout':go.Layout(
+            title="Increased",
             xaxis=dict(title='Genes'),
             yaxis=dict(title='Features')
         )
     }
 
+@app.callback(
+    dash.dependencies.Output('neut-heatmap', 'figure'),
+    [dash.dependencies.Input('cancer-type', 'value'),
+    dash.dependencies.Input('prediction-type', 'value'),
+    dash.dependencies.Input('gene-slider', 'value')])
+
+def update_neut(cancer_choice, prediction_choice, slider_choice):
+    neut_df = neut[neut['Target'] == prediction_choice]
+    neut_df = neut_df[neut_df['Cancer'] == cancer_choice]
+    neut_tmp = neut_df['Gene'].unique().tolist()
+    neut_tmp = neut_tmp[0:slider_choice]
+    neut_df = neut_df.loc[neut_df['Gene'].isin(neut_tmp)]
+
+    return {
+        'data': [(
+            go.Heatmap(
+                x=neut_df['Gene'],
+                y=neut_df['feature'],
+                z=neut_df['value'],
+                name='neut-heatmap',
+                colorscale='RdBu')
+                )],
+        'layout':go.Layout(
+            title="Neutral",
+            xaxis=dict(title='Genes'),
+            yaxis=dict(title='Features')
+        )
+    }
+
+@app.callback(
+    dash.dependencies.Output('down-heatmap', 'figure'),
+    [dash.dependencies.Input('cancer-type', 'value'),
+    dash.dependencies.Input('prediction-type', 'value'),
+    dash.dependencies.Input('gene-slider', 'value')])
+
+def update_down(cancer_choice, prediction_choice, slider_choice):
+    down_df = down[down['Target'] == prediction_choice]
+    down_df = down_df[down_df['Cancer'] == cancer_choice]
+    down_tmp = down_df['Gene'].unique().tolist()
+    down_tmp = down_tmp[0:slider_choice]
+    down_df = down_df.loc[down_df['Gene'].isin(down_tmp)]
+
+    return {
+        'data': [(
+            go.Heatmap(
+                x=down_df['Gene'],
+                y=down_df['feature'],
+                z=down_df['value'],
+                name='down-heatmap',
+                colorscale='RdBu')
+                )],
+        'layout':go.Layout(
+            title="Decreased",
+            xaxis=dict(title='Genes'),
+            yaxis=dict(title='Features')
+        )
+    }
+
+@app.callback(Output('updatemode-output-container', 'children'),
+    [dash.dependencies.Input('gene-slider', 'value')])
+
+def display_value(value):
+    return 'Maximum number of genes displayed: {}'.format(value, value)
+
 if __name__ == '__main__':
     app.run_server(debug=True)
-
-"""
-
-# Slider widget that controls number of genes shown for all dataframes
-gene_number=widgets.FloatSlider(
-    value=5,
-    min=1,
-    max=num_uniq_genes,
-    step=1,
-    description='Number of genes to display',
-    continuous_update=True
-)
-# Dropdown widget that will show several cancer type options
-tissue = widgets.Dropdown(
-    options=list(cancer_type),
-    description="Cancer Tissue:",
-    value = 'Pan'
-)
-# Dropdown widget that will show several target prediction options
-target = widgets.Dropdown(
-    options=list(prediction_type),
-    description="MetOncoFit Target:",
-    value = "TCGA"
-)
-
-# Create the empty figures that will have the traces and the responding widget
-up = [go.Heatmap(z=df['value'].to_list(),
-    colorscale='RdBu',
-    x=df['Gene'],
-    y=df['feature'])]
-neut = [go.Heatmap(z=df['value'].to_list(),
-    colorscale='RdBu',
-    x=df['Gene'],
-    y=df['feature'])]
-down = [go.Heatmap(z=df['value'].to_list(),
-    colorscale='RdBu',
-    x=df['Gene'],
-    y=df['feature'])]
-
-#heatmap_up = up.iplot(kind='heatmap', colorscale='spectral', filename='test')
-#heatmap_neut = neut.iplot(kind='heatmap', colorscale='spectral', filename='test')
-#heatmap_down = down.iplot(kind='heatmap', colorscale='spectral', filename='test')
-
-g = GraphWidget()
-
-# write functions that will handle the inputs from the widget and alter the graphs:
-
-def response(change):
-    filter_list = [i and j for i, j in zip(df['Cancer'] == tissue.value, df['Target'] == target.value)]
-    new_df = df[filtered_list]
-    g.restyle({'x':[]})
-    g.layout.xaxis.title='Genes'
-    g.layout.yaxis.title='Features'
-
-tissue.observe(response, names="value")
-target.observe(response, names="value")
-
-#fig = tools.make_subplots(rows=1, cols=3)
-#fig.append_trace(up, 1, 1)
-#fig.append_trace(neut,1, 2)
-#fig.append_trace(down,1,3)
-
-container1 = widgets.HBox(children=[gene_number])
-container2 = widgets.HBox(children=[tissue, target])
-all_widgets = widgets.VBox([container1, container2])
-
-# Edit the hovertext
-#hovertext = list()
-#for fidx, feat in enumerate(features):
-#    hovertext.append(list())
-#    for gidx, gene in enumerate(genes):
-#        hovertext[-1].append('Gene: {}</br />Feature: {}<br />Value: {}'.format(gene, feat, value[fidx][gidx]))
-
-# Graph params
-#layout=go.Layout(
-#    autosize=True,
-#    margin=dict(t=0, b=0, l=0, r=0)
-#    )
-#)
-display(all_widgets)
-display(g)
-
-updatemenus=list([
-    dict(
-        buttons=list([
-            dict(
-                args=['Cancer Tissue', 'Breast']
-                label='Breast Cancer'
-                method='restyle'
-            ),
-            dict(
-                args=['Cancer Tissue', 'CNS']
-                label='Glioma'
-                method='restyle'
-            ),
-            dict(
-                args=['Cancer Tissue', 'Colorectal']
-                label='Colorectal Cancer'
-                method='restyle'
-            ),
-            dict(
-                args=['Cancer Tissue', 'Lung']
-                label='Lung Cancer'
-                method='restyle'
-            ),
-            dict(
-                args=['Cancer Tissue', 'Melanoma']
-                label='Melanoma'
-                method='restyle'
-            ),
-            dict(
-                args=['Cancer Tissue', 'Renal']
-                label='Renal Cancer'
-                method='restyle'
-            ),
-            dict(
-                args=['Cancer Tissue', 'Prostate']
-                label='Prostate Cancer'
-                method='restyle'
-            ),
-            dict(
-                args=['Cancer Tissue', 'Ovarian']
-                label='Ovarian Cancer'
-                method='restyle'
-            ),
-            dict(
-                args=['Cancer Tissue', 'Leukemia']
-                label='B-cell Lymphoma'
-                method='restyle'
-            ),
-            dict(
-                args=['Cancer Tissue', 'Pan']
-                label='Pan Cancer'
-                method='restyle'
-            ),
-        ]),
-        direction='down',
-        pad={'r':10,'t'=10},
-        showactive=True,
-        x=0.3,
-        xanchor='left',
-        y=1.12,
-        yanchor='top'
-    ),
-    dict(
-        buttons=list([
-            dict(
-                args=['MetOncoFit Target', 'TCGA']
-                label='Differential Expression'
-                method='restyle'
-            ),
-            dict(
-                args=['MetOncoFit Target', 'CNV']
-                label='Copy Number Variation'
-                method='restyle'
-            ),
-            dict(
-                args=['MetOncoFit Target', 'SURV']
-                label='Cancer Patient Survival'
-                method='restyle'
-            ),
-        ]),
-        direction='down',
-        pad={'r':10,'t'=10},
-        showactive=True,
-        x=0.3,
-        xanchor='left',
-        y=1.0,
-        yanchor='top'
-    )
-])
-
-annotations = list([
-    dict(text='Cancer<br>Tissue', x=0, y=1.11, yref='paper', align='left', showarrow=False),
-    dict(text='MetOncoFit<br>Target', x=0.25, y=1.11, yref='paper', align='left', showarrow=False)
-])
-
-layout['updatemenus'] = updatemenus
-layout['annotations'] = annotations
-
-fig['layout'] = layout
-py.iplot(fig, filename='')
-"""
