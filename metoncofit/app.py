@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Website app
+Website app using plotly and dash
 @author: Scott Campit
 """
 import pandas as pd
@@ -103,7 +103,7 @@ _widgets = dbc.Container(
                         min=1,
                         max=num_uniq_genes,
                         step=1,
-                        value=5,
+                        value=25,
                         marks={
                             0: {'label':'0'},
                             25: {'label':'25'},
@@ -169,19 +169,23 @@ app.layout = html.Div([_body, _widgets,
                             showticklabels=True,
                             tickfont=dict(
                                 family='Arial, sans-serif',
-                                size=19, 
+                                size=19,
                                 color='black'
                             )
                         )
                     )
                 },
+                config={
+                    'displayModeBar': False
+                }
             )
         ]
     ),
     dbc.Container(
         [
             dbc.Row(html.Div(html.H6("Neutral"))),
-            html.Div(
+
+            dbc.Row(html.Div(
                 dcc.Graph(
                     id='neut-heatmap',
                     figure={
@@ -200,7 +204,7 @@ app.layout = html.Div([_body, _widgets,
                     }
                 ),
                 style={'width':'100%'},
-            )
+            ))
         ]
     ),
     dbc.Container(
@@ -254,8 +258,10 @@ def update_up(cancer_choice, prediction_choice, slider_choice):
                 colorscale='RdBu')
                 )],
         'layout':go.Layout(
-            xaxis=dict(title='Genes'),
-            yaxis=dict(title='Features')
+            autosize=False,
+            yaxis=dict(
+                automargin=True
+            )
         )
     }
 
@@ -281,8 +287,10 @@ def update_neut(cancer_choice, prediction_choice, slider_choice):
                 colorscale='RdBu')
                 )],
         'layout':go.Layout(
-            xaxis=dict(title='Genes'),
-            yaxis=dict(title='Features')
+            autosize=False,
+            yaxis=dict(
+                automargin=True
+            )
         )
     }
 
@@ -308,8 +316,10 @@ def update_down(cancer_choice, prediction_choice, slider_choice):
                 colorscale='RdBu')
                 )],
         'layout':go.Layout(
-            xaxis=dict(title='Genes'),
-            yaxis=dict(title='Features')
+            autosize=False,
+            yaxis=dict(
+                automargin=True
+            )
         )
     }
 
