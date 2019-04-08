@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-db.py creates the metoncofit dataframe that will be used to create html figures 
+db.py creates the metoncofit dataframe that can be used for several applications.
+
+@author: Scott Campit
 """
 
 import sys, copy, operator, argparse, re, os
@@ -29,25 +31,25 @@ for fil in os.listdir('./../data'):
             datapath = './../data/'
         canc = fil.replace(".train.csv","")
         if canc == "breast":
-            canc = "Breast"
+            canc = "Breast Cancer"
         elif canc == "cns":
-            canc = "CNS"
+            canc = "Glioma"
         elif canc == "colon":
-            canc = "Colorectal"
+            canc = "Colorectal Cancer"
         elif canc == "complex":
-            canc = "Pan"
+            canc = "Pan Cancer"
         elif canc == "leukemia":
-            canc = "Leukemia"
+            canc = "B-Cell Lymphoma"
         elif canc == "melanoma":
             canc = "Melanoma"
         elif canc == "nsclc":
-            canc = "Lung"
+            canc = "Lung Cancer"
         elif canc == "ovarian":
-            canc = "Ovarian"
+            canc = "Ovarian Cancer"
         elif canc == "prostate":
-            canc = "Prostate"
+            canc = "Prostate Cancer"
         elif canc == "renal":
-            canc = "Renal"
+            canc = "Renal Cancer"
 
         classes = []
         data = []
@@ -164,7 +166,7 @@ for fil in os.listdir('./../data'):
         if t == 'CNV':
             class_col = ["GAIN", "NEUT", "LOSS"]
         else:
-            class_col = ["UPREG", "NEUTRAL", "DOWNREG"]
+            class_col = ["UPREGULATED", "NEUTRAL", "DOWNREGULATED"]
 
         # Scale the dataframe from 0 to 1
         idx = one_gene_df.index
@@ -172,6 +174,7 @@ for fil in os.listdir('./../data'):
         scaler = MinMaxScaler()
         result = scaler.fit_transform(one_gene_df)
         one_gene_df = pd.DataFrame(result, columns=col, index=idx)
+        #print(one_gene_df)
 
         # Get the genes that are up/neut/downregulated
         tmparr_up = one_gene_df[one_gene_df.index.isin(up_genes)]
@@ -179,31 +182,37 @@ for fil in os.listdir('./../data'):
         tmparr_down = one_gene_df[one_gene_df.index.isin(down_genes)]
 
         features = list(importance['Feature'])
+
         up = tmparr_up[features].T
-        up = up.reset_index().rename(columns={'index':"feature"})
-        up = pd.melt(up, id_vars=["feature"])
-        up["type"] = class_col[0]
+        up = up.merge(importance, how='inner', left_index=True, right_on='Feature')
+        up = pd.melt(up, id_vars=["Feature", "Gini", "R"], var_name="Gene", value_name="Value")
+        up["Type"] = class_col[0]
 
         neut = tmparr_neut[features].T
-        neut = neut.reset_index().rename(columns={'index':"feature"})
-        neut = pd.melt(neut, id_vars=["feature"])
-        neut["type"] = class_col[1]
+        neut = neut.merge(importance, how='inner', left_index=True, right_on='Feature')
+        neut = pd.melt(neut, id_vars=["Feature", "Gini", "R"], var_name="Gene", value_name="Value")
+        neut["Type"] = class_col[0]
 
         down = tmparr_down[features].T
-        down = down.reset_index().rename(columns={'index':"feature"})
-        down = pd.melt(down, id_vars=["feature"])
-        down["type"] = class_col[2]
+        down = down.merge(importance, how='inner', left_index=True, right_on='Feature')
+        down = pd.melt(down, id_vars=["Feature", "Gini", "R"], var_name="Gene", value_name="Value")
+        down["Type"] = class_col[0]
 
         final_df = pd.concat([up, neut, down], axis=0)
         final_df['Cancer'] = canc
         final_df = final_df.reset_index().drop('index', axis=1)
+        #print(final_df)
 
         if t == "TCGA annotation":
-            t = "TCGA"
+            t = "Differential Expression"
+        elif t == "CNV":
+            t = "Copy Number Variation"
+        else:
+            t = "Patient Survival"
 
         final_df["Target"] = t
         all_dfs.append(final_df)
 
 big_df = pd.concat(all_dfs, axis=0, ignore_index=True)
-#big_df.to_csv("metoncofit.csv")
+big_df.to_csv("metoncofit.csv")
 big_df.to_json("metoncofit.json")
