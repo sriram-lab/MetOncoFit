@@ -1,7 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Website app using plotly and dash
+Initial website app for MetOncoFit.
+
+Current app layout:
+  - Description of MetOncoFit
+  - MetOncoFit Heatmaps
+
+Future implementation of the MetOncoFit app:
+  - Include the figures that are in the publication
+  - Exploratory data analysis
+
 @author: Scott Campit
 """
 import pandas as pd
@@ -22,10 +31,10 @@ import dash_bootstrap_components as dbc
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 # Get data from MetOncoFit database
-df = pd.read_json("metoncofit.json", orient='columns')
-up = df.loc[(df["type"] == "UPREG") | (df["type"] == "GAIN")]
-neut = df.loc[(df["type"] == "NEUTRAL") | (df["type"] == "NEUT")]
-down = df.loc[(df["type"] == "DOWNREG") | (df["type"] == "LOSS")]
+df = pd.read_json("db.json", orient='columns')
+up = df.loc[(df["Type"] == "UPREGULATED") | (df["Type"] == "GAIN")]
+neut = df.loc[(df["Type"] == "NEUTRAL") | (df["Type"] == "NEUT")]
+down = df.loc[(df["Type"] == "DOWNREGULATED") | (df["Type"] == "LOSS")]
 
 # get values that will be used
 num_uniq_genes = df["Gene"].nunique()
@@ -56,13 +65,13 @@ _body = dbc.Container(
                     """
                     )
                 ]),
-                html.Div([
+                html.Div(
                     dcc.Markdown(
-                    """
+                    '''
                     `pip install metoncofit`
-                    """
+                    '''
                     )
-                ]),
+                ),
                 html.Div([
                     html.H4("Contributing to the MetOncoFit Project"),
                     html.P(
@@ -72,8 +81,11 @@ _body = dbc.Container(
                     To support the MetOncoFit project, you can cite our publication:
                     Oruganty, K., Campit, S.E., Mamde, S., & Chandrasekaran, S. Common biochemical and topological attributes of metabolic genes recurrently dysregulated in tumors.
                     """
-                    )
-                ])
+                    ),
+                ]),
+                html.Div(
+                    html.H4("Interactive MetOncoFit Heatmaps")
+                )
             ]
         )
     ]
@@ -81,9 +93,6 @@ _body = dbc.Container(
 
 _widgets = dbc.Container(
     [
-        html.Div(
-            html.H4("Interactive MetOncoFit Heatmaps")
-        ),
         # Text that updates with slider values
         dbc.Row(
             html.Div(id='updatemode-output-container',
@@ -106,7 +115,6 @@ _widgets = dbc.Container(
                         value=25,
                         marks={
                             0: {'label':'0'},
-                            25: {'label':'25'},
                             100: {'label':'100'},
                             250: {'label':'250'},
                             500: {'label':'500'},
@@ -115,7 +123,7 @@ _widgets = dbc.Container(
                         },
                         updatemode='drag'
                     ),
-                style={'width':'60%', 'padding':'0px 20px 20px 20px'},
+                style={'width':'50%', 'padding':'0px 20px 20px 20px'},
                 ),
 
                 # Dropdown menus
@@ -124,10 +132,10 @@ _widgets = dbc.Container(
                         dcc.Dropdown(
                             id='cancer-type',
                             options=[{'label':i, 'value':i} for i in cancer_type],
-                            value='Pan'
+                            value='Pan Cancer'
                         )
                     ),
-                    width={"size":2},
+                    width={"size":3.0},
 
                 ),
                 dbc.Col(
@@ -135,10 +143,11 @@ _widgets = dbc.Container(
                         dcc.Dropdown(
                             id='prediction-type',
                             options=[{'label':i,'value':i} for i in prediction_type],
-                            value='TCGA'
+                            value='Differential Expression'
                         )
                     ),
-                    width={"size":2, "offset":0.3}
+                    width={"size":3.0,
+                        "offset":0.3}
                 )
             ]
         )
@@ -147,90 +156,91 @@ _widgets = dbc.Container(
 
 app.layout = html.Div([_body, _widgets,
     dbc.Container(
-        [
-            dbc.Row(html.Div(html.H6("Increased")), style={'marginTop':20}),
-            dcc.Graph(
-                id='up-heatmap',
-                figure={
-                    'data': [(
-                        go.Heatmap(
-                            x=up['Gene'],
-                            y=up['feature'],
-                            z=up['value'],
-                            name='up',
-                            colorscale='RdBu')
-                            )],
-                    'layout':go.Layout(
-                        autosize=False,
-                        title='Increased',
-                        xaxis=dict(title='Genes'),
-                        yaxis=dict(
-                            title='Features',
-                            showticklabels=True,
-                            tickfont=dict(
-                                family='Arial, sans-serif',
-                                size=19,
-                                color='black'
-                            )
+        dcc.Graph(
+            id='up-heatmap',
+            figure={
+                'data': [(
+                    go.Heatmap(
+                        x=up['Gene'],
+                        y=up['Feature'],
+                        z=up['Value'],
+                        name='up',
+                        colorscale='RdBu')
+                        )],
+                'layout':go.Layout(
+                    autosize=False,
+                    yaxis=dict(
+                        automargin=True,
+                        tickfont=dict(
+                            family='Arial, sans-serif',
+                            size=14,
+                            color='black'
                         )
                     )
-                },
-                config={
-                    'displayModeBar': False
-                }
-            )
-        ]
+                )
+            },
+            config={
+                'displayModeBar': False
+            }
+        )
     ),
     dbc.Container(
-        [
-            dbc.Row(html.Div(html.H6("Neutral"))),
-
-            dbc.Row(html.Div(
-                dcc.Graph(
-                    id='neut-heatmap',
-                    figure={
-                        'data': [(
-                            go.Heatmap(
-                                x=neut['Gene'],
-                                y=neut['feature'],
-                                z=neut['value'],
-                                name='neut',
-                                colorscale='RdBu')
-                                )],
-                        'layout':go.Layout(
-                            xaxis=dict(title='Genes'),
-                            yaxis=dict(title='Features', automargin=True)
+        dcc.Graph(
+            id='neut-heatmap',
+            figure={
+                'data': [(
+                    go.Heatmap(
+                        x=neut['Gene'],
+                        y=neut['Feature'],
+                        z=neut['Value'],
+                        name='neut',
+                        colorscale='RdBu')
+                        )],
+                'layout':go.Layout(
+                    autosize=False,
+                    yaxis=dict(
+                        automargin=True,
+                        tickfont=dict(
+                            family='Arial, sans-serif',
+                            size=14,
+                            color='black'
                         )
-                    }
-                ),
-                style={'width':'100%'},
-            ))
-        ]
+                    )
+                )
+            },
+            config={
+                'displayModeBar': False
+            }
+        )
     ),
     dbc.Container(
-        [
-            dbc.Row(html.Div(html.H6("Decreased"))),
-            html.Div(
-                dcc.Graph(
-                    id='down-heatmap',
-                    figure={
-                        'data': [(
-                            go.Heatmap(
-                                x=down['Gene'],
-                                y=down['feature'],
-                                z=down['value'],
-                                name='down',
-                                colorscale='RdBu')
-                                )],
-                        'layout':go.Layout(
-                            xaxis=dict(title='Genes'),
-                            yaxis=dict(title='Features', automargin=True)
+        dcc.Graph(
+            id='down-heatmap',
+            figure={
+                'data': [(
+                    go.Heatmap(
+                        x=down['Gene'],
+                        y=down['Feature'],
+                        z=down['Value'],
+                        name='down',
+                        colorscale='RdBu')
+                        )],
+                'layout':go.Layout(
+                    autosize=False,
+                    yaxis=dict(
+                        automargin=True,
+                        tickfont=dict(
+                            family='Arial, sans-serif',
+                            size=14,
+                            color='black'
                         )
-                    }
-                ),
-                style={'width':'100%'},
-            )
-        ]
+                    )
+                )
+            },
+            config={
+                'displayModeBar': False
+            }
+        )
     )
 ])
 
@@ -252,15 +262,20 @@ def update_up(cancer_choice, prediction_choice, slider_choice):
         'data': [(
             go.Heatmap(
                 x=up_df['Gene'],
-                y=up_df['feature'],
-                z=up_df['value'],
+                y=up_df['Feature'],
+                z=up_df['Value'],
                 name='up-heatmap',
                 colorscale='RdBu')
                 )],
         'layout':go.Layout(
             autosize=False,
             yaxis=dict(
-                automargin=True
+                automargin=True,
+                tickfont=dict(
+                    family='Arial, sans-serif',
+                    size=14,
+                    color='black'
+                )
             )
         )
     }
@@ -281,15 +296,20 @@ def update_neut(cancer_choice, prediction_choice, slider_choice):
         'data': [(
             go.Heatmap(
                 x=neut_df['Gene'],
-                y=neut_df['feature'],
-                z=neut_df['value'],
+                y=neut_df['Feature'],
+                z=neut_df['Value'],
                 name='neut-heatmap',
                 colorscale='RdBu')
                 )],
         'layout':go.Layout(
             autosize=False,
             yaxis=dict(
-                automargin=True
+                automargin=True,
+                tickfont=dict(
+                    family='Arial, sans-serif',
+                    size=14,
+                    color='black'
+                )
             )
         )
     }
@@ -310,15 +330,20 @@ def update_down(cancer_choice, prediction_choice, slider_choice):
         'data': [(
             go.Heatmap(
                 x=down_df['Gene'],
-                y=down_df['feature'],
-                z=down_df['value'],
+                y=down_df['Feature'],
+                z=down_df['Value'],
                 name='down-heatmap',
                 colorscale='RdBu')
                 )],
         'layout':go.Layout(
             autosize=False,
             yaxis=dict(
-                automargin=True
+                automargin=True,
+                tickfont=dict(
+                    family='Arial, sans-serif',
+                    size=14,
+                    color='black'
+                )
             )
         )
     }
@@ -327,7 +352,7 @@ def update_down(cancer_choice, prediction_choice, slider_choice):
 @app.callback(Output('updatemode-output-container', 'children'),
     [dash.dependencies.Input('gene-slider', 'value')])
 def display_value(value):
-    return 'Maximum number of genes displayed: {}'.format(value, value)
+    return 'Number of genes displayed: {}'.format(value, value)
 
 if __name__ == '__main__':
     app.run_server(debug=True)

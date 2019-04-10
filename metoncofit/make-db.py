@@ -25,6 +25,7 @@ datapath = None
 all_dfs = []
 targ = ["TCGA_annot", "CNV", "SURV"]
 var_excl = ["TCGA gene expression fold change", "CNV gain/loss ratio"]
+
 for fil in os.listdir('./../data'):
     for t in targ:
         if datapath is None:
@@ -191,17 +192,16 @@ for fil in os.listdir('./../data'):
         neut = tmparr_neut[features].T
         neut = neut.merge(importance, how='inner', left_index=True, right_on='Feature')
         neut = pd.melt(neut, id_vars=["Feature", "Gini", "R"], var_name="Gene", value_name="Value")
-        neut["Type"] = class_col[0]
+        neut["Type"] = class_col[1]
 
         down = tmparr_down[features].T
         down = down.merge(importance, how='inner', left_index=True, right_on='Feature')
         down = pd.melt(down, id_vars=["Feature", "Gini", "R"], var_name="Gene", value_name="Value")
-        down["Type"] = class_col[0]
+        down["Type"] = class_col[2]
 
         final_df = pd.concat([up, neut, down], axis=0)
         final_df['Cancer'] = canc
         final_df = final_df.reset_index().drop('index', axis=1)
-        #print(final_df)
 
         if t == "TCGA annotation":
             t = "Differential Expression"
@@ -214,5 +214,5 @@ for fil in os.listdir('./../data'):
         all_dfs.append(final_df)
 
 big_df = pd.concat(all_dfs, axis=0, ignore_index=True)
-big_df.to_csv("metoncofit.csv")
-big_df.to_json("metoncofit.json")
+big_df.to_csv("db.csv")
+big_df.to_json("db.json")
