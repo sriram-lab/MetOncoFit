@@ -43,18 +43,20 @@ prediction_type = df["Target"].unique()
 
 # Create content and store as "cards"
 _body = dbc.Container(
-    [
-        dbc.Row(
-            [
+    dbc.Row(
+        [
+            dbc.Col([
                 html.Div([
-                    html.H1("MetOncoFit"),
+                    html.H1("MetOncoFit")
+                    ], style={'marginTop':30, 'marginBottom':30}),
+                html.Div([
                     html.H4("A Machine Learning Algorithm to Identify Common Biochemical and Topological Attributes of Metabolic Genes Recurrently Dysregulated in Tumors"),
                     html.P(
                     """
                     MetOncoFit is a data-driven approach that uses biochemical and metabolic attributes to predict tumor differential expression, copy number variation, and patient survival.
                     """
                     )
-                ]),
+                ], style={'marginTop':30, 'marginBottom':30}),
                 html.Div([
                     html.H4("Installing MetOncoFit"),
                     html.P(
@@ -64,31 +66,44 @@ _body = dbc.Container(
                     To install the package, use PyPI:
                     """
                     )
-                ]),
-                html.Div(
-                    dcc.Markdown(
-                    '''
-                    `pip install metoncofit`
-                    '''
-                    )
+                ], style={'marginTop':30, 'marginBottom':30}),
+                html.Div([
+                    html.P('''
+                    > pip install metoncofit
+                    ''')],
+                    style={'marginTop':10, 'marginBottom':10, 'font-family':'courier', 'background-color':'#393939', 'color':'#EC7F37', 'text-indent':'1em'}
                 ),
                 html.Div([
-                    html.H4("Contributing to the MetOncoFit Project"),
+                    html.H4("Contributing to the MetOncoFit project"),
                     html.P(
                     """
                     Contributions are welcome! Please read the contributions guide to get started.
-
-                    To support the MetOncoFit project, you can cite our publication:
-                    Oruganty, K., Campit, S.E., Mamde, S., & Chandrasekaran, S. Common biochemical and topological attributes of metabolic genes recurrently dysregulated in tumors.
+                    """),
+                    html.P(
+                    """
                     """
                     ),
-                ]),
+                    html.P(
+                    """
+                    To support the MetOncoFit project, you can cite our publication:
+                    """
+                    ),
+                    html.P(
+                    """
+                    """
+                    ),
+                    html.P(
+                    """
+                    Oruganty, K., Campit, S.E., Mamde, S., & Chandrasekaran, S. Common biochemical and topological attributes of metabolic genes recurrently dysregulated in tumors.
+                    """
+                    )
+                ], style={'marginTop':30, 'marginBottom':30}),
                 html.Div(
-                    html.H4("Interactive MetOncoFit Heatmaps")
+                    html.H4("MetOncoFit interactive explorer")
                 )
-            ]
-        )
-    ]
+            ])
+        ]
+    )
 )
 
 _widgets = dbc.Container(
@@ -168,6 +183,17 @@ app.layout = html.Div([_body, _widgets,
                         colorscale='RdBu')
                         )],
                 'layout':go.Layout(
+                    title=go.layout.Title(
+                        text=('<b>Target label: '+up['Type'].iloc[0]+'</b>'),
+                        xanchor='left',
+                        yanchor='bottom',
+                        x=0,
+                        font=dict(
+                            family='Arial',
+                            size=16,
+                            color='black'
+                        )
+                    ),
                     autosize=False,
                     yaxis=dict(
                         automargin=True,
@@ -197,6 +223,17 @@ app.layout = html.Div([_body, _widgets,
                         colorscale='RdBu')
                         )],
                 'layout':go.Layout(
+                    title=go.layout.Title(
+                        text=('<b>Target label: '+neut['Type'].iloc[0]+'</b>'),
+                        xanchor='left',
+                        yanchor='bottom',
+                        x=0,
+                        font=dict(
+                            family='Arial',
+                            size=16,
+                            color='black'
+                        )
+                    ),
                     autosize=False,
                     yaxis=dict(
                         automargin=True,
@@ -226,6 +263,17 @@ app.layout = html.Div([_body, _widgets,
                         colorscale='RdBu')
                         )],
                 'layout':go.Layout(
+                    title=go.layout.Title(
+                        text=('<b>Target label: '+down['Type'].iloc[0]+'</b>'),
+                        xanchor='left',
+                        yanchor='bottom',
+                        x=0,
+                        font=dict(
+                            family='Arial',
+                            size=16,
+                            color='black'
+                        )
+                    ),
                     autosize=False,
                     yaxis=dict(
                         automargin=True,
@@ -268,6 +316,17 @@ def update_up(cancer_choice, prediction_choice, slider_choice):
                 colorscale='RdBu')
                 )],
         'layout':go.Layout(
+            title=go.layout.Title(
+                text=('<b>Target label: '+up_df['Type'].iloc[0]+'</b>'),
+                xanchor='left',
+                yanchor='bottom',
+                x=0,
+                font=dict(
+                    family='Arial',
+                    size=16,
+                    color='black'
+                )
+            ),
             autosize=False,
             yaxis=dict(
                 automargin=True,
@@ -302,6 +361,17 @@ def update_neut(cancer_choice, prediction_choice, slider_choice):
                 colorscale='RdBu')
                 )],
         'layout':go.Layout(
+            title=go.layout.Title(
+                text=('<b>Target label: '+neut_df['Type'].iloc[0]+'</b>'),
+                xanchor='left',
+                yanchor='bottom',
+                x=0,
+                font=dict(
+                    family='Arial',
+                    size=16,
+                    color='black'
+                )
+            ),
             autosize=False,
             yaxis=dict(
                 automargin=True,
@@ -336,6 +406,17 @@ def update_down(cancer_choice, prediction_choice, slider_choice):
                 colorscale='RdBu')
                 )],
         'layout':go.Layout(
+            title=go.layout.Title(
+                text=('<b>Target label: '+down_df['Type'].iloc[0]+'</b>'),
+                xanchor='left',
+                yanchor='bottom',
+                x=0,
+                font=dict(
+                    family='Arial',
+                    size=16,
+                    color='black'
+                )
+            ),
             autosize=False,
             yaxis=dict(
                 automargin=True,
