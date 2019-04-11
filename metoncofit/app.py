@@ -32,6 +32,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 # Get data from MetOncoFit database
 df = pd.read_json("db.json", orient='columns')
+
 up = df.loc[(df["Type"] == "UPREGULATED") | (df["Type"] == "GAIN")]
 neut = df.loc[(df["Type"] == "NEUTRAL") | (df["Type"] == "NEUT")]
 down = df.loc[(df["Type"] == "DOWNREGULATED") | (df["Type"] == "LOSS")]
@@ -98,9 +99,9 @@ _body = dbc.Container(
                     """
                     )
                 ], style={'marginTop':30, 'marginBottom':30}),
-                html.Div(
-                    html.H4("MetOncoFit interactive explorer")
-                )
+                html.Div([
+                    html.H4("MetOncoFit interactive explorer"),
+                ])
             ])
         ]
     )
@@ -171,124 +172,122 @@ _widgets = dbc.Container(
 
 app.layout = html.Div([_body, _widgets,
     dbc.Container(
-        dcc.Graph(
-            id='up-heatmap',
-            figure={
-                'data': [(
-                    go.Heatmap(
-                        x=up['Gene'],
-                        y=up['Feature'],
-                        z=up['Value'],
-                        name='up',
-                        colorscale='RdBu')
-                        )],
-                'layout':go.Layout(
-                    title=go.layout.Title(
-                        text=('<b>Target label: '+up['Type'].iloc[0]+'</b>'),
-                        xanchor='left',
-                        yanchor='bottom',
-                        x=0,
-                        font=dict(
-                            family='Arial',
-                            size=16,
-                            color='black'
-                        )
-                    ),
-                    autosize=False,
-                    yaxis=dict(
-                        automargin=True,
-                        tickfont=dict(
-                            family='Arial, sans-serif',
-                            size=14,
-                            color='black'
-                        )
-                    )
-                )
-            },
-            config={
-                'displayModeBar': False
-            }
-        )
-    ),
-    dbc.Container(
-        dcc.Graph(
-            id='neut-heatmap',
-            figure={
-                'data': [(
-                    go.Heatmap(
-                        x=neut['Gene'],
-                        y=neut['Feature'],
-                        z=neut['Value'],
-                        name='neut',
-                        colorscale='RdBu')
-                        )],
-                'layout':go.Layout(
-                    title=go.layout.Title(
-                        text=('<b>Target label: '+neut['Type'].iloc[0]+'</b>'),
-                        xanchor='left',
-                        yanchor='bottom',
-                        x=0,
-                        font=dict(
-                            family='Arial',
-                            size=16,
-                            color='black'
-                        )
-                    ),
-                    autosize=False,
-                    yaxis=dict(
-                        automargin=True,
-                        tickfont=dict(
-                            family='Arial, sans-serif',
-                            size=14,
-                            color='black'
+        dbc.Row([
+            dcc.Graph(
+                id='up-heatmap',
+                figure={
+                    'data': [(
+                        go.Heatmap(
+                            x=up['Gene'],
+                            y=up['Feature'],
+                            z=up['Value'],
+                            name='up',
+                            colorscale='RdBu')
+                            )],
+                    'layout':go.Layout(
+                        title=go.layout.Title(
+                            text=('<b>Target label: '+up['Type'].iloc[0]+'</b>'),
+                            xanchor='left',
+                            yanchor='bottom',
+                            x=0,
+                            font=dict(
+                                family='Arial',
+                                size=16,
+                                color='black'
+                            )
+                        ),
+                        autosize=False,
+                        yaxis=dict(
+                            automargin=True,
+                            tickfont=dict(
+                                family='Arial, sans-serif',
+                                size=14,
+                                color='black'
+                            )
                         )
                     )
-                )
-            },
-            config={
-                'displayModeBar': False
-            }
-        )
-    ),
-    dbc.Container(
-        dcc.Graph(
-            id='down-heatmap',
-            figure={
-                'data': [(
-                    go.Heatmap(
-                        x=down['Gene'],
-                        y=down['Feature'],
-                        z=down['Value'],
-                        name='down',
-                        colorscale='RdBu')
-                        )],
-                'layout':go.Layout(
-                    title=go.layout.Title(
-                        text=('<b>Target label: '+down['Type'].iloc[0]+'</b>'),
-                        xanchor='left',
-                        yanchor='bottom',
-                        x=0,
-                        font=dict(
-                            family='Arial',
-                            size=16,
-                            color='black'
-                        )
-                    ),
-                    autosize=False,
-                    yaxis=dict(
-                        automargin=True,
-                        tickfont=dict(
-                            family='Arial, sans-serif',
-                            size=14,
-                            color='black'
+                },
+                config={
+                    'displayModeBar': False
+                }
+            ),
+            dcc.Graph(
+                id='neut-heatmap',
+                figure={
+                    'data': [(
+                        go.Heatmap(
+                            x=neut['Gene'],
+                            y=neut['Feature'],
+                            z=neut['Value'],
+                            name='neut',
+                            colorscale='RdBu')
+                            )],
+                    'layout':go.Layout(
+                        title=go.layout.Title(
+                            text=('<b>Target label: '+neut['Type'].iloc[0]+'</b>'),
+                            xanchor='left',
+                            yanchor='bottom',
+                            x=0,
+                            font=dict(
+                                family='Arial',
+                                size=16,
+                                color='black'
+                            )
+                        ),
+                        autosize=False,
+                        yaxis=dict(
+                            automargin=True,
+                            tickfont=dict(
+                                family='Arial, sans-serif',
+                                size=14,
+                                color='black'
+                            )
                         )
                     )
-                )
-            },
-            config={
-                'displayModeBar': False
-            }
-        )
+                },
+                config={
+                    'displayModeBar': False
+                }
+            ),
+            dcc.Graph(
+                id='down-heatmap',
+                figure={
+                    'data': [(
+                        go.Heatmap(
+                            x=down['Gene'],
+                            y=down['Feature'],
+                            z=down['Value'],
+                            name='down',
+                            colorscale='RdBu')
+                            )],
+                    'layout':go.Layout(
+                        title=go.layout.Title(
+                            text=('<b>Target label: '+down['Type'].iloc[0]+'</b>'),
+                            xanchor='left',
+                            yanchor='bottom',
+                            x=0,
+                            font=dict(
+                                family='Arial',
+                                size=16,
+                                color='black'
+                            )
+                        ),
+                        autosize=False,
+                        yaxis=dict(
+                            automargin=True,
+                            tickfont=dict(
+                                family='Arial, sans-serif',
+                                size=14,
+                                color='black'
+                            )
+                        )
+                    )
+                },
+                config={
+                    'displayModeBar': False
+                }
+            )
+        ])
     )
 ])
 
@@ -306,6 +305,11 @@ def update_up(cancer_choice, prediction_choice, slider_choice):
     up_tmp = up_tmp[0:slider_choice]
     up_df = up_df.loc[up_df['Gene'].isin(up_tmp)]
 
+    custom_hover = []
+    for _, i in up_df.iterrows():
+        dat = 'Gene: '+'{}'.format(i['Gene'])+'<br>'+'Feature: '+'{}'.format(i['Feature'])+'<br>'+'Value: '+'{}'.format(i['Value'])+'<br>'+'R: '+'{}'.format(i['R'])
+        custom_hover.append(dat)
+
     return {
         'data': [(
             go.Heatmap(
@@ -313,7 +317,9 @@ def update_up(cancer_choice, prediction_choice, slider_choice):
                 y=up_df['Feature'],
                 z=up_df['Value'],
                 name='up-heatmap',
-                colorscale='RdBu')
+                colorscale='RdBu',
+                text=custom_hover,
+                hoverinfo='text')
                 )],
         'layout':go.Layout(
             title=go.layout.Title(
@@ -351,6 +357,11 @@ def update_neut(cancer_choice, prediction_choice, slider_choice):
     neut_tmp = neut_tmp[0:slider_choice]
     neut_df = neut_df.loc[neut_df['Gene'].isin(neut_tmp)]
 
+    custom_hover = []
+    for _, i in neut_df.iterrows():
+        dat = 'Gene: '+'{}'.format(i['Gene'])+'<br>'+'Feature: '+'{}'.format(i['Feature'])+'<br>'+'Value: '+'{}'.format(i['Value'])+'<br>'+'R: '+'{}'.format(i['R'])
+        custom_hover.append(dat)
+
     return {
         'data': [(
             go.Heatmap(
@@ -358,7 +369,9 @@ def update_neut(cancer_choice, prediction_choice, slider_choice):
                 y=neut_df['Feature'],
                 z=neut_df['Value'],
                 name='neut-heatmap',
-                colorscale='RdBu')
+                colorscale='RdBu',
+                text=custom_hover,
+                hoverinfo='text')
                 )],
         'layout':go.Layout(
             title=go.layout.Title(
@@ -396,6 +409,11 @@ def update_down(cancer_choice, prediction_choice, slider_choice):
     down_tmp = down_tmp[0:slider_choice]
     down_df = down_df.loc[down_df['Gene'].isin(down_tmp)]
 
+    custom_hover=[]
+    for _, i in down_df.iterrows():
+        dat = 'Gene: '+'{}'.format(i['Gene'])+'<br>'+'Feature: '+'{}'.format(i['Feature'])+'<br>'+'Value: '+'{}'.format(i['Value'])+'<br>'+'R: '+'{}'.format(i['R'])
+        custom_hover.append(dat)
+
     return {
         'data': [(
             go.Heatmap(
@@ -403,7 +421,9 @@ def update_down(cancer_choice, prediction_choice, slider_choice):
                 y=down_df['Feature'],
                 z=down_df['Value'],
                 name='down-heatmap',
-                colorscale='RdBu')
+                colorscale='RdBu',
+                text=custom_hover,
+                hoverinfo='text')
                 )],
         'layout':go.Layout(
             title=go.layout.Title(
