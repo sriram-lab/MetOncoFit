@@ -14,26 +14,32 @@ cancers = ["Breast cancer", "Ovarian cancer", "Colorectal cancer", "Lung cancer"
 df = pd.read_excel("./raw/prognoscan/prognoscan.xlsx")
 df = df.drop(columns=remove_col, axis=1)
 df["HR [95% CI-low CI-upp]"] = df["HR [95% CI-low CI-upp]"].str.replace('\[(.*?)\]', '', regex=True)
+df["CANCER TYPE"] = df["CANCER TYPE"].str.replace(' cancer', '', regex=True)
+df["CANCER TYPE"] = df["CANCER TYPE"].str.lower()+
 df = df[df["CANCER TYPE"].isin(cancers)]
-
 df["HR [95% CI-low CI-upp]"] = df["HR [95% CI-low CI-upp]"].apply(pd.to_numeric)
 df["SURV"] = ""
 
+# Make the actual labels
 df["SURV"].loc[df["HR [95% CI-low CI-upp]"] >= 2] = "UPREG"
 df["SURV"].loc[df["HR [95% CI-low CI-upp]"] <= 0.5] = "DOWNREG"
 df["SURV"].loc[(df["HR [95% CI-low CI-upp]"] < 2) & (df["HR [95% CI-low CI-upp]"] > 0.5)] = "NEUTRAL"
 
-"""
-# Make labels
-for _, row in df.iterrows():
-    if row["COX P-VALUE"] < 0.05:
-        if row["HR [95% CI-low CI-upp]"] >= 2:
-            df["SURV"] = "UPREG"
-        elif row["HR [95% CI-low CI-upp]"] <= 0.5:
-            df["SURV"] = "DOWNREG"
-        else:
-            df["SURV"] = "NEUTRAL"
-    else:
-        df["SURV"] = "NEUTRAL"
-"""
+# Majority vote on the labels if there are multiple genes and they each have different labels
+df = df.groupby(['ID_NAME', 'CANCER TYPE'])['SURV'].agg(pd.Series.mode).to_frame()
+df = df.reset_index()
+
+# I physically edited the csv file
+#df.to_csv('surv.csv')
+
+df = pd.read_csv('surv.csv')
 print(df)
+
+# Read in the existing model and format it for our analysis
+fil = r"./data/new/breast.csv"
+model = pd.read_csv(fil)
+model["Gene"], model["Cell Line"] = model["GENE"].str.split('_', 1).str
+model = model.drop(columns='GENE', axis=1)
+
+# Drop existing labels
+model = model.drop(columns="SURV", axis=1)
