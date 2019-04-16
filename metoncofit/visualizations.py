@@ -23,20 +23,6 @@ import seaborn as sns
 from matplotlib.colors import ListedColormap
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from bokeh.io import output_file, show
-from bokeh.models import BasicTicker, ColorBar, ColumnDataSource, LinearColorMapper, PrintfTickFormatter, CustomJS, BoxSelectTool
-from bokeh.plotting import figure
-from bokeh.transform import transform
-from bokeh.layouts import column, row, widgetbox, gridplot
-from bokeh.models.widgets import Button, RadioButtonGroup, Select, Slider
-from bokeh.palettes import brewer
-from bokeh.embed import file_html
-from bokeh.resources import CDN
-
-import holoviews as hv
-hv.extension('bokeh')
-
-
 def conf_matr(orig_classes, pred_class, cv_acc, pval, zscore, targ, canc, normalize=True, cmap=False, savepath=False, filename=False):
     """
     The code to generate the confusion matrix was adapted from https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html#sphx-glr-auto-examples-model-selection-plot-confusion-matrix-py

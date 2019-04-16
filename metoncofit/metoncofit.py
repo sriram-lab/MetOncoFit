@@ -21,8 +21,9 @@ from openpyxl import load_workbook
 
 # Create data structures that will be used in the analysis
 df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ = process.preprocess(
-    './../data/', sys.argv[1], sys.argv[2], sys.argv[3])
+    './../data/new/', sys.argv[1], sys.argv[2], sys.argv[3])
 
+"""
 # Random Forest Classifier, prediction, and hold out accuracy
 rfc, rfc_pred, mean_acc = random_forest.random_forest(
     canc, targ, data, classes, orig_data, orig_classes)
@@ -65,3 +66,4 @@ importance, up, neut, down, final_df = process.plotting_preprocess(
 visualizations.make_figure(final_df, importance, cm, orig_classes, rfc_pred, cv_score,
                            pvalue, zscore, canc, targ, normalize=True, savepath=False, filename=False)
 #visualizations.heatmap_html(up, neut, down, up_genes, neut_genes, down_genes, targ, canc, savepath=False, filename=False)
+"""

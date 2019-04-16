@@ -47,32 +47,6 @@ def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
         data, classes: The NumPy array containing scaled data and classes for training the random forest classifier
         orig_data, orig_classes: The NumPy array containing scaled data and classes for testing the random forest classifier
     """
-
-    if datapath is None:
-        datapath = './../data/'
-
-    canc = fil.replace(".train.csv", "")
-    if canc == "breast":
-        canc = "Breast"
-    elif canc == "cns":
-        canc = "CNS"
-    elif canc == "colon":
-        canc = "Colorectal"
-    elif canc == "complex":
-        canc = "Pan"
-    elif canc == "leukemia":
-        canc = "Leukemia"
-    elif canc == "melanoma":
-        canc = "Melanoma"
-    elif canc == "nsclc":
-        canc = "Lung"
-    elif canc == "ovarian":
-        canc = "Ovarian"
-    elif canc == "prostate":
-        canc = "Prostate"
-    elif canc == "renal":
-        canc = "Renal"
-
     classes = []
     data = []
     names = []
@@ -80,9 +54,27 @@ def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
     if targ == 'TCGA_annot':
         targ = str("TCGA annotation")
 
+    if datapath is None:
+        datapath = './../data/original'
+
+    canc = fil.replace(".csv", "")
+    canc_dict = {
+        'breast':'Breast Cancer',
+        'cns':'Glioma',
+        'colon':'Colorectal Cancer',
+        'leukemia':'B-cell lymphoma',
+        'melanoma':'Melanoma',
+        'nsclc':'Lung Cancer',
+        'ovarian':'Ovarian Cancer',
+        'prostate':'Prostate Cancer',
+        'renal':'Renal Cancer'
+    }
+    canc = canc_dict.get(canc)
+
     df_names = pd.read_csv("./../labels/real_headers.txt", sep='\t')
     df = pd.read_csv(
-        datapath+fil, names=list(df_names.iloc[:, 1]), index_col=0, skiprows=1)
+        datapath+fil, names=list(df_names.iloc[:, 1]), skiprows=1)
+    df = df.set_index(['Gene', 'Cell Line'])
 
     # We are label encoding the subsystem and datapath labels
     le = preprocessing.LabelEncoder()
@@ -108,6 +100,7 @@ def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
     # Robust scaling the dataset with random oversampling
     data = np.array(df).astype(np.float)
     data = RobustScaler().fit_transform(data)
+    print(data)
 
     new_data, orig_data, new_classes, orig_classes = train_test_split(
         data, classes, test_size=0.3)
