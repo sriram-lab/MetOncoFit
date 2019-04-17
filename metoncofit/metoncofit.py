@@ -23,7 +23,6 @@ from openpyxl import load_workbook
 df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ = process.preprocess(
     './../data/new/', sys.argv[1], sys.argv[2], sys.argv[3])
 
-"""
 # Random Forest Classifier, prediction, and hold out accuracy
 rfc, rfc_pred, mean_acc = random_forest.random_forest(
     canc, targ, data, classes, orig_data, orig_classes)
@@ -45,25 +44,12 @@ df4 = df1.copy(deep=True)
 lofo = validator.leave_one_feat_out(df4, canc, targ)
 
 # Save the stuff:
-save.make_excel(summary, compare_models, loco, lofo)
+save.make_excel(summary, compare_models, loco, lofo, filename='surv1.xlsx')
 
 # Create data structures that will only be used while making the figures
-up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, one_gene_class = process.one_gene_only(
-    df1, targ)
+up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, one_gene_class = process.one_gene_only(df1, targ)
 
-importance, up, neut, down, final_df = process.plotting_preprocess(
-    up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, rfc, header, targ, orig_classes, rfc_pred, one_gene_class, canc)
-
-# if targ == "TCGA annotation":
-#    targ = "TCGA"
-
-#final_df["Target"] = targ
-
-# filename=(str(canc)+str(targ)+'.json')
-#final_df.to_json(filename, orient='columns')
+importance, up, neut, down, final_df = process.plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, rfc, header, targ, orig_classes, rfc_pred, one_gene_class, canc)
 
 # Make the figures
-visualizations.make_figure(final_df, importance, cm, orig_classes, rfc_pred, cv_score,
-                           pvalue, zscore, canc, targ, normalize=True, savepath=False, filename=False)
-#visualizations.heatmap_html(up, neut, down, up_genes, neut_genes, down_genes, targ, canc, savepath=False, filename=False)
-"""
+visualizations.make_figure(final_df, importance, cm, orig_classes, rfc_pred, cv_score, pvalue, zscore, canc, targ, normalize=True, savepath=False, filename=False)

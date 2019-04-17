@@ -3,7 +3,7 @@
 
 """
 `save.py` saves all the resulting data into Excel files
-@authors: Krishna Oruganty & Scott Campit
+@author: Scott Campit
 """
 
 import sys
@@ -12,7 +12,7 @@ from openpyxl import load_workbook
 
 targ = sys.argv[2]
 
-def make_excel(summary, compare_models, loco, lofo):
+def make_excel(summary, compare_models, loco, lofo, filename):
     """
     make_excel is the function that will save the resulting dataframes into Excel Files.
 
@@ -26,8 +26,8 @@ def make_excel(summary, compare_models, loco, lofo):
         * An excel file in the output/Tables folder containing the Excel file.
     """
 
-    book = load_workbook('./../output/Tables/SI.xlsx')
-    writer = pd.ExcelWriter('./../output/Tables/SI.xlsx', engine='openpyxl')
+    book = load_workbook('./../output/Tables/'+filename)
+    writer = pd.ExcelWriter('./../output/Tables/'+filename, engine='openpyxl')
     writer.book = book
     writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
 

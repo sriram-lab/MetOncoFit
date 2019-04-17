@@ -229,8 +229,8 @@ def leave_one_cell_out(df2, canc, targ):
     """
 
     # Split the index into Gene symbol and Cell Line
-    df2["Gene"], df2["Cell Line"] = df2.index.str.split('_', 1).str
-    _ = df2.pop('Gene') # don't need gene labels
+    df2 = df2.reset_index()
+    _ = df2.pop('Genes') # don't need gene labels
     cell_line = df2.pop("Cell Line")
     cell_line = pd.DataFrame(cell_line)
 

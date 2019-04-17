@@ -71,10 +71,11 @@ def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
     }
     canc = canc_dict.get(canc)
 
-    df_names = pd.read_csv("./../labels/real_headers.txt", sep='\t')
-    df = pd.read_csv(
-        datapath+fil, names=list(df_names.iloc[:, 1]), skiprows=1)
-    df = df.set_index(['Gene', 'Cell Line'])
+    df_names = pd.read_csv("./../labels/real_headers.txt", sep='\t', names=['Original', 'New'])
+    names = dict([(i, nam) for i, nam in zip(df_names['Original'], df_names['New'])])
+    df = pd.read_csv(datapath+fil, index_col=None)
+    df = df.rename(columns=names)
+    df = df.set_index(['Genes','Cell Line'])
 
     # We are label encoding the subsystem and datapath labels
     le = preprocessing.LabelEncoder()
@@ -100,7 +101,6 @@ def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
     # Robust scaling the dataset with random oversampling
     data = np.array(df).astype(np.float)
     data = RobustScaler().fit_transform(data)
-    print(data)
 
     new_data, orig_data, new_classes, orig_classes = train_test_split(
         data, classes, test_size=0.3)
@@ -109,7 +109,6 @@ def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
     data, classes = ros.fit_sample(new_data, new_classes)
 
     return df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ
-
 
 def one_gene_only(df, target):
     """
@@ -140,9 +139,8 @@ def one_gene_only(df, target):
         targ_dict = {'NEUTRAL': 0, 'DOWNREG': 0, 'UPREG': 0}
 
     df = df.reset_index()
-    df["Gene"], df["Cell Line"] = df["index"].str.split("_", 1).str
-    one_gene_df = df.drop(columns=["index", "Cell Line"]).groupby(
-        ["Gene", target]).median().reset_index().set_index("Gene")
+    one_gene_df = df.drop(columns="Cell Line").groupby(
+        ["Genes", target]).median().reset_index().set_index("Genes")
     one_gene_class = pd.DataFrame(one_gene_df[target])
     one_gene_class = one_gene_class.reset_index()
 
@@ -249,7 +247,7 @@ def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_gene
     down["type"] = class_col[2]
 
     df = pd.concat([up, neut, down], axis=0)
-    df = df.sort_values('Gene')
+    df = df.sort_values('Genes')
     df['Cancer'] = canc
     df = df.reset_index().drop('index', axis=1)
 
