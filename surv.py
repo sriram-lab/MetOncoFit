@@ -98,5 +98,4 @@ for fil in folder:
     model = make_model(path, fil)
     complex.append(model)
 df = pd.concat(complex)
-print(df)
 df.to_csv('./data/lax/complex.csv', index=False)
