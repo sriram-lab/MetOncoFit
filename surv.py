@@ -40,10 +40,10 @@ def make_surv(input, cox, hr_up, hr_low):
     df = df.reset_index()
 
     # I physically edited the xlsx file. Need to devise conditional rule set to automatically determine labels for multiple modes
-    df.to_excel('surv.xlsx', index=False)
-    print('surv.xlsx done!')
+    df.to_excel('lax.xlsx', index=False)
+    print('lax.xlsx done!')
 
-#make_surv("./raw/prognoscan/prognoscan.xlsx", cox=0.05, hr_up=2, hr_low=0.05)
+#make_surv("./raw/prognoscan/prognoscan.xlsx", cox=0.05, hr_up=1.1, hr_low=0.9)
 
 def make_model(path, fil):
     """
@@ -68,16 +68,12 @@ def make_model(path, fil):
     if fil == 'complex.csv':
         pass
 
-    df = pd.read_excel('surv.xlsx')
+    df = pd.read_excel('lax.xlsx')
     df = df.replace({'CANCER TYPE':canc_dict})
 
     # Read in the existing model and format it for our analysis
     model = pd.read_csv(path+fil)
     canc, _ = os.path.splitext(fil)
-
-    # Split gene name and cell line.
-    model["Gene"], model["Cell Line"] = model["GENE"].str.split('_', 1).str
-    model = model.drop(columns='GENE', axis=1)
 
     # Drop existing survival labels
     model = model.drop(columns="SURV", axis=1)
@@ -91,9 +87,8 @@ def make_model(path, fil):
 
     model = model.set_index(['Gene', 'Cell Line'])
     model = model.reset_index()
+    #model.to_csv('./data/lax/'+canc+'.csv', index=False)
     return model
-    model.to_csv('./data/new/'+canc+'.csv', index=False)
-    print(canc+' is done!')
 
 path = r"./data/original/"
 folder = os.listdir(path)
@@ -102,6 +97,6 @@ complex = []
 for fil in folder:
     model = make_model(path, fil)
     complex.append(model)
-
 df = pd.concat(complex)
-df.to_csv('./data/new/complex.csv', index=False)
+print(df)
+df.to_csv('./data/lax/complex.csv', index=False)

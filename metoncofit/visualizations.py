@@ -21,7 +21,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.colors import ListedColormap
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 def conf_matr(orig_classes, pred_class, cv_acc, pval, zscore, targ, canc, normalize=True, cmap=False, savepath=False, filename=False):
     """

@@ -1,4 +1,5 @@
-GENE	GENE
+Gene	Genes
+Cell Line	Cell Line
 Alanine and Aspartate Metabolism	Flux change in Alanine and Aspartate Metabolism after gene KO
 Aminosugar Metabolism	Flux change in Aminosugar Metabolism after gene KO
 Arginine and Proline Metabolism	Flux change in Arginine and Proline Metabolism after gene KO
