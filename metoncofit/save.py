@@ -37,14 +37,12 @@ def make_excel(summary, compare_models, loco, lofo, filename):
             summary.to_excel(writer, sheet_name="S. Table 4 | CNV Pred", startrow=writer.sheets["S. Table 4 | CNV Pred"].max_row, header=False)
         else:
             summary.to_excel(writer, sheet_name="S. Table 4 | CNV Pred", header=True)
-
     elif targ == "SURV":
         if "S. Table 5 | SURV Pred" in book:
             summary.to_excel(writer, sheet_name="S. Table 5 | SURV Pred", startrow=writer.sheets["S. Table 5 | SURV Pred"].max_row, header=False)
         else:
             summary.to_excel(writer, sheet_name="S. Table 5 | SURV Pred", header=True)
-
-    elif targ == "TCGA annotation":
+    else:
         if "S. Table 3 | DE Pred" in book:
             summary.to_excel(writer, sheet_name="S. Table 3 | DE Pred", startrow=writer.sheets["S. Table 3 | DE Pred"].max_row, header=False)
         else:

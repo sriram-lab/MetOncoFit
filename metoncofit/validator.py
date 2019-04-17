@@ -175,16 +175,17 @@ def leave_one_feat_out(df, canc, targ):
     """
 
     # create 4 dataframes that will be used for each of the features after robust scaler
-    df1 = df.copy(deep=True)
-    classes = df1.pop(targ)
-    num = RobustScaler().fit_transform(np.array(df1).astype(np.float))
-    df1 = pd.DataFrame(num, columns=df1.columns, index=df1.index)
+    df = df.reset_index()
+    df = df.drop(columns=['Genes', 'Cell Line'])
+    classes = df.pop(targ)
+    num = RobustScaler().fit_transform(np.array(df).astype(np.float))
+    df = pd.DataFrame(num, columns=df.columns, index=df.index)
 
-    dynm = df1.drop(df1.columns[0:52], axis=1)
-    topo = df1.drop(df1.columns[53:132], axis=1)
-    kexp = df1.drop(df1.columns[132:], axis=1)
-    genexp = df1.drop(df1.columns[133:], axis=1)
-    subsys = df1.drop(df1.columns[134], axis=1)
+    dynm = df.drop(df.columns[0:52], axis=1)
+    topo = df.drop(df.columns[53:132], axis=1)
+    kexp = df.drop(df.columns[132:], axis=1)
+    genexp = df.drop(df.columns[133:], axis=1)
+    subsys = df.drop(df.columns[134], axis=1)
 
     # concatenate the dataframes to a single structure and get accuracies
     dfs = [topo, dynm, kexp, genexp]
