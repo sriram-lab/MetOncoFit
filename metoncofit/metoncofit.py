@@ -20,7 +20,7 @@ import pandas as pd
 from openpyxl import load_workbook
 
 # Create data structures that will be used in the analysis
-df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ = process.preprocess(datapath='./../data/new/', sys.argv[1], sys.argv[2], sys.argv[3])
+df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ = process.preprocess(datapath='./../data/lax/', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3])
 
 # Random Forest Classifier, prediction, and hold out accuracy
 rfc, rfc_pred, mean_acc = random_forest.random_forest(
@@ -43,7 +43,7 @@ df4 = df1.copy(deep=True)
 lofo = validator.leave_one_feat_out(df4, canc, targ)
 
 # Save the stuff:
-save.make_excel(summary, compare_models, loco, lofo, filename='surv1.xlsx')
+save.make_excel(summary, compare_models, loco, lofo, filename='surv2.xlsx')
 
 # Create data structures that will only be used while making the figures
 up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, one_gene_class = process.one_gene_only(df1, targ)
