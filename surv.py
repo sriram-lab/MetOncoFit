@@ -55,30 +55,26 @@ def make_surv(input, cox, hr_up, hr_low):
 
 #make_surv("./raw/prognoscan/prognoscan.xlsx", cox=0.05, hr_up=1.1, hr_low=0.9)
 
-# def count_sample(input):
+def count_prognoscan(input):
 # Filters
-remove_col = ["TYPE", "ID_DESCRIPTION", "DATA_POSTPROCESSING", "DATASET", "SUBTYPE", "ENDPOINT", "COHORT","PROBE ID", "ARRAY TYPE", "CUTPOINT", "MINIMUM P-VALUE", "CORRECTED P-VALUE", "ln(HR-high / HR-low)", "ln(HR)"]
-cancers = ["Breast cancer", "Ovarian cancer", "Colorectal cancer", "Lung cancer", "Prostate cancer", "Skin cancer", "Brain cancer", "Renal cell carcinoma", "Blood cancer"]
+    remove_col = ["TYPE", "ID_DESCRIPTION", "DATA_POSTPROCESSING", "DATASET", "SUBTYPE", "ENDPOINT", "COHORT","PROBE ID", "ARRAY TYPE", "CUTPOINT", "MINIMUM P-VALUE", "CORRECTED P-VALUE", "ln(HR-high / HR-low)", "ln(HR)"]
+    cancers = ["Breast cancer", "Ovarian cancer", "Colorectal cancer", "Lung cancer", "Prostate cancer", "Skin cancer", "Brain cancer", "Renal cell carcinoma", "Blood cancer"]
 
-# Process data and only get the COX P-value and Hazard ratio
-df = pd.read_excel(input)
-df = df.drop(columns=remove_col, axis=1)
-df = df[df["CANCER TYPE"].isin(cancers)]
+    # Process data and only get the COX P-value and Hazard ratio
+    df = pd.read_excel(input)
+    df = df.drop(columns=remove_col, axis=1)
+    df = df[df["CANCER TYPE"].isin(cancers)]
 
-df["HR [95% CI-low CI-upp]"] = df["HR [95% CI-low CI-upp]"].str.replace(
-    '\[(.*?)\]', '', regex=True)
-df["HR [95% CI-low CI-upp]"] = df["HR [95% CI-low CI-upp]"].apply(
-    pd.to_numeric)
-df["SURV"] = ""
+    df["HR [95% CI-low CI-upp]"] = df["HR [95% CI-low CI-upp]"].str.replace(
+        '\[(.*?)\]', '', regex=True)
+    df["HR [95% CI-low CI-upp]"] = df["HR [95% CI-low CI-upp]"].apply(
+        pd.to_numeric)
+    df["SURV"] = ""
 
-df = df['CONTRIBUTOR'].drop_duplicate(keep='first')
-print(df['N'].sum())
+    df = df.drop_duplicates(subset='CONTRIBUTOR', keep='first')
+    print(df['N'].sum())
 
-# Majority vote on the labels if there are multiple genes and they each have different labels
-df = df.groupby(['ID_NAME', 'CANCER TYPE'])[
-                'SURV'].agg(pd.Series.mode).to_frame()
-df = df.reset_index()
-
+count_prognoscan("./raw/prognoscan/prognoscan.xlsx")
 
 def make_model(path, fil):
     """
