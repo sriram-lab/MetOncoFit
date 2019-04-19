@@ -39,11 +39,12 @@ for fil in os.listdir('./../data/original/'):
         if datapath is None:
             datapath = './../data/original/'
 
-        canc = fil.replace(".train.csv","")
+        canc = fil.replace(".csv","")
         canc_dict = {
             'breast':'Breast Cancer',
             'cns':'Glioma',
             'colon':'Colorectal Cancer',
+            'complex':'Pan Cancer',
             'leukemia':'B-cell lymphoma',
             'melanoma':'Melanoma',
             'nsclc':'Lung Cancer',

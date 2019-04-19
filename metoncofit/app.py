@@ -30,12 +30,18 @@ import dash_bootstrap_components as dbc
 # Start the application using bootstrap
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
+# For server
+#server = app.server
+
 # Get data from MetOncoFit database
 df = pd.read_json("db.json", orient='columns')
 
 up = df.loc[(df["Type"] == "UPREGULATED") | (df["Type"] == "GAIN")]
+up = up.sort_values(by="Gini", ascending=False)
 neut = df.loc[(df["Type"] == "NEUTRAL") | (df["Type"] == "NEUT")]
+neut = neut.sort_values(by="Gini", ascending=False)
 down = df.loc[(df["Type"] == "DOWNREGULATED") | (df["Type"] == "LOSS")]
+down = down.sort_values(by="Gini", ascending=False)
 
 # get values that will be used
 num_uniq_genes = df["Gene"].nunique()
