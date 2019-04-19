@@ -26,19 +26,19 @@ python3 metoncofit.py complex.csv TCGA_annot var_excl
 ### S. Figures 1 and 8: Including more expression features for differential expression and cancer patient survival
 
 # S. Figure X: Predicting differential expression using values
-python3 metoncofit.py breast.csv TCGA_annot var_excl_cnv
-python3 metoncofit.py nsclc.csv TCGA_annot var_excl_cnv
-python3 metoncofit.py melanoma.csv TCGA_annot var_excl_cnv
+#python3 metoncofit.py breast.csv TCGA_annot var_excl_cnv
+#python3 metoncofit.py nsclc.csv TCGA_annot var_excl_cnv
+#python3 metoncofit.py melanoma.csv TCGA_annot var_excl_cnv
 
 # S. Figure 1: Predicting copy number variation using values
-python3 metoncofit.py breast.csv CNV var_excl_cnv
-python3 metoncofit.py nsclc.csv CNV var_excl_cnv
-python3 metoncofit.py melanoma.csv CNV var_excl_cnv
+#python3 metoncofit.py breast.csv CNV var_excl_cnv
+#python3 metoncofit.py nsclc.csv CNV var_excl_cnv
+#python3 metoncofit.py melanoma.csv CNV var_excl_cnv
 
 # S. Figure 8: Predicting patient survival including all values (TCGA gene expression fold change and CNV ratio)
-python3 metoncofit.py breast.csv SURV no_excl
-python3 metoncofit.py nsclc.csv SURV no_excl
-python3 metoncofit.py melanoma.csv SURV no_excl
+#python3 metoncofit.py breast.csv SURV no_excl
+#python3 metoncofit.py nsclc.csv SURV no_excl
+#python3 metoncofit.py melanoma.csv SURV no_excl
 
 ################################################################################
 ### S. Figures 2-7: The other cancer models not described in the main text
