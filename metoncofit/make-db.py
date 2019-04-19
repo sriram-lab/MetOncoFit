@@ -26,6 +26,7 @@ targ = ["TCGA_annot", "CNV", "SURV"]
 var_excl = ["TCGA gene expression fold change", "CNV gain/loss ratio"]
 
 for fil in os.listdir('./../data/original/'):
+    # Iterate between models
     for t in targ:
 
         # Proprocessing data
@@ -55,6 +56,7 @@ for fil in os.listdir('./../data/original/'):
         df_names = pd.read_csv("./../labels/real_headers.txt", sep='\t', names=['Original', 'New'])
         names = dict([(i, nam) for i, nam in zip(df_names['Original'], df_names['New'])])
         df = pd.read_csv(datapath+fil, index_col=None)
+        df = df.drop(columns=['TCGA_val','CNV_val'],axis=1)
         df = df.rename(columns=names)
         df = df.set_index(['Genes','Cell Line'])
 
@@ -65,13 +67,6 @@ for fil in os.listdir('./../data/original/'):
 
         excl_targ = {'TCGA annotation', 'SURV', 'CNV'}
         tmp = excl_targ.remove(t)
-
-        # We will drop a few columns in the cases where we have an exclusion list.
-        if(len(sys.argv) > 3):
-            fil2 = open("./../labels/"+var_excl)
-            drop_col_names = [i.strip() for i in fil2.readlines()]
-            fil2.close()
-            df = df.drop(columns=drop_col_names)
 
         df = df.drop(columns=excl_targ)
         classes = df[t]
@@ -107,9 +102,8 @@ for fil in os.listdir('./../data/original/'):
             targ_dict = {'NEUTRAL': 0, 'DOWNREG': 0, 'UPREG': 0}
 
         df1 = df1.reset_index()
-        print(df1)
-        one_gene_df = df1.drop(columns="Cell Line").groupby(["Genes", targ]).median().reset_index().set_index("Genes")
-        one_gene_class = pd.DataFrame(one_gene_df[targ])
+        one_gene_df = df1.drop(columns="Cell Line").groupby(["Genes", t]).median().reset_index().set_index("Genes")
+        one_gene_class = pd.DataFrame(one_gene_df[t])
         one_gene_class = one_gene_class.reset_index()
 
         # These dataframes contain the df entries with increased, neutral, and decreased values.
