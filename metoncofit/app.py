@@ -192,7 +192,7 @@ app.layout = html.Div([_body, _widgets,
                 'layout':go.Layout(
                     title=go.layout.Title(
                         text=('<b>Target label: '+up['Type'].iloc[0]+'</b>'),
-                        xanchor='left',
+                        xanchor='right',
                         yanchor='bottom',
                         x=0,
                         font=dict(
@@ -233,7 +233,7 @@ app.layout = html.Div([_body, _widgets,
                 'layout':go.Layout(
                     title=go.layout.Title(
                         text=('<b>Target label: '+neut['Type'].iloc[0]+'</b>'),
-                        xanchor='left',
+                        xanchor='right',
                         yanchor='bottom',
                         x=0,
                         font=dict(
@@ -274,7 +274,7 @@ app.layout = html.Div([_body, _widgets,
                 'layout':go.Layout(
                     title=go.layout.Title(
                         text=('<b>Target label: '+down['Type'].iloc[0]+'</b>'),
-                        xanchor='left',
+                        xanchor='right',
                         yanchor='bottom',
                         x=0,
                         font=dict(
@@ -334,8 +334,9 @@ def update_up(cancer_choice, prediction_choice, slider_choice):
         'layout':go.Layout(
             title=go.layout.Title(
                 text=('<b>Target label: '+up_df['Type'].iloc[0]+'</b>'),
-                xanchor='right',
+                xanchor='left',
                 yanchor='bottom',
+                x=0.47,
                 font=dict(
                     family='Arial',
                     size=16,
@@ -346,10 +347,11 @@ def update_up(cancer_choice, prediction_choice, slider_choice):
             width=1000,
             yaxis=dict(
                 automargin=True,
+                autorange='reversed',
                 tickfont=dict(
                     family='Arial, sans-serif',
                     size=14,
-                    color='black'
+                    color='black',
                 )
             )
         )
@@ -386,8 +388,9 @@ def update_neut(cancer_choice, prediction_choice, slider_choice):
         'layout':go.Layout(
             title=go.layout.Title(
                 text=('<b>Target label: '+neut_df['Type'].iloc[0]+'</b>'),
-                xanchor='right',
+                xanchor='left',
                 yanchor='bottom',
+                x=0.47,
                 font=dict(
                     family='Arial',
                     size=16,
@@ -398,6 +401,7 @@ def update_neut(cancer_choice, prediction_choice, slider_choice):
             width=1000,
             yaxis=dict(
                 automargin=True,
+                autorange='reversed',
                 tickfont=dict(
                     family='Arial, sans-serif',
                     size=14,
@@ -438,8 +442,9 @@ def update_down(cancer_choice, prediction_choice, slider_choice):
         'layout':go.Layout(
             title=go.layout.Title(
                 text=('<b>Target label: '+down_df['Type'].iloc[0]+'</b>'),
-                xanchor='right',
+                xanchor='left',
                 yanchor='bottom',
+                x=0.47,
                 font=dict(
                     family='Arial',
                     size=16,
@@ -450,6 +455,7 @@ def update_down(cancer_choice, prediction_choice, slider_choice):
             width=1000,
             yaxis=dict(
                 automargin=True,
+                autorange='reversed',
                 tickfont=dict(
                     family='Arial, sans-serif',
                     size=14,
