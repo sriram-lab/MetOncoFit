@@ -62,6 +62,7 @@ def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
         'breast':'Breast Cancer',
         'cns':'Glioma',
         'colon':'Colorectal Cancer',
+        'complex':'Pan Cancer',
         'leukemia':'B-cell lymphoma',
         'melanoma':'Melanoma',
         'nsclc':'Lung Cancer',
