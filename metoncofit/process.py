@@ -139,8 +139,7 @@ def one_gene_only(df, target):
         targ_dict = {'NEUTRAL': 0, 'DOWNREG': 0, 'UPREG': 0}
 
     df = df.reset_index()
-    one_gene_df = df.drop(columns="Cell Line").groupby(
-        ["Genes", target]).median().reset_index().set_index("Genes")
+    one_gene_df = df.drop(columns="Cell Line").groupby(["Genes", target]).median().reset_index().set_index("Genes")
     one_gene_class = pd.DataFrame(one_gene_df[target])
     one_gene_class = one_gene_class.reset_index()
 

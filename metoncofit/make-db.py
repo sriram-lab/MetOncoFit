@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-db.py creates the metoncofit dataframe that can be used for several applications.
+db.py creates the metoncofit dataframe that can be used for several web and development applications.
 
 @author: Scott Campit
 """
@@ -20,47 +20,43 @@ from sklearn.externals import joblib
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
 
-global fil, t, var_excl
 datapath = None
 all_dfs = []
 targ = ["TCGA_annot", "CNV", "SURV"]
 var_excl = ["TCGA gene expression fold change", "CNV gain/loss ratio"]
 
-for fil in os.listdir('./../data'):
+for fil in os.listdir('./../data/original/'):
     for t in targ:
-        if datapath is None:
-            datapath = './../data/'
-        canc = fil.replace(".train.csv","")
-        if canc == "breast":
-            canc = "Breast Cancer"
-        elif canc == "cns":
-            canc = "Glioma"
-        elif canc == "colon":
-            canc = "Colorectal Cancer"
-        elif canc == "complex":
-            canc = "Pan Cancer"
-        elif canc == "leukemia":
-            canc = "B-Cell Lymphoma"
-        elif canc == "melanoma":
-            canc = "Melanoma"
-        elif canc == "nsclc":
-            canc = "Lung Cancer"
-        elif canc == "ovarian":
-            canc = "Ovarian Cancer"
-        elif canc == "prostate":
-            canc = "Prostate Cancer"
-        elif canc == "renal":
-            canc = "Renal Cancer"
 
+        # Proprocessing data
         classes = []
         data = []
         names = []
 
         if t == 'TCGA_annot':
             t = str("TCGA annotation")
+        if datapath is None:
+            datapath = './../data/original/'
 
-        df_names = pd.read_csv("./../labels/real_headers.txt", sep='\t')
-        df = pd.read_csv(datapath+fil, names=list(df_names.iloc[:,1]), index_col=0, skiprows=1)
+        canc = fil.replace(".train.csv","")
+        canc_dict = {
+            'breast':'Breast Cancer',
+            'cns':'Glioma',
+            'colon':'Colorectal Cancer',
+            'leukemia':'B-cell lymphoma',
+            'melanoma':'Melanoma',
+            'nsclc':'Lung Cancer',
+            'ovarian':'Ovarian Cancer',
+            'prostate':'Prostate Cancer',
+            'renal':'Renal Cancer'
+        }
+        canc = canc_dict.get(canc)
+
+        df_names = pd.read_csv("./../labels/real_headers.txt", sep='\t', names=['Original', 'New'])
+        names = dict([(i, nam) for i, nam in zip(df_names['Original'], df_names['New'])])
+        df = pd.read_csv(datapath+fil, index_col=None)
+        df = df.rename(columns=names)
+        df = df.set_index(['Genes','Cell Line'])
 
         # We are label encoding the subsystem and datapath labels
         le = preprocessing.LabelEncoder()
@@ -72,7 +68,7 @@ for fil in os.listdir('./../data'):
 
         # We will drop a few columns in the cases where we have an exclusion list.
         if(len(sys.argv) > 3):
-            fil2=open("./../labels/"+var_excl)
+            fil2 = open("./../labels/"+var_excl)
             drop_col_names = [i.strip() for i in fil2.readlines()]
             fil2.close()
             df = df.drop(columns=drop_col_names)
@@ -91,6 +87,7 @@ for fil in os.listdir('./../data'):
         ros = RandomOverSampler()
         data, classes = ros.fit_sample(new_data, new_classes)
 
+        # Random forests (MetOncoFit)
         feat = (data.shape[1]-10)
         while(feat < data.shape[1]-1):
             trees = 5
@@ -110,21 +107,25 @@ for fil in os.listdir('./../data'):
             targ_dict = {'NEUTRAL': 0, 'DOWNREG': 0, 'UPREG': 0}
 
         df1 = df1.reset_index()
-        df1["Gene"], df1["Cell Line"] = df1["index"].str.split("_", 1).str
-        one_gene_df = df1.drop(columns=["index", "Cell Line"]).groupby(["Gene", t]).median().reset_index().set_index("Gene")
-        one_gene_class = pd.DataFrame(one_gene_df[t])
+        print(df1)
+        one_gene_df = df1.drop(columns="Cell Line").groupby(["Genes", targ]).median().reset_index().set_index("Genes")
+        one_gene_class = pd.DataFrame(one_gene_df[targ])
         one_gene_class = one_gene_class.reset_index()
 
+        # These dataframes contain the df entries with increased, neutral, and decreased values.
         up_df = one_gene_df.loc[(one_gene_df[t] == targ_labels[0])]
         neut_df = one_gene_df.loc[(one_gene_df[t] == targ_labels[1])]
         down_df = one_gene_df.loc[(one_gene_df[t] == targ_labels[2])]
 
+        # To create the figure, we are randomly selecting three genes that are upreg, neutral, or downreg and are storing them in this list.
         up_genes = up_df.index.values.tolist()
         neut_genes = neut_df.index.values.tolist()
         down_genes = down_df.index.values.tolist()
 
+        # Remove the classes
         _ = one_gene_df.pop(t)
 
+        # This will calculate the correlation for each feature, if there is one between the biological features.
         column_squigly = {}
         for col in one_gene_df.columns:
             v1 = up_df[col].median()
@@ -175,7 +176,6 @@ for fil in os.listdir('./../data'):
         scaler = MinMaxScaler()
         result = scaler.fit_transform(one_gene_df)
         one_gene_df = pd.DataFrame(result, columns=col, index=idx)
-        #print(one_gene_df)
 
         # Get the genes that are up/neut/downregulated
         tmparr_up = one_gene_df[one_gene_df.index.isin(up_genes)]
