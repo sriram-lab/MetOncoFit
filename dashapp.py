@@ -32,9 +32,6 @@ import flask
 # Start the application using bootstrap
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-# For server
-#server = app.server
-
 # Get data from MetOncoFit database
 df = pd.read_json("db.json", orient='columns')
 
@@ -473,5 +470,8 @@ def update_down(cancer_choice, prediction_choice, slider_choice):
 def display_value(value):
     return 'Number of genes displayed: {}'.format(value, value)
 
+# For server
+server = app.server
+
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, server=)
