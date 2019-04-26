@@ -101,6 +101,7 @@ vendor
 _site
 raw/
 output/
+app/
 
 # Spyder project settings
 .spyderproject

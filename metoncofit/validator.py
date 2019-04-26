@@ -172,6 +172,7 @@ def leave_one_feat_out(df, canc, targ):
     2. Dynamic features only
     3. Expression only
     4. Expression and kcat
+    5. RECON1 subsystem
     """
 
     # create 4 dataframes that will be used for each of the features after robust scaler
@@ -188,7 +189,7 @@ def leave_one_feat_out(df, canc, targ):
     subsys = df.drop(df.columns[134], axis=1)
 
     # concatenate the dataframes to a single structure and get accuracies
-    dfs = [topo, dynm, kexp, genexp]
+    dfs = [topo, dynm, kexp, genexp, subsys]
 
     output = []
     for df in dfs:
