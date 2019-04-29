@@ -20,14 +20,16 @@ import pandas as pd
 from openpyxl import load_workbook
 
 # Create data structures that will be used in the analysis
-df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ = process.preprocess(datapath='./../data/original/', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3])
+df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ = process.preprocess(
+    datapath='./../data/', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3])
 
 # Random Forest Classifier, prediction, and hold out accuracy
 rfc, rfc_pred, mean_acc = random_forest.random_forest(
     canc, targ, data, classes, orig_data, orig_classes)
 
 # Model performance and statistical measures. THIS FUNCTION IS ALSO NECESSARY TO GENERATE THE FIGURES.
-cm, pvalue, zscore, cv_score, summary = validator.summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, targ, excl_targ, mean_acc, canc)
+cm, pvalue, zscore, cv_score, summary = validator.summary_statistics(
+    rfc, rfc_pred, data, classes, orig_classes, orig_data, targ, excl_targ, mean_acc, canc)
 
 # Model comparison with Auslander et al., 2016. Use only gene expression in these predictions for a true comparison.
 #df2 = df1.copy(deep=True)
@@ -45,9 +47,12 @@ cm, pvalue, zscore, cv_score, summary = validator.summary_statistics(rfc, rfc_pr
 #save.make_excel(summary, compare_models, loco, lofo, filename='SI.xlsx')
 
 # Create data structures that will only be used while making the figures
-up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, one_gene_class = process.one_gene_only(df1, targ)
+up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, one_gene_class = process.one_gene_only(
+    df1, targ)
 
-importance, up, neut, down, final_df = process.plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, rfc, header, targ, orig_classes, rfc_pred, one_gene_class, canc)
+importance, up, neut, down, final_df = process.plotting_preprocess(
+    up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, rfc, header, targ, orig_classes, rfc_pred, one_gene_class, canc)
 
 # Make the figures
-visualizations.make_figure(final_df, importance, cm, orig_classes, rfc_pred, cv_score, pvalue, zscore, canc, targ, normalize=True, savepath=False, filename=False)
+visualizations.make_figure(final_df, importance, cm, orig_classes, rfc_pred, cv_score,
+                           pvalue, zscore, canc, targ, normalize=True, savepath=False, filename=False)

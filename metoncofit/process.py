@@ -55,28 +55,30 @@ def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
         targ = str("TCGA annotation")
 
     if datapath is None:
-        datapath = './../data/original'
+        datapath = './../data/'
 
     canc = fil.replace(".csv", "")
     canc_dict = {
-        'breast':'Breast Cancer',
-        'cns':'Glioma',
-        'colon':'Colorectal Cancer',
-        'complex':'Pan Cancer',
-        'leukemia':'B-cell lymphoma',
-        'melanoma':'Melanoma',
-        'nsclc':'Lung Cancer',
-        'ovarian':'Ovarian Cancer',
-        'prostate':'Prostate Cancer',
-        'renal':'Renal Cancer'
-    }
+        'breast': 'Breast Cancer',
+        'cns': 'Glioma',
+        'colon': 'Colorectal Cancer',
+        'complex': 'Pan Cancer',
+        'leukemia': 'B-cell lymphoma',
+        'melanoma': 'Melanoma',
+        'nsclc': 'Lung Cancer',
+        'ovarian': 'Ovarian Cancer',
+        'prostate': 'Prostate Cancer',
+        'renal': 'Renal Cancer'
+        }
     canc = canc_dict.get(canc)
 
-    df_names = pd.read_csv("./../labels/real_headers.txt", sep='\t', names=['Original', 'New'])
-    names = dict([(i, nam) for i, nam in zip(df_names['Original'], df_names['New'])])
+    df_names = pd.read_csv("./../labels/real_headers.txt",
+                           sep='\t', names=['Original', 'New'])
+    names = dict([(i, nam)
+                  for i, nam in zip(df_names['Original'], df_names['New'])])
     df = pd.read_csv(datapath+fil, index_col=None)
     df = df.rename(columns=names)
-    df = df.set_index(['Genes','Cell Line'])
+    df = df.set_index(['Genes', 'Cell Line'])
 
     # We are label encoding the subsystem and datapath labels
     le = preprocessing.LabelEncoder()
@@ -111,6 +113,7 @@ def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
 
     return df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ
 
+
 def one_gene_only(df, target):
     """
     one_gene_only will merge the gene target value by majority rules and will take the median values for all numerical values.
@@ -140,7 +143,8 @@ def one_gene_only(df, target):
         targ_dict = {'NEUTRAL': 0, 'DOWNREG': 0, 'UPREG': 0}
 
     df = df.reset_index()
-    one_gene_df = df.drop(columns="Cell Line").groupby(["Genes", target]).median().reset_index().set_index("Genes")
+    one_gene_df = df.drop(columns="Cell Line").groupby(
+        ["Genes", target]).median().reset_index().set_index("Genes")
     one_gene_class = pd.DataFrame(one_gene_df[target])
     one_gene_class = one_gene_class.reset_index()
 
