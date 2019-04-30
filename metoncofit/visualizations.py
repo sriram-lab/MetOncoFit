@@ -418,8 +418,9 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     sns.set_style("whitegrid")
     sns.stripplot(x="value", y="feature", hue="type", palette=class_col, data=df1, hue_order=targ_labels, dodge=True, jitter=True, alpha=0.3, zorder=1, size=2.75, ax=axarr[0])
 
+    from numpy import median
     # Show the conditional mean and standard deviation
-    sns.pointplot(x="value", y="feature", hue="type", palette=class_col, data=df1, hue_order=targ_labels, dodge=0.532, join=False, markers="D", scale=0.75, ci="sd", errwidth=1.00, ax=axarr[0])
+    sns.pointplot(x="value", y="feature", hue="type", palette=class_col, data=df1, hue_order=targ_labels, dodge=0.532, join=False, markers="D", scale=0.75, ci="sd", estimator=median, errwidth=1.00, ax=axarr[0])
 
     # Dotplot specific handles
     handles, labels = axarr[0].get_legend_handles_labels()

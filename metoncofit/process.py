@@ -83,7 +83,7 @@ def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
     # We are label encoding the subsystem and datapath labels
     le = preprocessing.LabelEncoder()
     df["RECON1 subsystem"] = le.fit_transform(df["RECON1 subsystem"])
-    df["Biomass subsystem"] = le.fit_transform(df["Biomass subsystem"])
+    df["Metabolic subnetwork"] = le.fit_transform(df["Metabolic subnetwork"])
 
     excl_targ = {'TCGA annotation', 'SURV', 'CNV'}
     tmp = excl_targ.remove(targ)
