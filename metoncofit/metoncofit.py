@@ -31,8 +31,6 @@ rfc, rfc_pred, mean_acc = random_forest.random_forest(
 cm, pvalue, zscore, cv_score, summary = validator.summary_statistics(
     rfc, rfc_pred, data, classes, orig_classes, orig_data, targ, excl_targ, mean_acc, canc)
 
-print(summary)
-
 # Model comparison with Auslander et al., 2016. Use only gene expression in these predictions for a true comparison.
 #df2 = df1.copy(deep=True)
 #compare_models = validator.area_under_curve_calc(df2, canc, targ)
@@ -54,6 +52,8 @@ up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, one_gene
 
 importance, up, neut, down, final_df = process.plotting_preprocess(
     up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, rfc, header, targ, orig_classes, rfc_pred, one_gene_class, canc)
+
+print(importance)
 
 # Make the figures
 visualizations.make_figure(final_df, importance, cm, orig_classes, rfc_pred, cv_score,

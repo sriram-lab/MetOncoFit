@@ -416,12 +416,10 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
 
     # Show each observation in scatter plot
     sns.set_style("whitegrid")
-    sns.stripplot(x="value", y="feature", hue="type", palette=class_col, data=df1,
-                  dodge=True, jitter=True, alpha=0.3, zorder=1, size=2.75, ax=axarr[0])
+    sns.stripplot(x="value", y="feature", hue="type", palette=class_col, data=df1, hue_order=targ_labels, dodge=True, jitter=True, alpha=0.3, zorder=1, size=2.75, ax=axarr[0])
 
     # Show the conditional mean and standard deviation
-    sns.pointplot(x="value", y="feature", hue="type", palette=class_col, data=df1,
-                  dodge=0.532, join=False, markers="D", scale=0.75, ci="sd", errwidth=1.00, ax=axarr[0])
+    sns.pointplot(x="value", y="feature", hue="type", palette=class_col, data=df1, hue_order=targ_labels, dodge=0.532, join=False, markers="D", scale=0.75, ci="sd", errwidth=1.00, ax=axarr[0])
 
     # Dotplot specific handles
     handles, labels = axarr[0].get_legend_handles_labels()
@@ -504,5 +502,5 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     axarr[2].text(-0.4, 5.0, "Z-score of accuracy: "
                   + (str(zscore).lstrip('[').rstrip(']')), size=7, ha="left")
 
-    figure.savefig(savepath+'/'+filename+'.svg', format='svg',
+    figure.savefig(savepath+'/'+filename+'.png', format='png',
                    dpi=300, bbox_inches='tight', pad_inches=0.2)
