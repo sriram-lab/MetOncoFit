@@ -135,7 +135,7 @@ total_path	Sum of topological distances to biomass components
 kcat	Catalytic efficiency
 GeneExp	NCI-60 gene expression
 subsys	RECON1 subsystem
-path_label	Biomass subsystem
+path_label	Metabolic subnetwork
 TCGA_val	TCGA gene expression fold change
 CNV_val	CNV gain/loss ratio
 TCGA_annot	TCGA annotation

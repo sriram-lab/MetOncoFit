@@ -35,7 +35,7 @@ def add_kcat(datapath='str', savepath='str', type='str'):
             mean_kcat = df['kcat'].mean()
             df['kcat'] = df['kcat'].replace(np.NaN, mean_kcat)
         elif type == 'mode':
-            mode_kcat = df['kcat'].mode()
+            mode_kcat = df['kcat'].mode('columns')
             df['kcat'] = df['kcat'].replace(np.NaN, mode_kcat)
         elif type == 'max':
             max_kcat = df['kcat'].max()
@@ -71,22 +71,20 @@ def remove_kcat(datapath='str', savepath='str', ext='str'):
         # Save dataframe as original file name.
         df.to_csv(savepath+filname+'.csv', index=False)
 
-# Get Mean
+# Remove crap:
 #remove_kcat(datapath='./../data/median/', savepath='./../data/original/', ext='')
-add_kcat(datapath='./../data/original/', savepath='./../data/mean/', type='mean')
+
+# Get Mean
+add_kcat(datapath='./../data/okdev/', savepath='./../data/mean/', type='mean')
 
 # Get Median
-#remove_kcat(datapath='', ext='')
-#add_kcat(datapath='', ext='1', type='median')
+add_kcat(datapath='./../data/okdev/', savepath='./../data/median/', type='median')
 
 # Get Mode
-#remove_kcat(datapath='', ext='')
-#add_kcat(datapath='', ext='1', type='mode')
+add_kcat(datapath='./../data/okdev/', savepath='./../data/mode/', type='mode')
 
 # Get Max
-#remove_kcat(datapath='', ext='')
-#add_kcat(datapath='', ext='1', type='max')
+add_kcat(datapath='./../data/okdev/', savepath='./../data/max/', type='max')
 
 # Get Min
-#remove_kcat(datapath='', ext='')
-#add_kcat(datapath='', ext='1', type='min')
+add_kcat(datapath='./../data/okdev/', savepath='./../data/min/', type='min')

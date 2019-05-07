@@ -21,7 +21,7 @@ from imblearn.over_sampling import RandomOverSampler
 from sklearn.model_selection import train_test_split
 
 
-def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3]):
+def preprocess(datapath='str', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3]):
     """
     preprocess takes in the '*.csv' file and transforms the data that can be
     analyzed or fed into the MetOncoFit classifier.
@@ -55,7 +55,7 @@ def preprocess(datapath='', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[
         targ = str("TCGA annotation")
 
     if datapath is None:
-        datapath = './../data/'
+        datapath = './../data/mean/'
 
     canc = fil.replace(".csv", "")
     canc_dict = {
