@@ -393,9 +393,9 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     correl = []
     for value in pearson:
         value = float(value)
-        if value > 0.75:
+        if value >= 0.50:
             correl.append(str('+'))
-        elif value < -0.75:
+        elif value <= -0.50:
             correl.append(u"\u2014")
         else:
             correl.append('~')

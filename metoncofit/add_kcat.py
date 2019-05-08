@@ -75,16 +75,16 @@ def remove_kcat(datapath='str', savepath='str', ext='str'):
 #remove_kcat(datapath='./../data/median/', savepath='./../data/original/', ext='')
 
 # Get Mean
-add_kcat(datapath='./../data/okdev/', savepath='./../data/mean/', type='mean')
+#add_kcat(datapath='./../data/okdev/', savepath='./../data/mean/', type='mean')
 
 # Get Median
-add_kcat(datapath='./../data/okdev/', savepath='./../data/median/', type='median')
+#add_kcat(datapath='./../data/okdev/', savepath='./../data/median/', type='median')
 
 # Get Mode
 add_kcat(datapath='./../data/okdev/', savepath='./../data/mode/', type='mode')
 
 # Get Max
-add_kcat(datapath='./../data/okdev/', savepath='./../data/max/', type='max')
+#add_kcat(datapath='./../data/okdev/', savepath='./../data/max/', type='max')
 
 # Get Min
-add_kcat(datapath='./../data/okdev/', savepath='./../data/min/', type='min')
+#add_kcat(datapath='./../data/okdev/', savepath='./../data/min/', type='min')
