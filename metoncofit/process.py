@@ -13,6 +13,7 @@ import re
 
 import numpy as np
 import pandas as pd
+from scipy.stats import pearsonr
 
 from sklearn import preprocessing
 from sklearn.preprocessing import RobustScaler
@@ -76,6 +77,7 @@ def preprocess(datapath='str', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.ar
                            sep='\t', names=['Original', 'New'])
     names = dict([(i, nam)
                   for i, nam in zip(df_names['Original'], df_names['New'])])
+
     df = pd.read_csv(datapath+fil, index_col=None)
     df = df.rename(columns=names)
     df = df.set_index(['Genes', 'Cell Line'])
@@ -183,10 +185,10 @@ def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_gene
         v2 = neut_df[col].median()
         v3 = down_df[col].median()
 
-        correl = np.corrcoef([v1, v2, v3], [1.0, 0.0, -1.0])
+        correl = pearsonr([v1, v2, v3], [1.0, 0.0, -1.0])
 
-        if(np.isnan(correl[0][1]) != True):
-            column_squigly[col] = correl[0][1]
+        if(np.isnan(correl[0]) != True):
+            column_squigly[col] = correl[0]
         else:
             column_squigly[col] = 0.0
 

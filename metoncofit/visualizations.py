@@ -393,17 +393,16 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     correl = []
     for value in pearson:
         value = float(value)
-        if value >= 0.50:
+        if value >= 0.60:
             correl.append(str('+'))
-        elif value <= -0.50:
+        elif value <= -0.60:
             correl.append(u"\u2014")
         else:
             correl.append('~')
 
     # Main figure parameters and arguments
     sns.set_style("whitegrid")
-    figure, axarr = plt.subplots(nrows=1, ncols=3, figsize=(7.2, 3.6), gridspec_kw={
-                                 'width_ratios': [1.0, 1.0, 0.75], 'wspace': 0.2}, sharex=False)
+    figure, axarr = plt.subplots(nrows=1, ncols=3, figsize=(7.2, 3.6), gridspec_kw={'width_ratios': [1.0, 1.0, 0.75], 'wspace': 0.2}, sharex=False)
 
     # Legend parameters for the dotplot
     from matplotlib.lines import Line2D
@@ -416,11 +415,11 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
 
     # Show each observation in scatter plot
     sns.set_style("whitegrid")
-    sns.stripplot(x="value", y="feature", hue="type", palette=class_col, data=df1, hue_order=targ_labels, dodge=True, jitter=True, alpha=0.3, zorder=1, size=2.75, ax=axarr[0])
+    sns.stripplot(x="value", y="feature", hue="type", palette=class_col, data=df1, order=importance['Feature'], hue_order=targ_labels, dodge=True, jitter=True, alpha=0.3, zorder=1, size=2.75, ax=axarr[0])
 
     from numpy import median
     # Show the conditional mean and standard deviation
-    sns.pointplot(x="value", y="feature", hue="type", palette=class_col, data=df1, hue_order=targ_labels, dodge=0.532, join=False, markers="D", scale=0.75, ci="sd", estimator=median, errwidth=1.00, ax=axarr[0])
+    sns.pointplot(x="value", y="feature", hue="type", palette=class_col, data=df1, order=importance['Feature'], hue_order=targ_labels, dodge=0.532, join=False, markers="D", scale=0.75, ci="sd", estimator=median, errwidth=1.00, ax=axarr[0])
 
     # Dotplot specific handles
     handles, labels = axarr[0].get_legend_handles_labels()
@@ -448,7 +447,7 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     axarr[1].tick_params(axis='x', which='both', top=False, labelsize=7)
     axarr[1].tick_params(axis='y', which='both', right=False,
                          left=True, labelleft=False, labelsize=7)
-    axarr[1].set_xlabel("Gini Score", fontsize=7)
+    axarr[1].set_xlabel("Importance Score", fontsize=7)
     axarr[1].set_ylabel('')
     axarr[1].grid(color='gray', axis='y')
     axarr[1].xaxis.grid(False)
