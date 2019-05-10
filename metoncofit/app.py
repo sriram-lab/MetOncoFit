@@ -15,7 +15,6 @@ Future implementation of the MetOncoFit app:
 """
 import pandas as pd
 import numpy as np
-import markdown
 
 from plotly import tools
 import plotly.plotly as py

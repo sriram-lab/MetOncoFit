@@ -25,7 +25,7 @@ all_dfs = []
 targ = ["TCGA_annot", "CNV", "SURV"]
 var_excl = ["TCGA gene expression fold change", "CNV gain/loss ratio"]
 
-for fil in os.listdir('./../data/original/'):
+for fil in os.listdir('./../data/median/'):
     # Iterate between models
     for t in targ:
 
@@ -64,7 +64,7 @@ for fil in os.listdir('./../data/original/'):
         # We are label encoding the subsystem and datapath labels
         le = preprocessing.LabelEncoder()
         df["RECON1 subsystem"] = le.fit_transform(df["RECON1 subsystem"])
-        df["Biomass subsystem"] = le.fit_transform(df["Biomass subsystem"])
+        df["Metabolic subnetwork"] = le.fit_transform(df["Metabolic subnetwork"])
 
         excl_targ = {'TCGA annotation', 'SURV', 'CNV'}
         tmp = excl_targ.remove(t)

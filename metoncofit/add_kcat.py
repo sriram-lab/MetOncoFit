@@ -36,7 +36,7 @@ def add_kcat(datapath='str', savepath='str', type='str'):
             df['kcat'] = df['kcat'].replace(np.NaN, mean_kcat)
         elif type == 'mode':
             mode_kcat = df['kcat'].mode('columns')
-            df['kcat'] = df['kcat'].replace(np.NaN, mode_kcat)
+            df['kcat'] = df['kcat'].replace(np.NaN, [mode_kcat])
         elif type == 'max':
             max_kcat = df['kcat'].max()
             df['kcat'] = df['kcat'].replace(np.NaN, max_kcat)
