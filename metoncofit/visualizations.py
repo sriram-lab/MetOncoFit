@@ -108,6 +108,52 @@ def plot_heatmap(df, one_gene_class, targ, canc, savepath=False, filename=False)
     #plt.savefig(savepath+'/'+filename+'.svg', dpi=600)
 
 
+def specific_pathways_heatmap(df, importance, targ, canc, genelist, savepath=False, filename=False):
+    """
+    Get the genes associated with specific metabolic pathways you're interested in.
+    """
+    if targ == False:
+        print("ERROR: Need to input targ set name.")
+
+    if savepath == False:
+        savepath = '.'
+
+    if filename == False:
+        filename = str(canc+'_'+targ)
+
+    if targ == 'CNV':
+        targ_labels = ["GAIN", "NEUT", "LOSS"]
+    else:
+        targ_labels = ["UPREG", "NEUTRAL", "DOWNREG"]
+
+    # Read in gene list
+    fil = open(genelist, "r")
+    genes = fil.read().split('\n')
+    del genes[0]
+    del genes[0]
+
+    # Get only the values you want:
+    df = df.loc[df.index.isin(genes)]
+
+    rank = importance['Feature'].tolist()
+    df = df[rank]
+
+    # Divide the df into 3 dataframes separated by target label
+    up = df.loc[(df[targ] == targ_labels[0])]
+    neut = df.loc[(df[targ] == targ_labels[1])]
+    down = df.loc[(df[targ] == targ_labels[2])]
+
+    # Main figure parameters and arguments
+    sns.set_style("whitegrid")
+    figure, axarr = plt.subplots(nrows=1, ncols=3, figsize=(7.2, 3.6), gridspec_kw={'width_ratios': [1.0, 1.0, 0.75], 'wspace': 0.2}, sharex=False)
+
+    # 3 heatmaps
+    sns.heatmap(up, cmap = 'RdBu', robust=True, ax=axarr[0])
+    sns.heatmap(neut, cmap = 'RdBu', robust=True, ax=axarr[1])
+    sns.heatmap(down, cmap = 'RdBu', robust=True, ax=axarr[2])
+
+    figure.savefig(savepath+'/'+filename+'.png', format='png', dpi=300, bbox_inches='tight', pad_inches=0.2)
+
 def plot_clustermap(df, one_gene_class, targ, canc, method=False, metric=False, savepath=False, filename=False):
     """
     Create a Seaborn clustermap that shows all of the genes and their corresponding feature values. The method and metric parameters are optional arguments.

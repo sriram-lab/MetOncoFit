@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/bin/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Initial website app for MetOncoFit.
@@ -470,7 +470,7 @@ def display_value(value):
     return 'Number of genes displayed: {}'.format(value, value)
 
 # For server
-server = app.server
+#server = app.server
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(host='0.0.0.0', debug=True)
