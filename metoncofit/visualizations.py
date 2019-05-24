@@ -133,25 +133,37 @@ def specific_pathways_heatmap(df, importance, targ, canc, genelist, savepath=Fal
     del genes[0]
 
     # Get only the values you want:
-    df = df.loc[df.index.isin(genes)]
-
+    df = df.loc[df['Genes'].isin(genes)]
     rank = importance['Feature'].tolist()
-    df = df[rank]
 
     # Divide the df into 3 dataframes separated by target label
-    up = df.loc[(df[targ] == targ_labels[0])]
-    neut = df.loc[(df[targ] == targ_labels[1])]
-    down = df.loc[(df[targ] == targ_labels[2])]
+    up = df.loc[(df['type'] == targ_labels[0])]
+    up = up.pivot(index='feature', columns='Genes', values='value')
+    up = up.reindex(rank)
+    neut = df.loc[(df['type'] == targ_labels[1])]
+    neut = neut.pivot(index='feature', columns='Genes', values='value')
+    neut = neut.reindex(rank)
+    down = df.loc[(df['type'] == targ_labels[2])]
+    down = down.pivot(index='feature', columns='Genes', values='value')
+    down = down.reindex(rank)
 
     # Main figure parameters and arguments
     sns.set_style("whitegrid")
-    figure, axarr = plt.subplots(nrows=1, ncols=3, figsize=(7.2, 3.6), gridspec_kw={'width_ratios': [1.0, 1.0, 0.75], 'wspace': 0.2}, sharex=False)
+    figure, axarr = plt.subplots(nrows=1, ncols=3, figsize=(7.2, 3.6), gridspec_kw={'width_ratios': [1, 1, 1], 'wspace': 0.2}, sharex=False)
 
     # 3 heatmaps
-    sns.heatmap(up, cmap = 'RdBu', robust=True, ax=axarr[0])
-    sns.heatmap(neut, cmap = 'RdBu', robust=True, ax=axarr[1])
-    sns.heatmap(down, cmap = 'RdBu', robust=True, ax=axarr[2])
+    sns.heatmap(up, cmap='RdBu', robust=True, cbar=False, square=False, yticklabels=True, ax=axarr[0])
+    sns.heatmap(neut, cmap= 'RdBu', robust=True, cbar=False, square=False, yticklabels=False, ax=axarr[1])
+    sns.heatmap(down, cmap='RdBu', robust=True, cbar=True, square=False, yticklabels=False, ax=axarr[2])
 
+
+    # Additional formatting for all 3 axes
+    for i in range(0,3):
+        axarr[i].set_xlabel('')
+        axarr[i].set_ylabel('')
+        axarr[i].set_title(targ_labels[i])
+
+    figure.tight_layout()
     figure.savefig(savepath+'/'+filename+'.png', format='png', dpi=300, bbox_inches='tight', pad_inches=0.2)
 
 def plot_clustermap(df, one_gene_class, targ, canc, method=False, metric=False, savepath=False, filename=False):

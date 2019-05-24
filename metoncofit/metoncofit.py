@@ -60,5 +60,5 @@ fils = [
   "tyrosine.txt"
 ]
 
-genelist = r"/mnt/c/Users/scampit/Desktop/alaaspglu.txt"
-visualizations.specific_pathways_heatmap(one_gene_df, importance, targ, canc, genelist, savepath=False, filename=False)
+genelist = r"/mnt/c/Users/scampit/Desktop/pyruvate.txt"
+visualizations.specific_pathways_heatmap(final_df, importance, targ, canc, genelist, savepath=False, filename=False)

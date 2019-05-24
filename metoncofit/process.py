@@ -160,8 +160,6 @@ def one_gene_only(df, target):
     neut_genes = neut_df.index.values.tolist()
     down_genes = down_df.index.values.tolist()
 
-    print(one_gene_df)
-
     return up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, one_gene_class
 
 
