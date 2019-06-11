@@ -22,7 +22,7 @@ from imblearn.over_sampling import RandomOverSampler
 from sklearn.model_selection import train_test_split
 
 
-def preprocess(datapath='str', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3]):
+def preprocess(datapath=sys.argv[1], fil=sys.argv[2], targ=sys.argv[3], exclude=sys.argv[4]):
     """
     preprocess takes in the '*.csv' file and transforms the data that can be
     analyzed or fed into the MetOncoFit classifier.
@@ -73,6 +73,13 @@ def preprocess(datapath='str', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.ar
         }
     canc = canc_dict.get(canc)
 
+    if sys.argv[1] == './../data/lax/':
+        type = "[0.90 - 1.10]"
+    elif sys.argv[1] == './../data/median/':
+        type = "[0.75 - 1.33]"
+    elif sys.argv[1] == './../data/stringent/':
+        type = "[0.50 - 2.00]"
+
     df_names = pd.read_csv("./../labels/real_headers.txt",
                            sep='\t', names=['Original', 'New'])
     names = dict([(i, nam)
@@ -80,6 +87,16 @@ def preprocess(datapath='str', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.ar
 
     df = pd.read_csv(datapath+fil, index_col=None)
     df = df.rename(columns=names)
+
+    # Used for evaluating the HR thresholds
+    freq = df[targ].value_counts()
+    freq = pd.DataFrame(freq)
+    freq = freq.reset_index()
+    freq = freq.rename({targ:"Label Frequency", "index":"Label"}, axis='columns')
+    freq["Cancer"] = canc
+    freq["Target"] = targ
+    freq["HR Thresholds"] = type
+
     df = df.set_index(['Genes', 'Cell Line'])
 
     # We are label encoding the subsystem and datapath labels
@@ -113,7 +130,7 @@ def preprocess(datapath='str', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.ar
     ros = RandomOverSampler()
     data, classes = ros.fit_sample(new_data, new_classes)
 
-    return df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ
+    return df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ, freq
 
 
 def one_gene_only(df, target):

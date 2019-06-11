@@ -562,3 +562,8 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
 
     figure.savefig(savepath+'/'+filename+'.png', format='png',
                    dpi=300, bbox_inches='tight', pad_inches=0.2)
+
+def hr_proof():
+    """
+    """
+    pass

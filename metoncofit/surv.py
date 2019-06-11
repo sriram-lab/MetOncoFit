@@ -12,7 +12,7 @@ import os
 import pandas as pd
 
 
-def make_surv(input, cox, hr_up, hr_low):
+def make_surv(input, cox, hr_up, hr_low, filename='str'):
     """
     make_surv will make a csv file containing the annotations by the Cox p-value and Hazard Ratio thresholds specified by the user. This file needs to be manually edited for multiple modes.
     """
@@ -50,13 +50,17 @@ def make_surv(input, cox, hr_up, hr_low):
     df = df.reset_index()
 
     # I physically edited the xlsx file. Need to devise conditional rule set to automatically determine labels for multiple modes
-    df.to_excel('lax.xlsx', index=False)
-    print('lax.xlsx done!')
+    df.to_excel(filename+'.xlsx', index=False)
 
-#make_surv("./raw/prognoscan/prognoscan.xlsx", cox=0.05, hr_up=1.1, hr_low=0.9)
+# Make labels
+#make_surv("./../raw/prognoscan/prognoscan.xlsx", cox=0.05, hr_up=1.1, hr_low=0.9, filename='lax')
+#make_surv("./../raw/prognoscan/prognoscan.xlsx", cox=0.05, hr_up=2.0, hr_low=0.5, filename='stringent')
 
 def count_prognoscan(input):
-# Filters
+    """
+    Another sanity check
+    """
+    # Filters
     remove_col = ["TYPE", "ID_DESCRIPTION", "DATA_POSTPROCESSING", "DATASET", "SUBTYPE", "ENDPOINT", "COHORT","PROBE ID", "ARRAY TYPE", "CUTPOINT", "MINIMUM P-VALUE", "CORRECTED P-VALUE", "ln(HR-high / HR-low)", "ln(HR)"]
     cancers = ["Breast cancer", "Ovarian cancer", "Colorectal cancer", "Lung cancer", "Prostate cancer", "Skin cancer", "Brain cancer", "Renal cell carcinoma", "Blood cancer"]
 
@@ -74,9 +78,9 @@ def count_prognoscan(input):
     df = df.drop_duplicates(subset='CONTRIBUTOR', keep='first')
     print(df['N'].sum())
 
-count_prognoscan("./raw/prognoscan/prognoscan.xlsx")
+#count_prognoscan("./raw/prognoscan/prognoscan.xlsx")
 
-def make_model(path, fil):
+def make_model(labels, filpath, filname):
     """
     make_model makes new model and integrates the labels specified in the make_surv function.
     """
@@ -92,19 +96,19 @@ def make_model(path, fil):
         'Renal cell carcinoma': 'renal'
         }
 
-    if path is None:
-        path = r"./data/original/"
+    if filpath is None:
+        filpath = r"./data/original/"
 
     # Skip pan cancer model
-    if fil == 'complex.csv':
+    if filname == 'complex.csv':
         pass
 
-    df = pd.read_excel('lax.xlsx')
+    df = pd.read_excel(labels)
     df = df.replace({'CANCER TYPE': canc_dict})
 
     # Read in the existing model and format it for our analysis
-    model = pd.read_csv(path+fil)
-    canc, _ = os.path.splitext(fil)
+    model = pd.read_csv(filpath+fil)
+    canc, _ = os.path.splitext(filname)
 
     # Drop existing survival labels
     model = model.drop(columns="SURV", axis=1)
@@ -119,12 +123,17 @@ def make_model(path, fil):
 
     model = model.set_index(['Gene', 'Cell Line'])
     model = model.reset_index()
-    #model.to_csv('./data/lax/'+canc+'.csv', index=False)
+    model.to_csv('./../data/stringent/'+canc+'.csv', index=False)
     return model
 
-#path = r"./data/original/"
+#path = r"./../data/original/"
 #folder = os.listdir(path)
 
+## Make cell line specific models
+#for fil in folder:
+#    model = make_model(r'./stringent.xlsx', filpath=path, filname=fil)
+
+# Make the pan cancer model
 #complex = []
 #for fil in folder:
 #    model = make_model(path, fil)
