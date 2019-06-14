@@ -108,8 +108,8 @@ def preprocess(datapath=sys.argv[1], fil=sys.argv[2], targ=sys.argv[3], exclude=
     tmp = excl_targ.remove(targ)
 
     # We will drop a few columns in the cases where we have an exclusion list.
-    if(len(sys.argv) > 3):
-        fil3 = open("./../labels/"+exclude)
+    if(len(sys.argv) > 4):
+        fil3 = open("./../labels/"+exclude.rstrip())
         drop_col_names = [i.strip() for i in fil3.readlines()]
         fil3.close()
         df = df.drop(columns=drop_col_names)

@@ -5,6 +5,7 @@ import sys
 import numpy as np
 import scipy
 import pandas as pd
+from openpyxl import load_workbook
 
 import process
 import random_forest
@@ -22,6 +23,10 @@ rfc, rfc_pred, mean_acc = random_forest.random_forest(canc, targ, data, classes,
 cm, pvalue, zscore, cv_score, summary = validator.summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, targ, excl_targ, mean_acc, canc)
 
 freq["10-fold CV Accuracy"] = cv_score
-print(freq)
 
-book = load_workbook('./../output/Tables/')
+book = load_workbook('./../output/Tables/SI.xlsx')
+writer = pd.ExcelWriter(r'./../output/Tables/SI.xlsx', engine='openpyxl')
+writer.book = book
+writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+freq.to_excel(writer, sheet_name='hrcheck')
+writer.save()
