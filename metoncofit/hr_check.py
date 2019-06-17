@@ -24,9 +24,13 @@ cm, pvalue, zscore, cv_score, summary = validator.summary_statistics(rfc, rfc_pr
 
 freq["10-fold CV Accuracy"] = cv_score
 
+# Save the results in an Excel file
 book = load_workbook('./../output/Tables/SI.xlsx')
 writer = pd.ExcelWriter(r'./../output/Tables/SI.xlsx', engine='openpyxl')
 writer.book = book
 writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-freq.to_excel(writer, sheet_name='hrcheck')
+if "S. Table 9 | HR Check" in book:
+    freq.to_excel(writer, sheet_name="S. Table 9 | HR Check", startrow=writer.sheets["S. Table 9 | HR Check"].max_row, header=False)
+else:
+    freq.to_excel(writer, sheet_name="S. Table 9 | HR Check", header=True)
 writer.save()
