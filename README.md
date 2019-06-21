@@ -9,13 +9,7 @@ Oruganty, K., Campit, S.E., Mamde, S., & Chandrasekaran, S. Common biochemical a
 ## Installation
 MetOncoFit is a Python package that takes curated cancer metabolic models to output differential expression, copy number variation, and patient survival classification predictions and ranked metabolic/biochemical feature importances.
 
-We recommend installing MetOncoFit inside a [virtual environment](https://virtualenv.pypa.io/en/latest/). To install the package, use PyPI:
-
-``` Python
-pip install metoncofit
-```
+We recommend creating a [virtual environment](https://virtualenv.pypa.io/en/latest/) specifically for MetOncoFit. Within this virtual environment, you can download all the dependencies in the `Setup` folder through a `pip install`. From there, you will be able to run the MetOncoFit package, which is located in the `metoncofit` folder. 
 
 ## Contributing
 Contributions are welcome! Please read the contributions guide to get started.
-
-## MetOncoFit
