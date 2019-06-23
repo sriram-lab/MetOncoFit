@@ -115,3 +115,7 @@ app/
 
 # mypy
 .mypy_cache/
+
+# scampit
+/metoncofit/accessory
+/metoncofit/__pycache__
