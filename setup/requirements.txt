@@ -78,7 +78,7 @@ ssh-import-id==5.7
 statsmodels==0.9.0
 systemd-python==234
 traitlets==4.3.2
-Twisted==17.9.0
+Twisted==19.2.1
 ufw==0.36
 unattended-upgrades==0.1
 urllib3==1.24.3
