@@ -11,5 +11,8 @@ MetOncoFit is a Python package that takes curated cancer metabolic models to out
 
 We recommend creating a [virtual environment](https://virtualenv.pypa.io/en/latest/) specifically for MetOncoFit. Within this virtual environment, you can download all the dependencies in the `Setup` folder through a `pip install`. From there, you will be able to run the MetOncoFit package, which is located in the `metoncofit` folder. 
 
+## Running MetOncoFit
+The file `metoncofit.py` contains the code that will call functions from other scripts in the `metoncofit` folder. To run all analyses that were done in Oruganty et al., you can run the bash script `do_all.sh`. 
+
 ## Contributing
 Contributions are welcome! Please read the contributions guide to get started.
