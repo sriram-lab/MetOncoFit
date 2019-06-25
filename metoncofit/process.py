@@ -92,7 +92,8 @@ def preprocess(datapath=sys.argv[1], fil=sys.argv[2], targ=sys.argv[3], exclude=
     freq = df[targ].value_counts()
     freq = pd.DataFrame(freq)
     freq = freq.reset_index()
-    freq = freq.rename({targ:"Label Frequency", "index":"Label"}, axis='columns')
+    freq = freq.rename(
+        {targ: "Label Frequency", "index": "Label"}, axis='columns')
     freq["Cancer"] = canc
     freq["Target"] = targ
     freq["HR Thresholds"] = type
@@ -135,12 +136,15 @@ def preprocess(datapath=sys.argv[1], fil=sys.argv[2], targ=sys.argv[3], exclude=
 
 def one_gene_only(df, target):
     """
-    one_gene_only will merge the gene target value by majority rules and will take the median values for all numerical values.
+    one_gene_only will merge the gene target value by majority rules and will take the median values for all numerical values. This code primarily designed to make the figures.
 
     STEPS:
         1. Split gene and cell line index
         2. Capture unique genes, grouping by majority vote and taking the median value for the gene. The data is stored in one_gene_df
         3. Get specific up/neut/down-regulated gene information and store in dataframes / lists
+        4. Calculate the Pearson Correlation Coefficient for up/neut/downregulated dataframes
+        5. Get the important features determined by the random forest classifier and capture the R value and Gini score in the importance dataframe.
+        6. Scale the data using the min/max approach and create the DataFrame that will be used, based on the `plot` argument
 
     INPUTS:
         df: DataFrame structure from the preprocess function.
@@ -177,22 +181,7 @@ def one_gene_only(df, target):
     neut_genes = neut_df.index.values.tolist()
     down_genes = down_df.index.values.tolist()
 
-    return up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, one_gene_class
-
-
-def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, rfc, header, targ, orig_classes, rfc_pred, one_gene_class, canc):
-    """
-    plotting_preprocess formats the data so that it can be used in the visualizations module.
-
-    STEPS:
-        1. Calculate the Pearson Correlation Coefficient for up/neut/downregulated dataframes
-        2. Get the important features determined by the random forest classifier and capture the R value and Gini score in the importance dataframe.
-        3. Scale the data using the min/max approach and create the DataFrame that will be used, based on the `plot` argument
-    """
-
-    global importance, up, neut, down, df
-
-    # Remove the classes
+    # Get rid of the target column
     _ = one_gene_df.pop(targ)
 
     # This will calculate the correlation for each feature, if there is one between the biological features.
@@ -219,6 +208,7 @@ def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_gene
         sorted_d = sorted(temp_dict_feat.items(),
                           key=operator.itemgetter(1), reverse=True)
         return sorted_d
+
     sorted_d = idx_change(header, rfc.feature_importances_)
 
     feat = []
@@ -274,4 +264,4 @@ def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_gene
     df['Cancer'] = canc
     df = df.reset_index().drop('index', axis=1)
 
-    return importance, up, neut, down, df
+    return importance, df
