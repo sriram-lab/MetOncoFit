@@ -45,14 +45,14 @@ cm, pvalue, zscore, cv_score, summary = validator.summary_statistics(
 #lofo = validator.leave_one_feat_out(df4, canc, targ)
 
 # Save the data into supplementary figures:
-save.make_excel(summary, compare_models, loco, lofo, filename='SI.xlsx')
+#save.make_excel(summary, compare_models, loco, lofo, filename='SI.xlsx')
 
 # Create data structures that will only be used while making the figures
-importance, final_df = process.one_gene_only(df1, targ)
+importance, final_df = process.one_gene_only(df1, targ, canc, rfc, header)
 
 # Make the figures
-visualizations.make_figure(final_df, importance, cm, orig_classes, rfc_pred, cv_score,
-                           pvalue, zscore, canc, targ, normalize=True, savepath=False, filename=False)
+#visualizations.make_figure(final_df, importance, cm, orig_classes, rfc_pred, cv_score,
+#                           pvalue, zscore, canc, targ, normalize=True, savepath=False, filename=False)
 
 # Make supplementary heatmaps
 #fils = [
