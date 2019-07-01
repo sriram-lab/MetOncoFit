@@ -22,7 +22,11 @@ from imblearn.over_sampling import RandomOverSampler
 from sklearn.model_selection import train_test_split
 
 
+<<<<<<< HEAD
 def preprocess(datapath='/path', fil='filename', targ='targ', exclude='exclusion'):
+=======
+def preprocess(datapath='str', fil='str', targ='str', exclude='str'):
+>>>>>>> c4b553d8d3f81f44903f51156171f2d3901b9966
     """
     preprocess takes in the '*.csv' file and transforms the data that can be
     analyzed or fed into the MetOncoFit classifier.
@@ -56,7 +60,11 @@ def preprocess(datapath='/path', fil='filename', targ='targ', exclude='exclusion
         targ = str("TCGA annotation")
 
     if datapath is None:
+<<<<<<< HEAD
         datapath = './../data/median/'
+=======
+        datapath = './../data/mean/'
+>>>>>>> c4b553d8d3f81f44903f51156171f2d3901b9966
 
     canc = fil.replace(".csv", "")
     canc_dict = {
@@ -73,11 +81,19 @@ def preprocess(datapath='/path', fil='filename', targ='targ', exclude='exclusion
         }
     canc = canc_dict.get(canc)
 
+<<<<<<< HEAD
     if datapath == './../data/lax/':
         type = "[0.90 - 1.10]"
     elif datapath == './../data/median/':
         type = "[0.75 - 1.33]"
     elif datapath == './../data/stringent/':
+=======
+    if './../data/median/' == './../data/lax/':
+        type = "[0.90 - 1.10]"
+    elif './../data/median/' == './../data/median/':
+        type = "[0.75 - 1.33]"
+    elif './../data/median/' == './../data/stringent/':
+>>>>>>> c4b553d8d3f81f44903f51156171f2d3901b9966
         type = "[0.50 - 2.00]"
 
     df_names = pd.read_csv("./../labels/real_headers.txt",
@@ -134,7 +150,11 @@ def preprocess(datapath='/path', fil='filename', targ='targ', exclude='exclusion
     return df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ, freq
 
 
+<<<<<<< HEAD
 def one_gene_only(df, targ, header, rfc, canc):
+=======
+def one_gene_only(df, targ, canc, rfc, header):
+>>>>>>> c4b553d8d3f81f44903f51156171f2d3901b9966
     """
     one_gene_only will merge the gene targ value by majority rules and will take the median values for all numerical values. This code primarily designed to make the figures.
 
@@ -148,7 +168,11 @@ def one_gene_only(df, targ, header, rfc, canc):
 
     INPUTS:
         df: DataFrame structure from the preprocess function.
+<<<<<<< HEAD
         targ: The target we are going to predict (CNV, DE, SURV)
+=======
+        targ: The targ we are going to predict (CNV, DE, SURV)
+>>>>>>> c4b553d8d3f81f44903f51156171f2d3901b9966
 
     OUTPUTS:
         one_gene_df, one_gene_class: Dataframe structure will all unique genes data and classes
@@ -216,7 +240,11 @@ def one_gene_only(df, targ, header, rfc, canc):
     corr = []
 
     x = 0
+<<<<<<< HEAD
     while(x < 130):  # Get the first 10 features
+=======
+    while(x < 10):  # Get the first 10 features
+>>>>>>> c4b553d8d3f81f44903f51156171f2d3901b9966
         tempa = sorted_d[x]
         feat.append(tempa[0])
         gini.append(tempa[1])
@@ -224,8 +252,11 @@ def one_gene_only(df, targ, header, rfc, canc):
         x = x+1
 
     importance = pd.DataFrame({"Feature": feat, "Gini": gini, "R": corr})
+<<<<<<< HEAD
     supp_fig = importance.copy(deep=True)
     importance = importance.head(10)
+=======
+>>>>>>> c4b553d8d3f81f44903f51156171f2d3901b9966
 
     # Map to label
     if targ == 'CNV':
@@ -265,6 +296,9 @@ def one_gene_only(df, targ, header, rfc, canc):
     df = df.sort_values('Genes')
     df['Cancer'] = canc
     df = df.reset_index().drop('index', axis=1)
+<<<<<<< HEAD
     print(df)
+=======
+>>>>>>> c4b553d8d3f81f44903f51156171f2d3901b9966
 
     return importance, df

@@ -66,10 +66,13 @@ def make_excel(summary, compare_models, loco, lofo, filename):
     else:
         compare_models.to_excel(writer, sheet_name="S. Table 8 | AUROC", index=False, header=True)
 
+<<<<<<< HEAD
     # Save results from checking HR thresholds
     if "S. Table 9 | HR Check" in book:
         freq.to_excel(writer, sheet_name="S. Table 9 | HR Check", startrow=writer.sheets["S. Table 9 | HR Check"].max_row, header=False)
     else:
         freq.to_excel(writer, sheet_name="S. Table 9 | HR Check", header=True)
         
+=======
+>>>>>>> c4b553d8d3f81f44903f51156171f2d3901b9966
     writer.save()
