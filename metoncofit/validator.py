@@ -279,9 +279,12 @@ def leave_one_cell_out(df2, canc, targ):
     # Return data frame to be saved
     loco = pd.DataFrame(output, columns=["Cancer", "Target", "Held-out cell line", "Mean class accuracy"])
     return loco
+<<<<<<< HEAD
 
 def hr_check(freq, cv_score):
     """
     """
     freq["10-fold CV Accuracy"] = cv_score
     return freq
+=======
+>>>>>>> c4b553d8d3f81f44903f51156171f2d3901b9966

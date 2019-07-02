@@ -215,6 +215,7 @@ for fil in os.listdir('./../data/median/'):
 
         final_df = pd.concat([up, neut, down], axis=0)
         final_df['Cancer'] = canc
+        final_df['Cancer'] = final_df['Cancer'].str.replace(' Cancer', '')
         final_df = final_df.reset_index().drop('index', axis=1)
 
         if t == "TCGA annotation":
@@ -237,8 +238,9 @@ for fil in os.listdir('./../data/median/'):
         final_df['Target'] = final_df['Target'].astype('category')
         final_df['Feature'] = final_df['Feature'].astype('category')
         final_df['Gene'] = final_df['Gene'].astype('category')
+        canc = canc.replace(' Cancer', '')
         print(canc)
-        
+
         from openpyxl import load_workbook
         book = load_workbook('./../output/Tables/SI.xlsx')
         writer = pd.ExcelWriter(
@@ -252,7 +254,7 @@ for fil in os.listdir('./../data/median/'):
         else:
             final_df.to_excel(writer, sheet_name=(
                 "S. Table "+str(x+9)+" | "+canc), header=True)
-        writer.save()
+            writer.save()
 
 #big_df = pd.concat(all_dfs, axis=0, ignore_index=True)
 #big_df.to_csv("db.csv")
