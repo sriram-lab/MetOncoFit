@@ -33,6 +33,9 @@ x = 0
 for fil in os.listdir('./../data/median/'):
     # Iterate between models
     x = x+1
+    if fil == 'complex.csv':
+        pass
+        
     for t in targ:
 
         # Proprocessing data
@@ -226,10 +229,9 @@ for fil in os.listdir('./../data/median/'):
             t = "Patient Survival"
 
         final_df["Target"] = t
-        final_df = final_df[~final_df['Cancer'].str.contains('Pan')]
 
         # Improve data storage efficiency
-        final_df = final_df.round(2)
+        final_df = final_df.round(3)
         final_df['Gini'] = pd.to_numeric(final_df['Gini'], downcast='float')
         final_df['R'] = pd.to_numeric(final_df['R'], downcast='float')
         final_df['Value'] = pd.to_numeric(final_df['Value'], downcast='float')
@@ -241,6 +243,14 @@ for fil in os.listdir('./../data/median/'):
         canc = canc.replace(' Cancer', '')
         print(canc)
 
+        final_df = final_df.sort_values('Gini', ascending=False)
+        tmp = final_df.copy(deep=True)
+        idx = final_df['Feature'].unique()
+        idx = pd.DataFrame(idx)
+        idx = idx[0].tolist()
+        final_df = pd.pivot_table(final_df, values = 'Value', index=['Gene', 'Target', 'Type', 'Cancer'], columns='Feature')
+        final_df = final_df.reindex(columns=idx)
+
         from openpyxl import load_workbook
         book = load_workbook('./../output/Tables/SI.xlsx')
         writer = pd.ExcelWriter(
@@ -250,11 +260,11 @@ for fil in os.listdir('./../data/median/'):
 
         if ("S. Table "+str(x+9)+" | "+canc) in book:
             final_df.to_excel(writer, sheet_name=("S. Table "+str(x+9)+" | "+canc),
-                              startrow=writer.sheets[("S. Table "+str(x+9)+" | "+canc)].max_row, header=False)
+                              startrow=writer.sheets[("S. Table "+str(x+9)+" | "+canc)].max_row, header=True)
         else:
             final_df.to_excel(writer, sheet_name=(
                 "S. Table "+str(x+9)+" | "+canc), header=True)
-            writer.save()
+        writer.save()
 
 #big_df = pd.concat(all_dfs, axis=0, ignore_index=True)
 #big_df.to_csv("db.csv")
