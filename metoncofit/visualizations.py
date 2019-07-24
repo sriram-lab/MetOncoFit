@@ -147,10 +147,10 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     plt.tick_params(axis='x', top=False, labelsize=7)
     plt.tick_params(axis='y', left=False, labelright=True,
                     labelleft=False, labelsize=7)
-    axarr[2].set_ylabel('True Class', labelpad=20,
+    axarr[2].set_ylabel('Experimental group', labelpad=20,
                         fontsize=7).set_rotation(-90)
     axarr[2].yaxis.set_label_position("right")
-    axarr[2].set_xlabel('Predicted Class', labelpad=10, fontsize=7)
+    axarr[2].set_xlabel('MetOncoFit prediction', labelpad=10, fontsize=7)
     plt.xticks(rotation=45)
     axarr[2].xaxis.set_label_position("bottom")
 

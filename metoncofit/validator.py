@@ -1,5 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from imblearn.over_sampling import RandomOverSampler
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import RobustScaler, label_binarize
+from sklearn.model_selection import train_test_split, permutation_test_score, cross_val_score
+from sklearn.metrics import f1_score, recall_score, precision_score, precision_recall_fscore_support, confusion_matrix, roc_curve, auc, classification_report, roc_auc_score, accuracy_score, average_precision_score, matthews_corrcoef
+from sklearn.metrics import cohen_kappa_score as coh_kap
+from sklearn import preprocessing
+from sklearn.externals import joblib
+from scipy import stats, interp
+import scipy
+from random import shuffle
 """
 `validator.py` contains several tools to assess the performance of the modelself.
 
@@ -16,19 +28,7 @@ Python Dependencies:
 import pandas as pd
 import numpy as np
 np.seterr(divide='ignore', invalid='ignore')
-from random import shuffle
-import scipy
-from scipy import stats, interp
 
-from sklearn.externals import joblib
-from sklearn import preprocessing
-from sklearn.metrics import cohen_kappa_score as coh_kap
-from sklearn.metrics import f1_score, recall_score, precision_score, precision_recall_fscore_support, confusion_matrix, roc_curve, auc, classification_report, roc_auc_score, accuracy_score, average_precision_score, matthews_corrcoef
-from sklearn.model_selection import train_test_split, permutation_test_score, cross_val_score
-from sklearn.preprocessing import RobustScaler, label_binarize
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import SVC
-from imblearn.over_sampling import RandomOverSampler
 
 def summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, targ, excl_targ, mean_acc, canc):
     """
@@ -59,12 +59,13 @@ def summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, ta
 
     # Create a distribution to measure the p-value associated with the accuracies obtained from MetOncoFit
     acc_distri = []
-    x=0
+    x = 0
     while(x <= 1000):
         temp_classes = list(classes)
         shuffle(temp_classes)
-        acc_distri.append(precision_score(temp_classes, classes, average='micro'))
-        x=x+1
+        acc_distri.append(precision_score(
+            temp_classes, classes, average='micro'))
+        x = x+1
     dist = np.array(acc_distri)
 
     # Basic statistical measures from the model
@@ -72,7 +73,8 @@ def summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, ta
     std = np.std(dist)
     kap = coh_kap(orig_classes, rfc_pred)
     f1 = f1_score(orig_classes, rfc_pred, average='micro')
-    cv_score = np.round(np.mean(cross_val_score(rfc, data, classes, scoring='accuracy', cv=10))*100, 2)
+    cv_score = np.round(np.mean(cross_val_score(
+        rfc, data, classes, scoring='accuracy', cv=10))*100, 2)
     mean_acc = np.round(mean_acc*100, 2)
 
     # Calculate the confusion matrix after 10 fold cross validation with new random forest classifier
@@ -80,17 +82,19 @@ def summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, ta
     while(feat < 140):
         trees = 5
         while(trees <= 500):
-            x=0
+            x = 0
             while(x < 10):
-                X_train, X_test, y_train, y_test = train_test_split(data, classes, test_size=0.3)
-                new_rfc = RandomForestClassifier(n_estimators=trees, max_features=feat)
+                X_train, X_test, y_train, y_test = train_test_split(
+                    data, classes, test_size=0.3)
+                new_rfc = RandomForestClassifier(
+                    n_estimators=trees, max_features=feat)
                 new_rfc.fit(X_train, y_train)
                 cm_pred = new_rfc.predict(X_test)
                 if x == 0:
                     cm = confusion_matrix(y_test, cm_pred)
                 elif x > 1:
                     cm = np.add(cm, confusion_matrix(y_test, cm_pred))
-                x=x+1
+                x = x+1
             trees = trees + 1500
         feat = feat + 20
 
@@ -99,7 +103,7 @@ def summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, ta
     report = pd.DataFrame.from_dict(report).round(2)
 
     # Calculating the upper tailed p-value from the cumulative distribution function
-    average_precision = report.loc[['precision'],['micro avg']].values[0]
+    average_precision = report.loc[['precision'], ['micro avg']].values[0]
     zscore = np.round((average_precision - ave)/std, 2)
     cdf = scipy.stats.norm.cdf(average_precision, ave, std)
     pvalue = 1 - cdf
@@ -107,15 +111,18 @@ def summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, ta
         pvalue = 1e-50
 
     if(targ == "CNV"):
-        targ_labels = ["GAIN","NEUT","LOSS"]
+        targ_labels = ["GAIN", "NEUT", "LOSS"]
     else:
-        targ_labels = ["UPREG","NEUTRAL","DOWNREG"]
-    dat = {"Average Hold-Out Accuracy (%)":mean_acc, "10-fold CV Accuracy (%)":cv_score, "Average Precision":(report.loc[['precision'],['micro avg']].values[0]), "UPREG/GAIN Precision":(report.loc[['precision'],[targ_labels[0]]].values[0]), "DOWNREG/LOSS Precision":(report.loc[['precision'],[targ_labels[2]]].values[0]), "Average Recall":(report.loc[['recall'],['micro avg']].values[0]), "UPREG/GAIN Recall":(report.loc[['recall'],[targ_labels[0]]].values[0]), "DOWNREG/LOSS Recall":(report.loc[['recall'],[targ_labels[2]]].values[0]), "P-value":pvalue, "Z-score":zscore, "F1-Score":(report.loc[['f1-score'],['micro avg']].values[0]), "MCC":mcc}
+        targ_labels = ["UPREG", "NEUTRAL", "DOWNREG"]
+    dat = {"Average Hold-Out Accuracy (%)": mean_acc, "10-fold CV Accuracy (%)": cv_score, "Average Precision": (report.loc[['precision'], ['micro avg']].values[0]), "UPREG/GAIN Precision": (report.loc[['precision'], [targ_labels[0]]].values[0]), "DOWNREG/LOSS Precision": (report.loc[['precision'], [targ_labels[2]]].values[0]), "Average Recall": (
+        report.loc[['recall'], ['micro avg']].values[0]), "UPREG/GAIN Recall": (report.loc[['recall'], [targ_labels[0]]].values[0]), "DOWNREG/LOSS Recall": (report.loc[['recall'], [targ_labels[2]]].values[0]), "P-value": pvalue, "Z-score": zscore, "F1-Score": (report.loc[['f1-score'], ['micro avg']].values[0]), "MCC": mcc}
 
-    summary = pd.DataFrame.from_dict(dict([(k, pd.Series(v)) for k,v in dat.items()])).T
-    summary = summary.rename(columns={0:(canc+' Cancer')})
+    summary = pd.DataFrame.from_dict(
+        dict([(k, pd.Series(v)) for k, v in dat.items()])).T
+    summary = summary.rename(columns={0: (canc+' Cancer')})
     summary = summary.T
     return cm, pvalue, zscore, cv_score, summary
+
 
 def area_under_curve_calc(df1, canc, targ):
     """
@@ -132,19 +139,21 @@ def area_under_curve_calc(df1, canc, targ):
     """
 
     if(targ == "CNV"):
-        targ_labels = ["GAIN","NEUT","LOSS"]
+        targ_labels = ["GAIN", "NEUT", "LOSS"]
     else:
-        targ_labels = ["UPREG","NEUTRAL","DOWNREG"]
+        targ_labels = ["UPREG", "NEUTRAL", "DOWNREG"]
 
     # Pop out the classification labels & binarize the array. This is necessary for calculating the auroc using sklearn.
     cls = df1.pop(targ)
-    cls = label_binarize(cls, classes=[targ_labels[0], targ_labels[1], targ_labels[2]])
+    cls = label_binarize(
+        cls, classes=[targ_labels[0], targ_labels[1], targ_labels[2]])
 
     data = np.array(df1).astype(np.float)
     #data = RobustScaler().fit_transform(data)
 
     # MetOncoFit Random Forest Classifier with specifications to the method used by Auslander et al
-    new_data, orig_data, new_classes, orig_classes = train_test_split(data, cls, test_size=0.2)
+    new_data, orig_data, new_classes, orig_classes = train_test_split(
+        data, cls, test_size=0.2)
     feat = (data.shape[1]-10)
     while(feat < data.shape[1]-1):
         trees = 5
@@ -160,9 +169,10 @@ def area_under_curve_calc(df1, canc, targ):
     # Calculate AUROC, averaged by taking into consideration label imbalance
     fpr, tpr, _ = roc_curve(orig_classes.ravel(), rfc_pred.ravel())
     auroc = auc(fpr, tpr)
-    dat = {"Cancer":[canc], "Target":[targ], "AUROC":[auroc]}
+    dat = {"Cancer": [canc], "Target": [targ], "AUROC": [auroc]}
     df = pd.DataFrame.from_dict(dat)
     return df
+
 
 def leave_one_feat_out(df, canc, targ):
     """
@@ -206,13 +216,15 @@ def leave_one_feat_out(df, canc, targ):
         else:
             return("ERROR: Not suitable df input")
 
-        new_data, orig_data, new_classes, orig_classes = train_test_split(df, classes, test_size=0.3)
+        new_data, orig_data, new_classes, orig_classes = train_test_split(
+            df, classes, test_size=0.3)
 
         feat = (new_data.shape[1]-10)
         while(feat < new_data.shape[1]-1):
             trees = 5
             while(trees <= 500):
-                rfc = RandomForestClassifier(n_estimators=trees, max_features=feat)
+                rfc = RandomForestClassifier(
+                    n_estimators=trees, max_features=feat)
                 rfc.fit(new_data, new_classes)
                 trees = trees + 1500
             feat = feat + 20
@@ -221,8 +233,10 @@ def leave_one_feat_out(df, canc, targ):
             output.append([canc, targ, lofo, mean_acc])
 
     # Return data frame to be saved
-    lofo_df = pd.DataFrame(output, columns=["Cancer", "Target", "Held-out feature set", "Mean class accuracy"])
+    lofo_df = pd.DataFrame(output, columns=[
+                           "Cancer", "Target", "Held-out feature set", "Mean class accuracy"])
     return lofo_df
+
 
 def leave_one_cell_out(df2, canc, targ):
     """
@@ -232,7 +246,7 @@ def leave_one_cell_out(df2, canc, targ):
 
     # Split the index into Gene symbol and Cell Line
     df2 = df2.reset_index()
-    _ = df2.pop('Genes') # don't need gene labels
+    _ = df2.pop('Genes')  # don't need gene labels
     cell_line = df2.pop("Cell Line")
     cell_line = pd.DataFrame(cell_line)
 
@@ -258,7 +272,8 @@ def leave_one_cell_out(df2, canc, targ):
         _ = new_df.pop("Cell Line")
 
         # Train test and split as usual
-        new_data, orig_data, new_classes, orig_classes = train_test_split(new_df, classes, test_size=0.3)
+        new_data, orig_data, new_classes, orig_classes = train_test_split(
+            new_df, classes, test_size=0.3)
 
         # Now we can do random oversampling
         ros = RandomOverSampler()
@@ -268,7 +283,8 @@ def leave_one_cell_out(df2, canc, targ):
         while(feat < data.shape[1]-1):
             trees = 5
             while(trees <= 500):
-                rfc = RandomForestClassifier(n_estimators=trees, max_features=feat)
+                rfc = RandomForestClassifier(
+                    n_estimators=trees, max_features=feat)
                 rfc.fit(data, classes)
                 trees = trees + 1500
             feat = feat + 20
@@ -277,14 +293,13 @@ def leave_one_cell_out(df2, canc, targ):
             output.append([canc, targ, cell, mean_acc])
 
     # Return data frame to be saved
-    loco = pd.DataFrame(output, columns=["Cancer", "Target", "Held-out cell line", "Mean class accuracy"])
+    loco = pd.DataFrame(output, columns=[
+                        "Cancer", "Target", "Held-out cell line", "Mean class accuracy"])
     return loco
-<<<<<<< HEAD
+
 
 def hr_check(freq, cv_score):
     """
     """
     freq["10-fold CV Accuracy"] = cv_score
     return freq
-=======
->>>>>>> c4b553d8d3f81f44903f51156171f2d3901b9966

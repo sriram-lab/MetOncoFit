@@ -21,12 +21,8 @@ import pandas as pd
 from openpyxl import load_workbook
 
 # Create data structures that will be used in the analysis
-<<<<<<< HEAD
-df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ, freq = process.preprocess(datapath='./../data/median/', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3])
-=======
 df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ, freq = process.preprocess(
     datapath='./../data/median/', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3])
->>>>>>> c4b553d8d3f81f44903f51156171f2d3901b9966
 
 # Random Forest Classifier, prediction, and hold out accuracy
 rfc, rfc_pred, mean_acc = random_forest.random_forest(
@@ -52,15 +48,11 @@ cm, pvalue, zscore, cv_score, summary = validator.summary_statistics(
 #save.make_excel(summary, compare_models, loco, lofo, filename='SI.xlsx')
 
 # Create data structures that will only be used while making the figures
-<<<<<<< HEAD
 importance, final_df = process.one_gene_only(df1, targ, header, rfc, canc)
-=======
-importance, final_df = process.one_gene_only(df1, targ, canc, rfc, header)
->>>>>>> c4b553d8d3f81f44903f51156171f2d3901b9966
 
 # Make the figures
-#visualizations.make_figure(final_df, importance, cm, orig_classes, rfc_pred, cv_score,
-#                           pvalue, zscore, canc, targ, normalize=True, savepath=False, filename=False)
+visualizations.make_figure(final_df, importance, cm, orig_classes, rfc_pred, cv_score,
+                           pvalue, zscore, canc, targ, normalize=True, savepath=False, filename=False)
 
 # Make supplementary heatmaps
 #fils = [
