@@ -3,8 +3,8 @@
 ### Main Figures 2-5 (With additional supplementary figures --> the first three for every cancer)
 
 # Figure 2: Differential expression
-#python3 metoncofit.py breast.csv TCGA_annot var_excl
-#python3 metoncofit.py nsclc.csv TCGA_annot var_excl
+python3 metoncofit.py breast.csv TCGA_annot var_excl
+python3 metoncofit.py nsclc.csv TCGA_annot var_excl
 #python3 metoncofit.py melanoma.csv TCGA_annot var_excl
 
 # Figure 3: Predicing copy number variation
@@ -13,13 +13,13 @@
 #python3 metoncofit.py melanoma.csv CNV var_excl
 
 # Figure 4: Predicting cancer patient survival
-python3 metoncofit.py breast.csv SURV var_excl
+#python3 metoncofit.py breast.csv SURV var_excl
 #python3 metoncofit.py nsclc.csv SURV var_excl
 #python3 metoncofit.py melanoma.csv SURV var_excl
 
 # Figure 5: Pan cancer predictions
 #python3 metoncofit.py complex.csv CNV var_excl
-#python3 metoncofit.py complex.csv SURV var_excl
+python3 metoncofit.py complex.csv SURV var_excl
 python3 metoncofit.py complex.csv TCGA_annot var_excl
 
 ################################################################################
