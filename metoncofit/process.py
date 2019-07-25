@@ -22,7 +22,7 @@ from imblearn.over_sampling import RandomOverSampler
 from sklearn.model_selection import train_test_split
 
 
-def preprocess(datapath='str', fil='str', targ='str', exclude='str'):
+def preprocess(datapath='/path', fil='filename', targ='targ', exclude='exclusion'):
     """
     preprocess takes in the '*.csv' file and transforms the data that can be
     analyzed or fed into the MetOncoFit classifier.
@@ -56,7 +56,7 @@ def preprocess(datapath='str', fil='str', targ='str', exclude='str'):
         targ = str("TCGA annotation")
 
     if datapath is None:
-        datapath = './../data/mean/'
+        datapath = './../data/median/'
 
     canc = fil.replace(".csv", "")
     canc_dict = {
@@ -73,11 +73,11 @@ def preprocess(datapath='str', fil='str', targ='str', exclude='str'):
         }
     canc = canc_dict.get(canc)
 
-    if './../data/median/' == './../data/lax/':
+    if datapath == './../data/lax/':
         type = "[0.90 - 1.10]"
-    elif './../data/median/' == './../data/median/':
+    elif datapath == './../data/median/':
         type = "[0.75 - 1.33]"
-    elif './../data/median/' == './../data/stringent/':
+    elif datapath == './../data/stringent/':
         type = "[0.50 - 2.00]"
 
     df_names = pd.read_csv("./../labels/real_headers.txt",
@@ -109,7 +109,7 @@ def preprocess(datapath='str', fil='str', targ='str', exclude='str'):
     tmp = excl_targ.remove(targ)
 
     # We will drop a few columns in the cases where we have an exclusion list.
-    if(len(sys.argv) > 4):
+    if(len(sys.argv) > 3):
         fil3 = open("./../labels/"+exclude.rstrip())
         drop_col_names = [i.strip() for i in fil3.readlines()]
         fil3.close()
@@ -134,7 +134,7 @@ def preprocess(datapath='str', fil='str', targ='str', exclude='str'):
     return df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ, freq
 
 
-def one_gene_only(df, targ, canc, rfc, header):
+def one_gene_only(df, targ, header, rfc, canc):
     """
     one_gene_only will merge the gene targ value by majority rules and will take the median values for all numerical values. This code primarily designed to make the figures.
 
@@ -224,6 +224,8 @@ def one_gene_only(df, targ, canc, rfc, header):
         x = x+1
 
     importance = pd.DataFrame({"Feature": feat, "Gini": gini, "R": corr})
+    supp_fig = importance.copy(deep=True)
+    importance = importance.head(10)
 
     # Map to label
     if targ == 'CNV':
@@ -263,5 +265,4 @@ def one_gene_only(df, targ, canc, rfc, header):
     df = df.sort_values('Genes')
     df['Cancer'] = canc
     df = df.reset_index().drop('index', axis=1)
-
     return importance, df

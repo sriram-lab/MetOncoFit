@@ -82,7 +82,8 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
                   order=importance['Feature'], hue_order=targ_labels, dodge=True, jitter=True, alpha=0.3, zorder=1, size=2.75, ax=axarr[0])
 
     from numpy import median
-    # Show the conditional mean and standard deviation
+
+    # Show the conditional median and standard deviation
     sns.pointplot(x="value", y="feature", hue="type", palette=class_col, data=df1,
                   order=importance['Feature'], hue_order=targ_labels, dodge=0.532, join=False, markers="D", scale=0.75, ci="sd", estimator=median, errwidth=1.00, ax=axarr[0])
 
@@ -99,7 +100,7 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     axarr[0].set_xlim((-0.1, 1.1))
     axarr[0].grid(color='gray', axis='y')
     axarr[0].xaxis.grid(False)
-    axarr[0].text(-2.25, 0, title_name, color='black', fontsize=7)
+    axarr[0].text(-2.25, 0, title_name, color='black', fontsize=8)
 
     # Create barplot
     sns.set(style="whitegrid")
@@ -147,10 +148,10 @@ def make_figure(df1, importance, cm, orig_classes, rfc_pred, cv_acc, pval, zscor
     plt.tick_params(axis='x', top=False, labelsize=7)
     plt.tick_params(axis='y', left=False, labelright=True,
                     labelleft=False, labelsize=7)
-    axarr[2].set_ylabel('True Class', labelpad=20,
+    axarr[2].set_ylabel('Experimental group', labelpad=20,
                         fontsize=7).set_rotation(-90)
     axarr[2].yaxis.set_label_position("right")
-    axarr[2].set_xlabel('Predicted Class', labelpad=10, fontsize=7)
+    axarr[2].set_xlabel('MetOncoFit prediction', labelpad=10, fontsize=7)
     plt.xticks(rotation=45)
     axarr[2].xaxis.set_label_position("bottom")
 
