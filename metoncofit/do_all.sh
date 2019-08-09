@@ -3,7 +3,7 @@
 ### Main Figures 2-5 (With additional supplementary figures --> the first three for every cancer)
 
 # Figure 2: Differential expression
-python3 metoncofit.py breast.csv TCGA_annot var_excl
+python3 metoncofit.py './../data/median/breast.csv' TCGA_annot './../labels/var_excl'
 python3 metoncofit.py nsclc.csv TCGA_annot var_excl
 #python3 metoncofit.py melanoma.csv TCGA_annot var_excl
 

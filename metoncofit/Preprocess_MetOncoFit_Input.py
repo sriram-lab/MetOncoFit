@@ -1,15 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Process module contains functions that will be used as inputs for the random forest classifier and for generating the figures in the manuscript.
+
 
 @authors: Krishna Dev Oruganty & Scott Campit
 """
 import sys
-import copy
-import operator
-import argparse
-import re
 
 import numpy as np
 import pandas as pd
@@ -21,66 +17,68 @@ from sklearn.preprocessing import MinMaxScaler
 from imblearn.over_sampling import RandomOverSampler
 from sklearn.model_selection import train_test_split
 
-
 import prettify_df_labels
 
 
-def label_encode(df):
+def preprocess_input_data(model_file, predictionTarget_string, exclusionTargets):
     """
+    preprocess_input_data reads in the data (from .csv files) for each cancer tissue model and outputs a pandas dataframe.
+    """
+    column_names = prettify_labels.long_feature_names()
+    cancer = model_file.strip(".")[0]
+    model = pd.read_csv(model_file, index_col=None, names=column_names).set_index(
+        ['Genes', 'Cell Line'])
+
+    return model, cancer
+
+
+def label_encode(model):
+    """
+    label_encode uses the label_encoder from scikit-learn for the RECON1 subsystem and Metabolic subnetwork associations.
     """
 
     label_encoder = preprocessing.LabelEncoder()
-    df["RECON1 subsystem"] = label_encoder.fit_transform(
-        df["RECON1 subsystem"])
-    df["Metabolic subnetwork"] = label_encoder.fit_transform(
-        df["Metabolic subnetwork"])
+    model["RECON1 subsystem"] = label_encoder.fit_transform(
+        model["RECON1 subsystem"])
+    model["Metabolic subnetwork"] = label_encoder.fit_transform(
+        model["Metabolic subnetwork"])
+    label_encoded_model = model.copy(deep=True)
 
-    return df
+    return label_encoded_model
 
 
-def preprocess_input_data(file, prediction_target, exclude='exclusion'):
+def remove_target_from_training_data(label_encoded_model, target):
     """
+    remove_target_from_training_data takes in an argument "target" and removes it from the label encoded model. The target labels are stored in the pandas Series "classes".
     """
+    if target == 'TCGA_annot':
+        target = str("TCGA annotation")
+    excl_target = {'TCGA annotation', 'SURV', 'CNV'}.remove(target)
 
-    if targ == 'TCGA_annot':
-        targ = str("TCGA annotation")
+    classes = label_encoded_model[target]
+    remove_list = open("./../labels/"+sys.argv[3].rstrip())
+    drop_col_names = [i.strip() for i in remove_list.readlines()]
+    remove_list.close()
 
-    canc = prettify_df_labels.prettifyCancerLabels(file)
-    column_names = prettify_df_labels.prettify_DataFrame_colNames()
+    no_target_model = label_encoded_model.drop(columns=drop_col_names)
+    no_target_model = no_target_model.drop([excl_target, target])
 
-    df = pd.read_csv(file, index_col=None, names=column_names).set_index(
-        ['Genes', 'Cell Line'])
-    df = label_encode(df)
-
-    classes = df[targ]
-    return df, classes
+    return no_target_model, classes
 
 
-def remove_targets(df):
+def robust_scaler(no_target_model):
     """
+    robust_scaler uses the scikit-learn Robust scaler function on the model data.
     """
-    excl_targ = {'TCGA annotation', 'SURV', 'CNV'}.remove(targ)
-
-    if(len(sys.argv) > 3):
-        fil3 = open("./../labels/"+exclude.rstrip())
-        drop_col_names = [i.strip() for i in fil3.readlines()]
-        fil3.close()
-        df = df.drop(columns=drop_col_names)
-
-    no_target_df = df.drop([excl_targ, targ])
-    return no_target_df
-
-
-def robust_scaler(df):
-    """
-    """
-    data = np.array(df).astype(np.float)
+    data = np.array(no_target_model).astype(np.float)
     robust_scaled_data = RobustScaler().fit_transform(data)
+
     return robust_scaled_data
 
 
-def split_data(robust_scaled_data, classes):
+def split_data_with_ROS(robust_scaled_data, classes):
     """
+    split_data_with_ROS splits the data into 30% test 70% training with random oversampling to account for class imbalance.
     """
     training_data, test_data, training_labels, test_labels = train_test_split(
         robust_scaled_data, classes, test_size=0.3)
@@ -92,119 +90,138 @@ def split_data(robust_scaled_data, classes):
     return oversampled_training_data, oversampled_training_labels, test_data, test_labels
 
 
-def one_gene_only(df):
+def merge_cellLine_to_tissue_model(label_encoded_model, target):
     """
+    merge_cellLine_to_tissue_model returns a tissue model containing single gene entries. The median values are used for the feature values.
     """
 
-    prediction_labels, prediction_dict = prettify_df_labels.prettify_prediction_labels(
-        prediction)
+    label_encoded_model = label_encoded_model.reset_index()
+    tissue_model = label_encoded_model.drop(columns="Cell Line")
+    tissue_model = tissue_model.groupby(
+        ["Genes", target]).median().reset_index()
+    tissue_model = tissue_model.set_index(["Genes"])
 
-    df = df.reset_index()
-    one_gene_df = df.drop(columns="Cell Line").groupby(
-        ["Genes", targ]).median().reset_index().set_index("Genes")
-    return one_gene_df
-
-
-def
-
-# These dataframes contain the df entries with increased, neutral, and decreased values.
-up_df = one_gene_df.loc[(one_gene_df[targ] == targ_labels[0])]
-neut_df = one_gene_df.loc[(one_gene_df[targ] == targ_labels[1])]
-down_df = one_gene_df.loc[(one_gene_df[targ] == targ_labels[2])]
-
-# To create the figure, we are randomly selecting three genes that are upreg, neutral, or downreg and are storing them in this list.
-up_genes = up_df.index.values.tolist()
-neut_genes = neut_df.index.values.tolist()
-down_genes = down_df.index.values.tolist()
-
-# Get rid of the targ column
-_ = one_gene_df.pop(targ)
+    return tissue_model
 
 
-def compute_pearson_correlation():
-    # This will calculate the correlation for each feature, if there is one between the biological features.
+def get_diffExp_genes(tissue_model, target_labels):
+    """
+    get_diffExp_genes is a function that returns a set of pandas dataframes that correspond to up / neutral / and down dataframes and gene lists based on the tissue model.
+    """
+
+    diffExp_dfs = {}
+    diffExp_geneList = {}
+    for label in range(1, len(target_labels)):
+        diffExp_dfs[label] = tissue_model.loc[tissue_model[target_labels[label]]]
+        diffExp_geneList[label] = diffExp_dfs[label].index.values.tolist()
+
+    return diffExp_dfs, diffExp_geneList
+
+
+def compute_pearson_correlation(diffExp_dfs, target):
+    """
+    compute_pearson_correlation returns a set of pearson correlation coefficients that correspond to the up / neutral / down dataframes mentioned previously.
+    """
+    _ = tissue_model.pop(target)
     pearson_correlation_coef = {}
-    for feature in one_gene_df.columns:
-        up_df_median = up_df[feature].median()
-        neut_df_median = neut_df[feature].median()
-        down_df_median = down_df[feature].median()
-        perfect_correlation = [1.0, 0.0, -1.0]
+    median = {}
 
-        feature_correlation = np.pearsonr(
-            [up_df_median, neut_df_median, down_df_median], perfect_correlation)
+    for label in range(1, len(diffExp_dfs)):
+        for feature in diffExp_dfs[0].columns:
+            median[label] = diffExp_dfs[label][feature].median()
+            perfect_correlation = [1.0, 0.0, -1.0]
+            feature_correlation = pearsonr(
+                [median[0], median[1], median[2]], perfect_correlation)
 
-        if(np.isnan(feature_correlation[0]) != True):
-            pearson_correlation_coef[feature] = feature_correlation[0]
-        else:
-            pearson_correlation_coef[feature] = 0.0
+            if np.isnan(feature_correlation[0]) != True:
+                pearson_correlation_coef[feature] = feature_correlation[0]
+            else:
+                pearson_correlation_coef[feature] = 0.0
+
     return pearson_correlation_coef
 
 
 def feature_importance_mapper(features, feature_importances):
     """
-    idx_change sorts the feature importances and maps it to the feature name
+    feature_importance_mapper creates a sorted dataframe of all the features ranked by the importance score.
     """
     feature_dictionary = {}
-    for i, j in zip(features, feature_importances):
-        feature_dictionary[i] = j
-    sorted_dataframe = sorted(feature_dictionary.items(),
-                              key=operator.itemgetter(1), reverse=True)
-    return sorted_dataframe
+    for feature, importance in zip(features, feature_importances):
+        feature_dictionary[feature] = importance
+    sorted_feature_df = sorted(
+        feature_dictionary.items(),  key=operator.itemgetter(1), reverse=True)
 
-    sorted_d = feature_importance_mapper(header, rfc.feature_importances_)
+    return sorted_feature_df
 
-    feat = []
-    gini = []
-    corr = []
 
-    x = 0
-    while(x < 10):  # Get the first 10 features
-        tempa = sorted_d[x]
-        feat.append(tempa[0])
-        gini.append(tempa[1])
-        corr.append(str(column_squigly[tempa[0]]))
-        x = x+1
+def get_importance_dataframe(sorted_feature_df):
+    """
+    get_importance_dataframe returns a sorted dataframe containing the feature, importance score, and associated pearson correlation coefficient.
+    """
+    feature = []
+    importance_score = []
+    pearson_correlation = []
 
-    importance = pd.DataFrame({"Feature": feat, "Gini": gini, "R": corr})
-    supp_fig = importance.copy(deep=True)
-    importance = importance.head(10)
+    feat = 0
+    while(feat < len(sorted_feature_df)):
+        temp = sorted_feature_df[feat]
+        feature.append(temp[0])
+        importance_score.append(temp[1])
+        pearson_correlation.append(str(pearson_correlation_coef[temp[0]]))
+        feat = feat + 1
 
-    # Map to label
-    if targ == 'CNV':
-        class_col = ["GAIN", "NEUT", "LOSS"]
-    else:
-        class_col = ["UPREG", "NEUTRAL", "DOWNREG"]
+    importance_dataframe = pd.DataFrame({
+        "Feature": feature,
+        "Importance Score": importance_score,
+        "R-Value": pearson_correlation
+        })
 
-    # Scale the dataframe from 0 to 1
-    idx = one_gene_df.index
-    col = one_gene_df.columns
+    return importance_dataframe
+
+
+def minMaxScale(tissue_model):
+    """
+    minMaxScale uses the scikit-learn function to perform min max scaling.
+    """
+    genes = tissue_model.index
+    features = tissue_model.columns
     scaler = MinMaxScaler()
-    result = scaler.fit_transform(one_gene_df)
-    one_gene_df = pd.DataFrame(result, columns=col, index=idx)
+    minMax_tissueModel = scaler.fit_transform(tissue_model)
+    minMax_tissueModel = pd.DataFrame(
+        minMax_tissueModel, columns=features, index=genes)
 
-    # Get the genes that are up/neut/downregulated
-    tmparr_up = one_gene_df[one_gene_df.index.isin(up_genes)]
-    tmparr_neut = one_gene_df[one_gene_df.index.isin(neut_genes)]
-    tmparr_down = one_gene_df[one_gene_df.index.isin(down_genes)]
+    return minMax_tissueModel
 
-    features = list(importance['Feature'])
-    up = tmparr_up[features].T
-    up = up.reset_index().rename(columns={'index': "feature"})
-    up = pd.melt(up, id_vars=["feature"])
-    up["type"] = class_col[0]
 
-    neut = tmparr_neut[features].T
-    neut = neut.reset_index().rename(columns={'index': "feature"})
-    neut = pd.melt(neut, id_vars=["feature"])
-    neut["type"] = class_col[1]
+def melt_dataframes(df, feature_list):
+    """
+    melt_dataframe performs a pd.melt to format the data for the figures.
+    """
+    df = df[feature_list].T
+    df = df.reset_index().rename(columns={'Index': "Feature"})
+    melted_df = df.melt(df, id_vars=["Feature"])
 
-    down = tmparr_down[features].T
-    down = down.reset_index().rename(columns={'index': "feature"})
-    down = pd.melt(down, id_vars=["feature"])
-    down["type"] = class_col[2]
+    return melted_df
 
-    df = pd.concat([up, neut, down], axis=0)
-    df = df.sort_values('Genes')
-    df['Cancer'] = canc
-    df = df.reset_index().drop('index', axis=1)
-    return importance, df
+
+def construct_figure_dataframes(minMax_tissueModel, importance, target, cancer):
+    """
+    construct_figure_dataframes returns a set of dataframes that will be used for the main figures in the manuscript.
+    """
+    diffExp_dfs, diffExp_geneList = get_diffExp_genes(minMax_tissueModel)
+    top_10_feature = importance.head(10)
+
+    prediction_labels, prediction_dict = prettify_df_labels.set_prediction_labels(
+        target)
+    feature_list = list(importance['Feature'])
+
+    melted_dfs = {}
+
+    for df in range(1, len(diffExp_dfs)):
+        melted_dfs[df] = melt_dataframes(diffExp_dfs[df], feature_list)
+        melted_dfs[df] = melted_dfs[df].sort_values('Genes')
+        melted_dfs[df]["Label"] = prediction_labels[df]
+        melted_dfs[df]["Cancer"] = cancer
+        melted_dfs[df] = melted_dfs[df].reset_index().drop('index', axis=1)
+
+    return melted_dfs
