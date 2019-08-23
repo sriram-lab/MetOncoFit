@@ -22,7 +22,7 @@ from openpyxl import load_workbook
 
 # Create data structures that will be used in the analysis
 df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ, freq = process.preprocess(
-    datapath='./../data/median/', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3])
+    datapath='./../data/geneko/', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3])
 
 # Random Forest Classifier, prediction, and hold out accuracy
 rfc, rfc_pred, mean_acc = random_forest.random_forest(
