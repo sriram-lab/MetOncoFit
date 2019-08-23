@@ -138,6 +138,7 @@ subsys	RECON1 subsystem
 path_label	Metabolic subnetwork
 TCGA_val	TCGA gene expression fold change
 CNV_val	CNV gain/loss ratio
+grRatio	Gene KO growth rate ratio
 TCGA_annot	TCGA annotation
 CNV	CNV
 SURV	SURV

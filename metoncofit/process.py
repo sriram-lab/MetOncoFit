@@ -73,12 +73,12 @@ def preprocess(datapath='/path', fil='filename', targ='targ', exclude='exclusion
         }
     canc = canc_dict.get(canc)
 
-    if datapath == './../data/lax/':
-        type = "[0.90 - 1.10]"
-    elif datapath == './../data/median/':
-        type = "[0.75 - 1.33]"
-    elif datapath == './../data/stringent/':
-        type = "[0.50 - 2.00]"
+    # if datapath == './../data/lax/':
+    #     type = "[0.90 - 1.10]"
+    # elif datapath == './../data/median/':
+    #     type = "[0.75 - 1.33]"
+    # elif datapath == './../data/stringent/':
+    #     type = "[0.50 - 2.00]"
 
     df_names = pd.read_csv("./../labels/real_headers.txt",
                            sep='\t', names=['Original', 'New'])
@@ -216,7 +216,7 @@ def one_gene_only(df, targ, header, rfc, canc):
     corr = []
 
     x = 0
-    while(x < 10):  # Get the first 10 features
+    while(x < 137):  # Get the first 10 features
         tempa = sorted_d[x]
         feat.append(tempa[0])
         gini.append(tempa[1])
@@ -225,7 +225,15 @@ def one_gene_only(df, targ, header, rfc, canc):
 
     importance = pd.DataFrame({"Feature": feat, "Gini": gini, "R": corr})
     supp_fig = importance.copy(deep=True)
-    importance = importance.head(10)
+    importance = importance.head(137)
+
+    if targ == "CNV":
+        export_csv = importance.to_csv (r'/Users/kirksmith/Documents/GitHub.nosync/MetOncoFit/metoncofit/ImpCNV.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
+    elif targ == "SURV":
+        export_csv = importance.to_csv (r'/Users/kirksmith/Documents/GitHub.nosync/MetOncoFit/metoncofit/ImpSurv.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
+    else:
+        export_csv = importance.to_csv (r'/Users/kirksmith/Documents/GitHub.nosync/MetOncoFit/metoncofit/ImpTCGA.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
+
 
     # Map to label
     if targ == 'CNV':
