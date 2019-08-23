@@ -1,0 +1,138 @@
+Feature,Gini,R
+NCI-60 gene expression,0.2089767284764621,0.9509431096702309
+RECON1 subsystem,0.1499597410473261,-0.8660254037844387
+Catalytic efficiency,0.08526254608480768,0.0
+Flux change in Urea cycle/amino group metabolism after gene KO,0.05241616467355692,0.8660254037844385
+Topological distance to cardiolipin (biomass),0.046917740861590354,0.8852325815216111
+Topological distance from glutamine (media),0.04593713795913329,-0.2401922307076307
+Flux change in Pyruvate Metabolism after gene KO,0.04203989281964029,0.0
+Topological distance to lsophosphatidylcholine (biomass),0.03549168914759568,0.8756969969183247
+Metabolic subnetwork,0.028863552505056157,-0.8660254037844387
+Topological distance to UMP (biomass),0.026602824015390734,0.8854475018981706
+Flux change in Arginine and Proline Metabolism after gene KO,0.022519600023670573,0.0
+Topological distance to glycogen (biomass),0.020758140497461552,0.8804835075678858
+Flux change in Glycolysis/Gluconeogenesis after gene KO,0.020715208187505225,-0.9969048703617261
+Flux change in Tyrosine metabolism after gene KO,0.020155377256532245,-0.8803075021161882
+Topological distance from oxidized glutathione (media),0.01763891140433423,0.8896802485305646
+Flux change in Fatty Acid Metabolism after gene KO,0.0160829213783099,-0.30999730766216316
+Topological distance from valine (media),0.014585672044729877,0.8806460440687297
+Sum of topological distances to media components,0.012812469280487692,0.8847777911306228
+Sum of topological distances to biomass components,0.01121615856021682,0.8782431965800964
+Topological distance from water (media),0.010206224195312873,0.8761489936497805
+Flux change in Glutamate metabolism after gene KO,0.010187606387339048,-0.8660254037844387
+Flux change in NAD Metabolism after gene KO,0.009252065636146407,0.0
+Flux change in Oxidative Phosphorylation after gene KO,0.008939723184493521,0.0
+Topological distance to GMP (biomass),0.008062280276333728,0.8891759960346852
+Topological distance to dAMP (biomass),0.007537095753627407,0.8811563154252395
+Topological distance from folate (media),0.007255966842074454,0.8850223552914651
+Flux change in Folate Metabolism after gene KO,0.005366553296220947,0.16269255582535858
+Flux change in Pentose and Glucuronate Interconversions after gene KO,0.0045954767777463944,0.0
+"Flux change in Valine, Leucine, and Isoleucine Metabolism after gene KO",0.0045049111553459075,0.0
+Topological distance from arginine (media),0.004478686476010776,0.8889318200674722
+Topological distance from histidine (media),0.00443286059662353,0.8889318200674722
+Topological distance from reduced glutathione (media),0.004265598891418943,-0.24019223070763066
+Topological distance to proline (biomass),0.004217454096852727,0.8803245409275815
+Flux change in Sphingolipid Metabolism after gene KO,0.0036957032757619587,0.0
+Topological distance from oxygen (media),0.0031566601949339183,0.884816671429501
+Flux change in Pyrimidine Biosynthesis after gene KO,0.0029492163882659096,0.0
+Gene KO growth rate ratio,0.00281140581185918,0.0
+Topological distance from lysine (media),0.0016959617098556174,0.8758061715238362
+Topological distance to dGMP (biomass),0.001644896429236774,0.8854475018981706
+Topological distance to alanine (biomass),0.0014524936946914012,0.8854475018981706
+Flux change in Cysteine Metabolism after gene KO,0.0013387366445350164,0.0
+Topological distance to tyrosine (biomass),0.0008432129510843499,0.875917837691566
+Topological distance from myo-inositol (media),0.0007341813110734133,0.8801690279569764
+Topological distance from glutamate (media),0.0007115650742143843,0.8808122718846412
+Flux change in Fatty acid elongation after gene KO,0.0006985792141646518,0.0
+Topological distance to cholesterol (biomass),0.0006088165464714479,0.8758061715238362
+Topological distance to triacylglycerol (biomass),0.0006050499548699919,0.8761489936497805
+Topological distance from alanine (media),0.0005751382075596442,0.8809823180348625
+Flux change in Histidine Metabolism after gene KO,0.000566389798619575,0.0
+Topological distance to dCMP (biomass),0.0005114683226486625,0.8850223552914651
+Topological distance to glutamine (biomass),0.0003591143647497375,0.8756969969183247
+Flux change in Glyoxylate and Dicarboxylate Metabolism after gene KO,0.00035551960085515566,0.0
+Topological distance from asparagine (media),0.0003548783453416773,0.884816671429501
+Topological distance from serine (media),0.00035163453635409246,0.8806460440687297
+Topological distance to phosphatidylinositol (biomass),0.0003451918123751953,0.8850223552914651
+Topological distance from hydrogen (media),0.00034302733723871046,0.0
+Topological distance to phosphatidylcholine (biomass),0.00028703897391604,0.8808122718846412
+Flux change in Tryptophan metabolism after gene KO,0.00018112091935261162,0.0
+Topological distance from choline (media),0.00017113157148013092,0.8846153846153846
+Topological distance to phosphatidic acid (biomass),0.00016666003477174295,0.8760320816498047
+Topological distance to CMP (biomass),0.00016518692150142993,-0.2401922307076307
+"Flux change in Glycine, Serine, and Threonine Metabolism after gene KO",4.166785815718449e-05,0.8660254037844386
+Flux change in IMP Biosynthesis after gene KO,1.0463455060711042e-05,0.0
+Flux change in Cholesterol Metabolism after gene KO,9.71065334459181e-06,0.0
+"Flux change in Tyrosine, Phenylalanine, and Tryptophan Biosynthesis after gene KO",1.9218765052884435e-06,0.0
+Flux change in Inositol Phosphate Metabolism after gene KO,1.2764197957217257e-06,0.0
+Flux change in Alanine and Aspartate Metabolism after gene KO,0.0,-0.7913103155547226
+Flux change in Aminosugar Metabolism after gene KO,0.0,0.0
+Flux change in Bile Acid Biosynthesis after gene KO,0.0,0.0
+Flux change in Biotin Metabolism after gene KO,0.0,0.0
+Flux change in Citric Acid Cycle after gene KO,0.0,0.0
+Flux change in CoA Biosynthesis after gene KO,0.0,0.0
+Flux change in CoA Catabolism after gene KO,0.0,0.0
+Flux change in Fatty acid activation after gene KO,0.0,0.0
+Flux change in Fatty acid oxidation after gene KO,0.0,0.0
+Flux change in Fatty acid oxidation (peroxisome) after gene KO,0.0,0.0
+Flux change in Galactose metabolism after gene KO,0.0,0.0
+Flux change in Glutathione Metabolism after gene KO,0.0,0.0
+Flux change in Heme Biosynthesis after gene KO,0.0,0.0
+Flux change in Heme Degradation after gene KO,0.0,0.0
+Flux change in Lysine Metabolism after gene KO,0.0,0.0
+Flux change in Methionine Metabolism after gene KO,0.0,0.0
+Flux change in N-Glycan Degradation after gene KO,0.0,0.0
+Flux change in Nucleic acid degradation after gene KO,0.0,0.0
+Flux change in Nucleotide Sugar Metabolism after gene KO,0.0,0.0
+Flux change in Pentose Phosphate Pathway after gene KO,0.0,0.0
+Flux change in Phenylalanine metabolism after gene KO,0.0,0.0
+Flux change in Purine Catabolism after gene KO,0.0,0.0
+Flux change in Pyrimidine Catabolism after gene KO,0.0,0.0
+Flux change in Salvage Pathway after gene KO,0.0,0.0
+Flux change in Steroid Metabolism after gene KO,0.0,0.0
+Flux change in Tetrahydrobiopterin after gene KO,0.0,0.0
+Flux change in Thiamine Metabolism after gene KO,0.0,0.0
+Flux change in Triacylglycerol Synthesis after gene KO,0.0,0.0
+Flux change in Ubiquinone Biosynthesis after gene KO,0.0,0.0
+Topological distance from aspartate (media),0.0,0.8852325815216111
+Topological distance from cysteine (media),0.0,0.8886927245510697
+Topological distance from D-glucose (media),0.0,0.0
+Topological distance from glycine (media),0.0,0.0
+Topological distance from isoleucine (media),0.0,0.8846153846153846
+Topological distance from leucine (media),0.0,0.0
+Topological distance from methionine (media),0.0,0.8755902314481185
+Topological distance from ammonia (media),0.0,0.8801690279569764
+Topological distance from phenylalanine (media),0.0,0.884816671429501
+Topological distance from inorganic phosphate (media),0.0,0.0
+Topological distance from succinate (media),0.0,0.0
+Topological distance from tetrahydrofolate (media),0.0,0.0
+Topological distance from threonine (media),0.0,0.0
+Topological distance from tryptophan (media),0.0,0.0
+Topological distance from tyrosine (media),0.0,0.0
+Topological distance from urea (media),0.0,0.0
+Topological distance to AMP (biomass),0.0,0.0
+Topological distance to arginine (biomass),0.0,0.8755902314481185
+Topological distance to asparagine (biomass),0.0,0.0
+Topological distance to aspartate (biomass),0.0,0.0
+Topological distance to ATP (biomass),0.0,0.0
+Topological distance to cysteine (biomass),0.0,0.884816671429501
+Topological distance to diacylglycerol (biomass),0.0,0.0
+Topological distance to dTMP (biomass),0.0,0.884816671429501
+Topological distance to glutamate (biomass),0.0,0.8809823180348625
+Topological distance to glycine (biomass),0.0,0.0
+Topological distance to water (biomass),0.0,0.884816671429501
+Topological distance to histidine (biomass),0.0,0.8803245409275815
+Topological distance to isoleucine (biomass),0.0,0.0
+Topological distance to leucine (biomass),0.0,0.0
+Topological distance to lysine (biomass),0.0,0.8896802485305646
+Topological distance to monoacylglycerol (biomass),0.0,0.8803245409275815
+Topological distance to methionine (biomass),0.0,0.8850223552914651
+Topological distance to phosphatidylethanolamine (biomass),0.0,0.0
+Topological distance to phenylalanine (biomass),0.0,0.0
+Topological distance to phosphatidylserine (biomass),0.0,0.8808122718846412
+Topological distance to serine (biomass),0.0,0.0
+Topological distance to sphingomyelin (biomass),0.0,0.8756969969183247
+Topological distance to threonine (biomass),0.0,0.0
+Topological distance to tryptophan (biomass),0.0,0.0
+Topological distance to valine (biomass),0.0,0.0
+Topological distance to cholesterol ester (biomass),0.0,0.8850223552914651
