@@ -1,0 +1,21 @@
+Feature,Gini,R
+NCI-60 gene expression,0.16258186287611048,0.9875129863459106
+Topological distance from reduced glutathione (media),0.1578421758698571,-0.8995842242437838
+Topological distance to ATP (biomass),0.13027956958954678,0.0
+Topological distance to tyrosine (biomass),0.07371573764135779,0.0
+Topological distance to cholesterol (biomass),0.05316650608859573,0.0
+RECON1 subsystem,0.04460632679667863,0.6546536707079772
+Metabolic subnetwork,0.040973315019988625,-0.8660254037844385
+Topological distance from glutamine (media),0.03485864674050329,-0.8988621614374462
+Flux change in Glutathione Metabolism after gene KO,0.03366251459702786,0.8660254037844386
+Catalytic efficiency,0.023353188691843413,0.8660254037844386
+Flux change in Urea cycle/amino group metabolism after gene KO,0.016285482041224215,0.8660254037844387
+Flux change in Arginine and Proline Metabolism after gene KO,0.014409768196772865,0.8660254037844386
+Sum of topological distances to biomass components,0.012010399018354757,-0.0004373865257303462
+Flux change in Glutamate metabolism after gene KO,0.011106120871524142,0.8660254037844387
+Flux change in Pyruvate Metabolism after gene KO,0.009253245220121165,0.5905698708799135
+Topological distance to lsophosphatidylcholine (biomass),0.009171829130549428,0.0
+Flux change in Glycolysis/Gluconeogenesis after gene KO,0.009161649802174274,-0.8660254037844386
+Sum of topological distances to media components,0.00908831306925509,-0.10729991948715335
+Flux change in Pentose and Glucuronate Interconversions after gene KO,0.008770337516341077,-0.8660254037844386
+Flux change in Tyrosine metabolism after gene KO,0.007874435297988038,-0.8645498616701113

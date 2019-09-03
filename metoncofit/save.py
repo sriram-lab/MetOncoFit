@@ -12,6 +12,7 @@ from openpyxl import load_workbook
 
 targ = sys.argv[2]
 
+
 def make_excel(summary, compare_models, loco, lofo, filename):
     """
     make_excel is the function that will save the resulting dataframes into Excel Files.
@@ -34,36 +35,55 @@ def make_excel(summary, compare_models, loco, lofo, filename):
     # Save the summary statistics data into excel files
     if targ == "CNV":
         if "S. Table 4 | CNV Pred" in book:
-            summary.to_excel(writer, sheet_name="S. Table 4 | CNV Pred", startrow=writer.sheets["S. Table 4 | CNV Pred"].max_row, header=False)
+            summary.to_excel(writer, sheet_name="S. Table 4 | CNV Pred",
+                             startrow=writer.sheets["S. Table 4 | CNV Pred"].max_row, header=False)
         else:
-            summary.to_excel(writer, sheet_name="S. Table 4 | CNV Pred", header=True)
+            summary.to_excel(
+                writer, sheet_name="S. Table 4 | CNV Pred", header=True)
     elif targ == "SURV":
         if "S. Table 5 | SURV Pred" in book:
-            summary.to_excel(writer, sheet_name="S. Table 5 | SURV Pred", startrow=writer.sheets["S. Table 5 | SURV Pred"].max_row, header=False)
+            summary.to_excel(writer, sheet_name="S. Table 5 | SURV Pred",
+                             startrow=writer.sheets["S. Table 5 | SURV Pred"].max_row, header=False)
         else:
-            summary.to_excel(writer, sheet_name="S. Table 5 | SURV Pred", header=True)
+            summary.to_excel(
+                writer, sheet_name="S. Table 5 | SURV Pred", header=True)
     else:
         if "S. Table 3 | DE Pred" in book:
-            summary.to_excel(writer, sheet_name="S. Table 3 | DE Pred", startrow=writer.sheets["S. Table 3 | DE Pred"].max_row, header=False)
+            summary.to_excel(writer, sheet_name="S. Table 3 | DE Pred",
+                             startrow=writer.sheets["S. Table 3 | DE Pred"].max_row, header=False)
         else:
-            summary.to_excel(writer, sheet_name="S. Table 3 | DE Pred", header=True)
+            summary.to_excel(
+                writer, sheet_name="S. Table 3 | DE Pred", header=True)
 
     # Save the Leave-One-Feature-Out dataset
     if "S. Table 6 | LOFO" in book:
-        lofo.to_excel(writer, sheet_name="S. Table 6 | LOFO", index=False, startrow=writer.sheets["S. Table 6 | LOFO"].max_row, header=False)
+        lofo.to_excel(writer, sheet_name="S. Table 6 | LOFO", index=False,
+                      startrow=writer.sheets["S. Table 6 | LOFO"].max_row, header=False)
     else:
-        lofo.to_excel(writer, sheet_name="S. Table 6 | LOFO", index=False, header=True)
+        lofo.to_excel(writer, sheet_name="S. Table 6 | LOFO",
+                      index=False, header=True)
 
     # Save the Leave-One-Cell-Out dataset
     if "S. Table 7 | LOCO" in book:
-        loco.to_excel(writer, sheet_name="S. Table 7 | LOCO", index=False, startrow=writer.sheets["S. Table 7 | LOCO"].max_row, header=False)
+        loco.to_excel(writer, sheet_name="S. Table 7 | LOCO", index=False,
+                      startrow=writer.sheets["S. Table 7 | LOCO"].max_row, header=False)
     else:
-        loco.to_excel(writer, sheet_name="S. Table 7 | LOCO", index=False, header=True)
+        loco.to_excel(writer, sheet_name="S. Table 7 | LOCO",
+                      index=False, header=True)
 
     # Save AUROC scores
     if "S. Table 8 | AUROC" in book:
-        compare_models.to_excel(writer, sheet_name="S. Table 8 | AUROC", index=False, startrow=writer.sheets["S. Table 8 | AUROC"].max_row, header=False)
+        compare_models.to_excel(writer, sheet_name="S. Table 8 | AUROC", index=False,
+                                startrow=writer.sheets["S. Table 8 | AUROC"].max_row, header=False)
     else:
-        compare_models.to_excel(writer, sheet_name="S. Table 8 | AUROC", index=False, header=True)
+        compare_models.to_excel(
+            writer, sheet_name="S. Table 8 | AUROC", index=False, header=True)
+
+    # Save results from checking HR thresholds
+    if "S. Table 9 | HR Check" in book:
+        freq.to_excel(writer, sheet_name="S. Table 9 | HR Check",
+                      startrow=writer.sheets["S. Table 9 | HR Check"].max_row, header=False)
+    else:
+        freq.to_excel(writer, sheet_name="S. Table 9 | HR Check", header=True)
 
     writer.save()

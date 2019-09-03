@@ -1,0 +1,21 @@
+Feature,Gini,R
+NCI-60 gene expression,0.19952928048945107,0.5577584609660934
+RECON1 subsystem,0.11857281148357617,-0.1555427542095638
+Catalytic efficiency,0.11404904067249935,0.0
+Metabolic subnetwork,0.03672091588670286,0.0
+Flux change in Arginine and Proline Metabolism after gene KO,0.03273431973640993,0.0
+Sum of topological distances to biomass components,0.026182172189808017,0.8662436286042533
+Sum of topological distances to media components,0.022672402356994713,0.8699676156817266
+Flux change in Pyruvate Metabolism after gene KO,0.019889062732869722,0.23279874121905053
+Flux change in Glycolysis/Gluconeogenesis after gene KO,0.01882486154780282,0.8654401364909173
+Flux change in NAD Metabolism after gene KO,0.016236432540875877,0.0
+Flux change in Glutamate metabolism after gene KO,0.0149722551185443,0.0
+Flux change in Fatty Acid Metabolism after gene KO,0.014597758739023175,0.0
+Flux change in Tyrosine metabolism after gene KO,0.014368288231272355,0.8653419942390256
+"Flux change in Valine, Leucine, and Isoleucine Metabolism after gene KO",0.014020125957652207,0.0
+Flux change in Pentose and Glucuronate Interconversions after gene KO,0.013446797294870236,0.0029883321315729646
+Flux change in Urea cycle/amino group metabolism after gene KO,0.012657926748168907,-0.8512209185986782
+Flux change in Cysteine Metabolism after gene KO,0.012225915401332853,0.0
+Flux change in Pyrimidine Catabolism after gene KO,0.011522947874935309,0.0
+Flux change in Alanine and Aspartate Metabolism after gene KO,0.010595595992549566,0.0
+Topological distance from cysteine (media),0.010591639593851147,0.8708227679022819

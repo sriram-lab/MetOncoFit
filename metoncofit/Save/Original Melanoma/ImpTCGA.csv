@@ -1,0 +1,21 @@
+Feature,Gini,R
+NCI-60 gene expression,0.2660366979476237,-8.730534810055334e-05
+RECON1 subsystem,0.20499327780583024,-0.6342853307421684
+Metabolic subnetwork,0.055600857241311454,0.8660254037844385
+Topological distance to monoacylglycerol (biomass),0.05153232500656246,-0.8660254037844387
+Catalytic efficiency,0.051459439962586576,0.0
+Topological distance from reduced glutathione (media),0.046351937365847765,0.0
+Sum of topological distances to biomass components,0.0389293577315434,0.0
+Topological distance from glutamine (media),0.034148368427702976,0.0
+Topological distance from lysine (media),0.018247728602441345,0.0
+Flux change in Glutamate metabolism after gene KO,0.01536139839082109,0.0
+Topological distance to glycogen (biomass),0.015321127966885516,0.0
+Flux change in Arginine and Proline Metabolism after gene KO,0.014968893137843728,0.0
+Topological distance to cholesterol (biomass),0.012453738888837293,0.48832807769325576
+Topological distance to proline (biomass),0.01215115194607536,-0.8449469405353346
+Flux change in Pyruvate Metabolism after gene KO,0.011808650608531961,-0.160879426429291
+Flux change in Glycolysis/Gluconeogenesis after gene KO,0.011476010453703441,-0.9993929622592876
+Flux change in NAD Metabolism after gene KO,0.010979855560560178,0.0
+Topological distance to tyrosine (biomass),0.0093538952938512,0.48819024980588793
+Flux change in Fatty Acid Metabolism after gene KO,0.008092849743828973,0.0
+Flux change in Urea cycle/amino group metabolism after gene KO,0.007751162612016663,-0.8428123382499129

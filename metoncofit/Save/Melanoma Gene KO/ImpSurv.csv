@@ -1,0 +1,21 @@
+Feature,Gini,R
+NCI-60 gene expression,0.24112035668572074,0.9793648762804518
+RECON1 subsystem,0.16714629961860822,0.9700172433694787
+Catalytic efficiency,0.07057292404544227,0.0
+Sum of topological distances to biomass components,0.0695095260953387,-0.8808789319808107
+Flux change in Arginine and Proline Metabolism after gene KO,0.04505316303360858,-0.827423978263079
+Metabolic subnetwork,0.025618065425008184,-0.8660254037844385
+Flux change in Glycolysis/Gluconeogenesis after gene KO,0.023834907406482093,-0.5372136790857199
+Sum of topological distances to media components,0.015126291172664322,-0.8902821755757313
+Flux change in NAD Metabolism after gene KO,0.014776664294011735,-0.8660254037844386
+grRatio,0.013118949351305559,0.0
+Flux change in Urea cycle/amino group metabolism after gene KO,0.012357999143125459,0.0
+Flux change in Pentose and Glucuronate Interconversions after gene KO,0.01202075967079921,-0.3863301537055608
+Topological distance to triacylglycerol (biomass),0.011037043347944418,-0.8852325815216111
+Flux change in Pyruvate Metabolism after gene KO,0.010021187955248301,-0.12102270194285471
+Flux change in Glutathione Metabolism after gene KO,0.009938943864190197,0.2768341086321915
+Flux change in Pyrimidine Catabolism after gene KO,0.009901518322525619,-0.8491228199988735
+Topological distance from histidine (media),0.009809799115067012,-0.8928424212659851
+Topological distance to tyrosine (biomass),0.009014067180866,-0.884816671429501
+Topological distance from reduced glutathione (media),0.008731648296611636,-0.8858920666876039
+Topological distance from oxidized glutathione (media),0.008498041260608793,-0.8955742347499436

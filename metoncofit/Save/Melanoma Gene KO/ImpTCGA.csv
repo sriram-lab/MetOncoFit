@@ -1,0 +1,21 @@
+Feature,Gini,R
+NCI-60 gene expression,0.26656876724589107,-8.844665274948498e-05
+RECON1 subsystem,0.21183020865965546,-0.6342853307421684
+Catalytic efficiency,0.06037246497491855,0.0
+Metabolic subnetwork,0.058606450694996724,0.8660254037844385
+Sum of topological distances to biomass components,0.040645640190485666,0.0
+Topological distance from ammonia (media),0.03479726166791021,-0.8660254037844387
+Topological distance from glutamine (media),0.03472130133332184,0.0
+Topological distance from reduced glutathione (media),0.030953911997090133,0.0
+Topological distance from lysine (media),0.021936026137117332,0.0
+Topological distance to CMP (biomass),0.017846437185639878,0.0
+Topological distance to tyrosine (biomass),0.015026365385193965,0.48819024980588793
+Flux change in Tyrosine metabolism after gene KO,0.013387583593324152,-0.5265465762857464
+Flux change in Glutamate metabolism after gene KO,0.010138796114626179,0.0
+Topological distance to cholesterol (biomass),0.010066864460994621,0.48832807769325576
+Flux change in Arginine and Proline Metabolism after gene KO,0.009838994816521307,0.0
+grRatio,0.0090689643576287,0.0
+Topological distance to monoacylglycerol (biomass),0.009043836112696494,-0.8660254037844387
+Flux change in Fatty acid oxidation after gene KO,0.008893733531393149,0.0
+Topological distance to proline (biomass),0.008579778656442851,-0.8449469405353346
+Flux change in NAD Metabolism after gene KO,0.008395784296141278,0.0

@@ -22,7 +22,7 @@ from imblearn.over_sampling import RandomOverSampler
 from sklearn.model_selection import train_test_split
 
 
-def preprocess(datapath=sys.argv[1], fil=sys.argv[2], targ=sys.argv[3], exclude=sys.argv[4]):
+def preprocess(datapath='/path', fil='filename', targ='targ', exclude='exclusion'):
     """
     preprocess takes in the '*.csv' file and transforms the data that can be
     analyzed or fed into the MetOncoFit classifier.
@@ -36,14 +36,14 @@ def preprocess(datapath=sys.argv[1], fil=sys.argv[2], targ=sys.argv[3], exclude=
     INPUTS:
         datapath: path to datasets for preprocessing
         file: csv file used for the analysis
-        target: the target for random forest prediction
+        targ: the targ for random forest prediction
         exclude: specifies if the TCGA patient data will be included or excluded in the dataset
 
     OUTPUTS:
-        df: DataFrame structure without the target classes. Should be used in the random_forest module
-        df1: DataFrame structure containing the target class strings. Should be used in generating the visualizations
+        df: DataFrame structure without the targ classes. Should be used in the random_forest module
+        df1: DataFrame structure containing the targ class strings. Should be used in generating the visualizations
         canc: The string variable containing the cancer tissue
-        targ: The string variable containing the target values
+        targ: The string variable containing the targ values
         var_excl: Features that should be removed in the analysis
         data, classes: The NumPy array containing scaled data and classes for training the random forest classifier
         orig_data, orig_classes: The NumPy array containing scaled data and classes for testing the random forest classifier
@@ -56,7 +56,7 @@ def preprocess(datapath=sys.argv[1], fil=sys.argv[2], targ=sys.argv[3], exclude=
         targ = str("TCGA annotation")
 
     if datapath is None:
-        datapath = './../data/mean/'
+        datapath = './../data/median/'
 
     canc = fil.replace(".csv", "")
     canc_dict = {
@@ -73,12 +73,12 @@ def preprocess(datapath=sys.argv[1], fil=sys.argv[2], targ=sys.argv[3], exclude=
         }
     canc = canc_dict.get(canc)
 
-    if sys.argv[1] == './../data/lax/':
-        type = "[0.90 - 1.10]"
-    elif sys.argv[1] == './../data/median/':
-        type = "[0.75 - 1.33]"
-    elif sys.argv[1] == './../data/stringent/':
-        type = "[0.50 - 2.00]"
+    # if datapath == './../data/lax/':
+    #     type = "[0.90 - 1.10]"
+    # elif datapath == './../data/median/':
+    #     type = "[0.75 - 1.33]"
+    # elif datapath == './../data/stringent/':
+    #     type = "[0.50 - 2.00]"
 
     df_names = pd.read_csv("./../labels/real_headers.txt",
                            sep='\t', names=['Original', 'New'])
@@ -92,9 +92,10 @@ def preprocess(datapath=sys.argv[1], fil=sys.argv[2], targ=sys.argv[3], exclude=
     freq = df[targ].value_counts()
     freq = pd.DataFrame(freq)
     freq = freq.reset_index()
-    freq = freq.rename({targ:"Label Frequency", "index":"Label"}, axis='columns')
+    freq = freq.rename(
+        {targ: "Label Frequency", "index": "Label"}, axis='columns')
     freq["Cancer"] = canc
-    freq["Target"] = targ
+    freq["targ"] = targ
     freq["HR Thresholds"] = type
 
     df = df.set_index(['Genes', 'Cell Line'])
@@ -108,7 +109,7 @@ def preprocess(datapath=sys.argv[1], fil=sys.argv[2], targ=sys.argv[3], exclude=
     tmp = excl_targ.remove(targ)
 
     # We will drop a few columns in the cases where we have an exclusion list.
-    if(len(sys.argv) > 4):
+    if(len(sys.argv) > 3):
         fil3 = open("./../labels/"+exclude.rstrip())
         drop_col_names = [i.strip() for i in fil3.readlines()]
         fil3.close()
@@ -117,8 +118,8 @@ def preprocess(datapath=sys.argv[1], fil=sys.argv[2], targ=sys.argv[3], exclude=
     df = df.drop(columns=excl_targ)
     classes = df[targ]
     header = df.columns
-    df1 = df.copy(deep=True)  # contains target classes
-    df = df.drop(columns=targ)  # doesn't contain target classes
+    df1 = df.copy(deep=True)  # contains targ classes
+    df = df.drop(columns=targ)  # doesn't contain targ classes
 
     # Robust scaling the dataset with random oversampling
     data = np.array(df).astype(np.float)
@@ -133,18 +134,21 @@ def preprocess(datapath=sys.argv[1], fil=sys.argv[2], targ=sys.argv[3], exclude=
     return df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ, freq
 
 
-def one_gene_only(df, target):
+def one_gene_only(df, targ, header, rfc, canc):
     """
-    one_gene_only will merge the gene target value by majority rules and will take the median values for all numerical values.
+    one_gene_only will merge the gene targ value by majority rules and will take the median values for all numerical values. This code primarily designed to make the figures.
 
     STEPS:
         1. Split gene and cell line index
         2. Capture unique genes, grouping by majority vote and taking the median value for the gene. The data is stored in one_gene_df
         3. Get specific up/neut/down-regulated gene information and store in dataframes / lists
+        4. Calculate the Pearson Correlation Coefficient for up/neut/downregulated dataframes
+        5. Get the important features determined by the random forest classifier and capture the R value and Gini score in the importance dataframe.
+        6. Scale the data using the min/max approach and create the DataFrame that will be used, based on the `plot` argument
 
     INPUTS:
         df: DataFrame structure from the preprocess function.
-        target: The target we are going to predict (CNV, DE, SURV)
+        targ: The targ we are going to predict (CNV, DE, SURV)
 
     OUTPUTS:
         one_gene_df, one_gene_class: Dataframe structure will all unique genes data and classes
@@ -154,7 +158,7 @@ def one_gene_only(df, target):
 
     global up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, one_gene_class
 
-    if(target == "CNV"):
+    if(targ == "CNV"):
         targ_labels = ["GAIN", "NEUT", "LOSS"]
         targ_dict = {'NEUT': 0, 'LOSS': 0, 'GAIN': 0}
     else:
@@ -163,36 +167,21 @@ def one_gene_only(df, target):
 
     df = df.reset_index()
     one_gene_df = df.drop(columns="Cell Line").groupby(
-        ["Genes", target]).median().reset_index().set_index("Genes")
-    one_gene_class = pd.DataFrame(one_gene_df[target])
+        ["Genes", targ]).median().reset_index().set_index("Genes")
+    one_gene_class = pd.DataFrame(one_gene_df[targ])
     one_gene_class = one_gene_class.reset_index()
 
     # These dataframes contain the df entries with increased, neutral, and decreased values.
-    up_df = one_gene_df.loc[(one_gene_df[target] == targ_labels[0])]
-    neut_df = one_gene_df.loc[(one_gene_df[target] == targ_labels[1])]
-    down_df = one_gene_df.loc[(one_gene_df[target] == targ_labels[2])]
+    up_df = one_gene_df.loc[(one_gene_df[targ] == targ_labels[0])]
+    neut_df = one_gene_df.loc[(one_gene_df[targ] == targ_labels[1])]
+    down_df = one_gene_df.loc[(one_gene_df[targ] == targ_labels[2])]
 
     # To create the figure, we are randomly selecting three genes that are upreg, neutral, or downreg and are storing them in this list.
     up_genes = up_df.index.values.tolist()
     neut_genes = neut_df.index.values.tolist()
     down_genes = down_df.index.values.tolist()
 
-    return up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, one_gene_class
-
-
-def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_genes, one_gene_df, rfc, header, targ, orig_classes, rfc_pred, one_gene_class, canc):
-    """
-    plotting_preprocess formats the data so that it can be used in the visualizations module.
-
-    STEPS:
-        1. Calculate the Pearson Correlation Coefficient for up/neut/downregulated dataframes
-        2. Get the important features determined by the random forest classifier and capture the R value and Gini score in the importance dataframe.
-        3. Scale the data using the min/max approach and create the DataFrame that will be used, based on the `plot` argument
-    """
-
-    global importance, up, neut, down, df
-
-    # Remove the classes
+    # Get rid of the targ column
     _ = one_gene_df.pop(targ)
 
     # This will calculate the correlation for each feature, if there is one between the biological features.
@@ -219,6 +208,7 @@ def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_gene
         sorted_d = sorted(temp_dict_feat.items(),
                           key=operator.itemgetter(1), reverse=True)
         return sorted_d
+
     sorted_d = idx_change(header, rfc.feature_importances_)
 
     feat = []
@@ -226,7 +216,7 @@ def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_gene
     corr = []
 
     x = 0
-    while(x < 10):  # Get the first 10 features
+    while(x < 137):  # Get the first 10 features
         tempa = sorted_d[x]
         feat.append(tempa[0])
         gini.append(tempa[1])
@@ -234,6 +224,16 @@ def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_gene
         x = x+1
 
     importance = pd.DataFrame({"Feature": feat, "Gini": gini, "R": corr})
+    supp_fig = importance.copy(deep=True)
+    importance = importance.head(137)
+
+    if targ == "CNV":
+        export_csv = importance.to_csv (r'/Users/kirksmith/Documents/GitHub.nosync/MetOncoFit/metoncofit/ImpCNV.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
+    elif targ == "SURV":
+        export_csv = importance.to_csv (r'/Users/kirksmith/Documents/GitHub.nosync/MetOncoFit/metoncofit/ImpSurv.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
+    else:
+        export_csv = importance.to_csv (r'/Users/kirksmith/Documents/GitHub.nosync/MetOncoFit/metoncofit/ImpTCGA.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
+
 
     # Map to label
     if targ == 'CNV':
@@ -273,5 +273,4 @@ def plotting_preprocess(up_df, neut_df, down_df, up_genes, neut_genes, down_gene
     df = df.sort_values('Genes')
     df['Cancer'] = canc
     df = df.reset_index().drop('index', axis=1)
-
-    return importance, up, neut, down, df
+    return importance, df
