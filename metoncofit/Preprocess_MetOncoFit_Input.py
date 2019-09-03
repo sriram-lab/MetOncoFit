@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-
-
 @authors: Krishna Dev Oruganty & Scott Campit
 """
 import sys
