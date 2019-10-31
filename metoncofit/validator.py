@@ -1,17 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-from imblearn.over_sampling import RandomOverSampler
-from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import RobustScaler, label_binarize
-from sklearn.model_selection import train_test_split, permutation_test_score, cross_val_score
-from sklearn.metrics import f1_score, recall_score, precision_score, precision_recall_fscore_support, confusion_matrix, roc_curve, auc, classification_report, roc_auc_score, accuracy_score, average_precision_score, matthews_corrcoef
-from sklearn.metrics import cohen_kappa_score as coh_kap
-from sklearn import preprocessing
-from sklearn.externals import joblib
-from scipy import stats, interp
-import scipy
-from random import shuffle
 """
 `validator.py` contains several tools to assess the performance of the modelself.
 
@@ -25,9 +11,61 @@ Python Dependencies:
 @authors: Krishna Oruganty & Scott Campit
 """
 
+from imblearn.over_sampling import RandomOverSampler
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import RobustScaler, label_binarize
+from sklearn.model_selection import train_test_split, permutation_test_score, cross_val_score
+from sklearn.metrics import f1_score, recall_score, precision_score, precision_recall_fscore_support, confusion_matrix, roc_curve, auc, classification_report, roc_auc_score, accuracy_score, average_precision_score, matthews_corrcoef
+from sklearn.metrics import cohen_kappa_score as coh_kap
+from sklearn import preprocessing
+from sklearn.externals import joblib
+from scipy import stats, interp
+import scipy
+from random import shuffle
+
+
 import pandas as pd
 import numpy as np
 np.seterr(divide='ignore', invalid='ignore')
+
+
+def crossValidation(model, data, splits=10):
+    """
+    """
+    from datetime import date
+    from sklearn.model_selection import KFold
+
+    kfolds = KFold(n_splits=splits, shuffle=True, random_state=date.today())
+
+    error = np.zeros(shape=(splits, 1))
+    for train, test in kfolds.split(data):
+        predictions = model.predict(train)
+        # INSERT REST OF CODE
+
+    return None
+
+
+def confusionMatrix():
+    """
+    """
+    return None
+
+
+def precisionAccuracyRecall():
+    """
+    """
+    return None
+
+
+def Ztest():
+    """
+    """
+
+
+def pearsonCorrelation():
+    """
+    """
 
 
 def summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, targ, excl_targ, mean_acc, canc):
@@ -58,18 +96,18 @@ def summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, ta
     """
 
     # Create a distribution to measure the p-value associated with the accuracies obtained from MetOncoFit
-    acc_distri = []
+    accuracyDistribution = []
     x = 0
     while(x <= 1000):
         temp_classes = list(classes)
         shuffle(temp_classes)
-        acc_distri.append(precision_score(
+        accuracyDistribution.append(precision_score(
             temp_classes, classes, average='micro'))
         x = x+1
-    dist = np.array(acc_distri)
+    dist = np.array(accuracyDistribution)
 
     # Basic statistical measures from the model
-    ave = np.mean(np.array(acc_distri))
+    ave = np.mean(np.array(accuracyDistribution))
     std = np.std(dist)
     kap = coh_kap(orig_classes, rfc_pred)
     f1 = f1_score(orig_classes, rfc_pred, average='micro')
