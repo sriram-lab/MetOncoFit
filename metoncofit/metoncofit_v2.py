@@ -1,4 +1,5 @@
 """
+
 """
 
 import datetime
@@ -6,12 +7,9 @@ import numpy as np
 import pandas as pd
 
 
-class RandomForest():
-
+class MetOncoFit:
     def __init__(self, X, y, nTrees, nFeatures, size,
                  depth=10, minLeafs=5):
-        """
-        """
 
         np.random.seed(datetime.datetime)
 
@@ -43,17 +41,3 @@ class RandomForest():
             depth=self.depth,
             minLeafs=self.minLeafs
             )
-
-    def predict(self, X):
-        """
-        """
-
-        return np.mean(
-            [tree.predict(X) for tree in self.trees], axis=0
-            )
-
-
-def stdAgg(count, std1, std2):
-    """
-    """
-    return math.sqrt(((std2/count) - (std1/count))**2)
