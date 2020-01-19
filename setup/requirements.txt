@@ -81,6 +81,6 @@ ufw==0.36
 unattended-upgrades==0.1
 urllib3==1.24.3
 virtualenv==15.1.0
-Werkzeug==0.15.2
+Werkzeug==0.15.3
 xlrd==1.2.0
 zope.interface==4.3.2
