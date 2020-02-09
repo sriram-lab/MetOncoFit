@@ -123,3 +123,5 @@ data/
 output/
 void/
 GeneKO/
+./idea
+.github
