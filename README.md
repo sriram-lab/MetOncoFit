@@ -1,5 +1,5 @@
 # MetOncoFit
-MetOncoFit is a machine learning approach that uses biochemical and metabolic attributes to predict tumor differential expression, copy number variation, and patient survival.
+MetOncoFit is a random forest algorithm that uses biochemical and metabolic attributes to predict tumor differential expression, copy number variation, and patient survival.
 
 ## Introduction
 Tumors reprogram normal cellular metabolism to support uncontrolled proliferation. While some of these metabolic reprogramming strategies are common across most tumors, such as the Warburg effect, there must be diverse metabolic objectives that contribute to tumor heterogeneity.
@@ -19,24 +19,14 @@ Our study demonstrates how biochemical and metabolic network features are predic
 ## Installation
 To install MetOncoFit, you can fork this GitHub repository onto your local machine. All outputs will be contained in this folder.
 
-We recommend creating a [virtual environment](https://virtualenv.pypa.io/en/latest/) specifically for MetOncoFit. 
-
-Within this virtual environment, you can download all the dependencies in the `setup` folder by running `pip install -r ./setup/requirements.txt` in a Linux command prompt. 
-
-From here, you will be able to run the MetOncoFit package, which is located in the `metoncofit` folder. 
+We recommend creating a [virtual environment](https://virtualenv.pypa.io/en/latest/) specifically for MetOncoFit and install all the requisite packages in the `requirements.txt` file supplied in the repository. From here, you will be able to run the MetOncoFit package, which is located in the `metoncofit` folder. 
 
 ## Usage
-To run MetOncoFit with the nine tumor models, you can run the bash script `run_all.sh` by typing the folloing into the command prompt: 
-
-`./do_all.sh`
-
-This bash script calls the Python script `metoncofit.py`, which is the parent script that uses functions from the other Python scripts in the directory. 
-
-## Authors:
-To support the MetOncoFit project, you can cite our publication:
-Oruganty, K., Campit, S.E., Mamde, S., & Chandrasekaran, S. Common biochemical and topological attributes of metabolic genes recurrently dysregulated in tumors. *in preparation*
-
+To run MetOncoFit with the nine tumor models, you can run the `runMetOncoFit.sh` file. which generates the trained tumor models and outputs the figures in the manuscript.
 
 ## Contributing
 Contributions are welcome! Please read the contributions guide to get started. Also feel free to submit bugs, feature requests, and pull requests.
+
+Otherwise, you can support the MetOncoFit project by citing our publication:
+Oruganty, K., Campit, S.E., Mamde, S., & Chandrasekaran, S. Common biochemical and topological attributes of metabolic genes recurrently dysregulated in tumors. *in preparation*
 
