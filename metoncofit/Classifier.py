@@ -6,10 +6,9 @@ Classifier.py contains the functions necessary to train, save, and load the mach
 """
 import os
 import numpy as np
-from sklearn.externals import joblib
+import joblib
 
-def random_forest(Xtrain, Ytrain,
-                  Xtest, Ytest):
+def random_forest(Xtrain, Ytrain, Xtest, Ytest):
     """
     random_forest will train a random forest classifier and outputs the trained classifier, predictions, and accuracy.
 
@@ -27,28 +26,37 @@ def random_forest(Xtrain, Ytrain,
 
     """
     from sklearn.ensemble import RandomForestClassifier
-    from sklearn.model_selection import cross_val_predict as CV
+    from sklearn.model_selection import cross_val_score as CV
+
+    from tqdm import tqdm
 
     # For reproducibility
     np.random.seed(0)
 
-    trees = 64
-    while(trees <= 128):
-        RFC = RandomForestClassifier(n_estimators=trees,
+    initialTrees = 64
+    totalTrees = 128
+    print("Starting to train random forest model")
+
+    pbar = tqdm(total=initialTrees)
+    while(initialTrees <= totalTrees):
+        RFC = RandomForestClassifier(n_estimators=initialTrees,
                                      criterion="gini",
                                      max_features="auto",
-                                     boostrap=True,
+                                     bootstrap=True,
                                      oob_score=True,
                                      random_state=True)
         RFC = RFC.fit(Xtrain, Ytrain)
-        trees = trees + 1
+        initialTrees += 1
+        pbar.update(1)
+    pbar.close()
+
     RFC_prediction = RFC.predict(Xtest)
     HoldOutAccuracy = RFC.score(Xtest, Ytest)
-    CVAccuracy = CV(RFC, Xtest, Ytest, cv=10)
-
+    CVAccuracy = CV(RFC, Xtest, Ytest, cv=10).mean()
+    print("Finished training random forest")
     return RFC, RFC_prediction, HoldOutAccuracy, CVAccuracy
 
-def pickleModel(cancer, target, excluded="DE_and_CNV", mdl, savepath='./../models/'):
+#def pickleModel(cancer, target, excluded="DE_and_CNV", mdl, savepath='./../models/'):
     """
     pickleModel saves the tumor-specific random forest model as a pickled object.
 
@@ -63,13 +71,13 @@ def pickleModel(cancer, target, excluded="DE_and_CNV", mdl, savepath='./../model
     :return:
         The pickled file containing the trained MetOncoFit model.
     """
-    if not os.path.exists(savepath):
-        os.makedirs(savepath)
+    #if not os.path.exists(savepath):
+    #    os.makedirs(savepath)
 
-    filename = os.path.join(savepath, (cancer + '_' + target + "_" + excluded + '.pkl'))
-    joblib.dump(mdl, filename)
+    #filename = os.path.join(savepath, (cancer + '_' + target + "_" + excluded + '.pkl'))
+    #joblib.dump(mdl, filename)
 
-def loadModel(fileName):
+#def loadModel(fileName):
     """
     loadModel loads the pickled MetOncoFit model to use.
 
@@ -80,5 +88,5 @@ def loadModel(fileName):
         mdl:      The pickled MetOncoFit model object.
     """
 
-    mdl = joblib.load(model)
-    return mdl
+    #mdl = joblib.load(model)
+    #return mdl

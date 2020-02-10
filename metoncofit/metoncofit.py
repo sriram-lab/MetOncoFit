@@ -11,8 +11,13 @@
 """
 
 import sys
+<<<<<<< HEAD
 import process
 import RandomForest
+=======
+import DataPreparation
+import Classifier
+>>>>>>> cae28e5
 import validator
 import visualizations
 import save
@@ -21,16 +26,16 @@ import pandas as pd
 from openpyxl import load_workbook
 
 # Create data structures that will be used in the analysis
-df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ, freq = process.preprocess(
-    datapath='./../data/geneko/', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3])
+#df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ, freq = process.preprocess(
+#    datapath='./../data/geneko/', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3])
 
 # Random Forest Classifier, prediction, and hold out accuracy
-rfc, rfc_pred, mean_acc = RandomForest.random_forest(
-    canc, targ, data, classes, orig_data, orig_classes)
+#rfc, rfc_pred, mean_acc = RandomForest.random_forest(
+#    canc, targ, data, classes, orig_data, orig_classes)
 
 # Model performance and statistical measures. THIS FUNCTION IS ALSO NECESSARY TO GENERATE THE FIGURES.
-cm, pvalue, zscore, cv_score, summary = validator.summary_statistics(
-    rfc, rfc_pred, data, classes, orig_classes, orig_data, targ, excl_targ, mean_acc, canc)
+#cm, pvalue, zscore, cv_score, summary = validator.summary_statistics(
+#    rfc, rfc_pred, data, classes, orig_classes, orig_data, targ, excl_targ, mean_acc, canc)
 
 # Model comparison with Auslander et al., 2016. Use only gene expression in these predictions for a true comparison.
 #df2 = df1.copy(deep=True)
@@ -48,11 +53,11 @@ cm, pvalue, zscore, cv_score, summary = validator.summary_statistics(
 #save.make_excel(summary, compare_models, loco, lofo, filename='SI.xlsx')
 
 # Create data structures that will only be used while making the figures
-importance, final_df = process.one_gene_only(df1, targ, header, rfc, canc)
+#importance, final_df = process.one_gene_only(df1, targ, header, rfc, canc)
 
 # Make the figures
-visualizations.make_figure(final_df, importance, cm, orig_classes, rfc_pred, cv_score,
-                           pvalue, zscore, canc, targ, normalize=True, savepath=False, filename=False, title_name=canc)
+#visualizations.make_figure(final_df, importance, cm, orig_classes, rfc_pred, cv_score,
+#                           pvalue, zscore, canc, targ, normalize=True, savepath=False, filename=False, title_name=canc)
 
 # Make supplementary heatmaps
 #fils = [
@@ -66,3 +71,22 @@ visualizations.make_figure(final_df, importance, cm, orig_classes, rfc_pred, cv_
 
 #genelist = r"/mnt/c/Users/scampit/Desktop/pyruvate.txt"
 #visualizations.specific_pathways_heatmap(final_df, importance, targ, canc, genelist, savepath=False, filename=False)
+
+if __name__ == '__main__':
+    Xtrain, Xtest, Ytrain, Ytest = DataPreparation.processDataFromFile(
+                                        filename=sys.argv[1],
+                                        target=sys.argv[2],
+                                        exclude=sys.argv[3],
+                                        labelFileName=sys.argv[4])
+    RFC, Ypred, HoldOutAcc, CVAcc = Classifier.random_forest(Xtrain,
+                                                             Ytrain,
+                                                             Xtest,
+                                                             Ytest)
+
+    confusionMatrix, normalizedCM = validator.computeConfusionMatrix(filename=sys.argv[1],
+                                                           target=sys.argv[2],
+                                                           exclude=sys.argv[3],
+                                                           labelFileName=sys.argv[4],
+                                                           clf = RFC,
+                                                           iterations=1000)
+    print(confusionMatrix)
