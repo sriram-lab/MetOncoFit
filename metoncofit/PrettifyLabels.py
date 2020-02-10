@@ -3,6 +3,7 @@
 @author: Scott Campit
 """
 
+import pandas as pd
 
 def long_cancer_nnames(fileName):
     canc = fileName.replace(".csv", "")
@@ -22,10 +23,9 @@ def long_cancer_nnames(fileName):
     return canc
 
 
-def long_feature_names():
-    labelFile = "./../labels/real_headers.txt"
+def long_feature_names(labelFileName):
     columnName_map = pd.read_csv(
-        labelFile, sep='\t', names=['Original', 'New'])
+        labelFileName, sep='\t', names=['Original', 'New'])
     bestNames = dict([(index, name)
                       for index, name in zip(columnName_map['Original'], columnName_map['New'])])
     return bestNames

@@ -3,6 +3,7 @@ validator.py contains several functions that assesses and reports model performa
 
 @authors: Krishna Oruganty & Scott Campit
 """
+from tqdm import tqdm
 
 from sklearn import preprocessing
 from sklearn.externals import joblib
@@ -16,7 +17,8 @@ np.seterr(divide='ignore', invalid='ignore')
 import DataPreparation
 import Classifier
 
-def computeConfusionMatrix(filename, target, exclude, iterations=1000):
+def computeConfusionMatrix(filename, target, exclude, labelFileName,
+                           clf, iterations=1000):
     """
     computeConfusionMatrix generates the raw confusion matrix and normalized confusion matrix using the test data and
     the predicted data.
@@ -36,14 +38,19 @@ def computeConfusionMatrix(filename, target, exclude, iterations=1000):
     np.set_printoptions(precision=2)
 
     count = 0
+    pbar = tqdm(total=count)
+    print("Computing confusion matrix")
+
     while (count <= iterations):
-        Xtrain, Xtest, Ytrain, Ytest = DataPreparation.processDataFromFile(filename, target, exclude)
-        _, Ypred, _, _ = Classifier.random_forest(Xtrain, Ytrain, Xtest, Ytest)
+        Xtrain, Xtest, Ytrain, Ytest = DataPreparation.processDataFromFile(filename, target, exclude, labelFileName)
+        Ypred = clf.predict(Xtest)
         if count is 0:
             matrix = confusion_matrix(Ytest, Ypred)
         elif count > 1:
             matrix = np.add(matrix, confusion_matrix(Ytest, Ypred))
         count += 1
+        pbar.update(1)
+    pbar.close()
     normalizedMatrix = matrix.astype('float') / matrix.sum(axis=1)[:, np.newaxis]
 
     return matrix, normalizedMatrix
@@ -103,7 +110,7 @@ def Summarize(filename, target, exclude, iterations=1000):
         Summary[count, 'F1'] = f1_score(Ytest, Ypred, average='micro')
         Summary[count, 'MCC'] = matthews_corrcoef(Ytest, Ypred)
 
-        Summary[count, 'Precision'] = report.loc[['precision'], ['micro avg']].values[0])
+        Summary[count, 'Precision'] = report.loc[['precision'], ['micro avg']].values[0]
         Summary[count, 'UPREG/GAIN Precision'] = report.loc[['precision'], [labels[0]]].values[0]
         Summary[count, 'DOWNREG/LOSS Precision'] = report.loc[['precision'], [labels[2]]].values[0]
 
@@ -229,7 +236,7 @@ def leave_one_feat_out(filename, target, exclude):
                       columns=model.columns,
                       index=model.index)
 
-dynm = df.drop(df.columns[0:52], axis=1)
+    dynm = df.drop(df.columns[0:52], axis=1)
     topo = df.drop(df.columns[53:132], axis=1)
     kexp = df.drop(df.columns[132:], axis=1)
     genexp = df.drop(df.columns[133:], axis=1)

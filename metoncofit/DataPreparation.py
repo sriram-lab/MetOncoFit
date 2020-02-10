@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 from sklearn import preprocessing
 
-def load_data(model_file):
+def load_data(model_file, labelFileName):
     """
     load_data reads in the cancer model data (.csv file) and outputs a pandas dataframe.
 
@@ -26,12 +26,13 @@ def load_data(model_file):
         cancer:     A string denoting the tissue type from the name of the .csv file.
     """
 
-    import prettify_df_labels
+    import PrettifyLabels
 
-    column_names = prettify_labels.long_feature_names()
+    column_names = PrettifyLabels.long_feature_names(labelFileName)
     cancer = model_file.strip(".")[0]
-    model = pd.read_csv(model_file, index_col=None,     names=column_names).set_index(
-        ['Genes', 'Cell Line'])
+    model = pd.read_csv(model_file)
+    model = model.rename(columns=column_names)
+    model = model.set_index(['Genes', 'Cell Line'])
 
     return model, cancer
 
@@ -50,10 +51,10 @@ def label_encode(model):
     """
 
     label_encoder = preprocessing.LabelEncoder()
-    model["RECON1 subsystem"] = label_encoder.fit_transform(
-        model["RECON1 subsystem"])
-    model["Metabolic subnetwork"] = label_encoder.fit_transform(
-        model["Metabolic subnetwork"])
+    model['RECON1 subsystem'] = label_encoder.fit_transform(
+        model['RECON1 subsystem'])
+    model['Metabolic subnetwork'] = label_encoder.fit_transform(
+        model['Metabolic subnetwork'])
     label_encoded_model = model.copy(deep=True)
 
     return label_encoded_model
@@ -78,8 +79,8 @@ def prune_targets(model, target="DE", exclude="DE_and_CNV"):
         - 'DE_and_CNV': Removes fold change values for differential expression and copy number variation.
         - 'CNV_only':   Removes fold change values for copy number variation only.
     """
-
-    if exclude is "DE_and_CNV":
+    label_encoded_model = model.copy(deep=True)
+    if exclude is 'DE_and_CNV':
         label_encoded_model = label_encoded_model.drop(['TCGA gene expression fold change',
                                                         'CNV gain/loss ratio'])
     elif exclude is 'CNV_only':
@@ -90,7 +91,9 @@ def prune_targets(model, target="DE", exclude="DE_and_CNV"):
                        'SURV':'SURV'}
     target = targetVariables.get(target)
     classes = label_encoded_model[target]
-    pruned_model = label_encoded_model.drop(['TCGA annotation', 'CNV', 'SURV'])
+    pruned_model = label_encoded_model.drop(
+        ["TCGA annotation", "CNV", "SURV"],
+        axis=1)
 
     return pruned_model, classes
 
@@ -108,8 +111,7 @@ def robust_scaler(model):
     from sklearn.preprocessing import RobustScaler
 
     data = np.array(model).astype(np.float)
-    scaler = RobustScaler(with_centering=True, with_scaling=True).fit_transform(data)
-    robust_model = scaler.transform(data)
+    robust_model = RobustScaler(with_centering=True, with_scaling=True).fit_transform(data)
 
     return robust_model
 
@@ -147,12 +149,12 @@ def randomOversampling(model, classes, testSize=0.2):
 
     return Xtrain, Xtest, Ytrain, Ytest
 
-def processDataFromFile(filename, target, exclude):
-    model, cancer = load_data(filename)
+def processDataFromFile(filename, target, exclude, labelFileName):
+    model, cancer = load_data(filename, labelFileName)
     labelEncodedModel = label_encode(model)
-    prunedModels, classes = prune_targets(model, target, exclude)
+    prunedModels, classes = prune_targets(labelEncodedModel, target, exclude)
     robustModel = robust_scaler(prunedModels)
-    Xtrain, Xtest, Ytrain, Ytest = randomOversampling(robustModels, classes, testSize=0.2)
+    Xtrain, Xtest, Ytrain, Ytest = randomOversampling(robustModel, classes, testSize=0.2)
     return Xtrain, Xtest, Ytrain, Ytest
 
 def create_tissue_model(model, target):
@@ -326,7 +328,7 @@ def constructFigureDF(model, importance, target, cancer):
 
     meltedDFs = {}
 
-    for df in diffExp_dfs):
+    for df in diffExp_dfs:
         meltedDFs[df] = melt_dataframes(diffExpDFs[df], featureList)
         meltedDFs[df] = meltedDFs[df].sort_values('Genes')
         meltedDFs[df]["Label"] = predictionLabels[df]
