@@ -1,218 +1,214 @@
 """
-`validator.py` contains several tools to assess the performance of the modelself.
-
-Python Dependencies:
-    * pandas
-    * numpy
-    * scipy
-    * scikit-learn
-    * imbalanced-learn
+validator.py contains several functions that assesses and reports model performance.
 
 @authors: Krishna Oruganty & Scott Campit
 """
 
-from imblearn.over_sampling import RandomOverSampler
-from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import RobustScaler, label_binarize
-from sklearn.model_selection import train_test_split, permutation_test_score, cross_val_score
-from sklearn.metrics import f1_score, recall_score, precision_score, precision_recall_fscore_support, confusion_matrix, roc_curve, auc, classification_report, roc_auc_score, accuracy_score, average_precision_score, matthews_corrcoef
-from sklearn.metrics import cohen_kappa_score as coh_kap
 from sklearn import preprocessing
 from sklearn.externals import joblib
-from scipy import stats, interp
+from scipy import stats
 import scipy
-from random import shuffle
-
 
 import pandas as pd
 import numpy as np
 np.seterr(divide='ignore', invalid='ignore')
 
+import DataPreparation
+import Classifier
 
-def crossValidation(model, data, splits=10):
+def computeConfusionMatrix(filename, target, exclude, iterations=1000):
     """
+    computeConfusionMatrix generates the raw confusion matrix and normalized confusion matrix using the test data and
+    the predicted data.
+
+    :params:
+        filename:   The path to the .csv file containing the rows as observations and the columns as features.
+        target:     A string denoting the target variable of interest.
+        exclude:    A string denoting which features to keep in the dataset.
+        iterations: An integer denoting the number of times to compute the confusion matrix.
+
+    :return:
+        matrix:           A numpy array containing the non-normalized confusion matrix after i iterations.
+        normalizedMatrix: A numpy array containing the normalized confusion matrix after i iterations.
+
     """
-    from datetime import date
-    from sklearn.model_selection import KFold
+    from sklearn.metrics import confusion_matrix
+    np.set_printoptions(precision=2)
 
-    kfolds = KFold(n_splits=splits, shuffle=True, random_state=date.today())
+    count = 0
+    while (count <= iterations):
+        Xtrain, Xtest, Ytrain, Ytest = DataPreparation.processDataFromFile(filename, target, exclude)
+        _, Ypred, _, _ = Classifier.random_forest(Xtrain, Ytrain, Xtest, Ytest)
+        if count is 0:
+            matrix = confusion_matrix(Ytest, Ypred)
+        elif count > 1:
+            matrix = np.add(matrix, confusion_matrix(Ytest, Ypred))
+        count += 1
+    normalizedMatrix = matrix.astype('float') / matrix.sum(axis=1)[:, np.newaxis]
 
-    error = np.zeros(shape=(splits, 1))
-    for train, test in kfolds.split(data):
-        predictions = model.predict(train)
-        # INSERT REST OF CODE
+    return matrix, normalizedMatrix
 
-    return None
-
-
-def confusionMatrix():
+def Summarize(filename, target, exclude, iterations=1000):
     """
+    Summarize outputs several statistical metrics used to evaluate the MetOncoFit model.
+
+    :params:
+        filename:   The path to the .csv file containing the rows as observations and the columns as features.
+        target:     A string denoting the target variable of interest.
+        exclude:    A string denoting which features to keep in the dataset.
+        iterations: An integer denoting the number of times to compute the summary statistics.
+
+    :return:
+        Summary: A pandas dataframe that stores several statistical values, including:
+            CV:        10-fold cross validation score
+            Accuracy:  Out-of-bag accuracy
+            Mean:      Mean of the out-of-bag accuracy values
+            Sigma:     The standard deviation of the out-of-bag accuracy values
+            Kappa:     Cohen's kappa coefficient
+            F1:        F1 score or harmonic average of the precision and recall
+            Precision: The average precision score across all classes
+            Recall:    The average recall score across all classes
+            UPREG/GAIN Precision, DOWNREG/LOSS Precision: The precision score for the
+                upregulated/gain and downregulated/loss class.
+            UPREG/GAIN Recall, DOWNREG/LOSS Recall: The recall score for the
+                upregulated/gain and downregulated/loss class
+            T-score: the T-score of accuracy
+            P-value: the P-value of accuracy using a Two-Tailed T-test
     """
-    return None
+    from random import shuffle
+    from sklearn.metrics import f1_score, classification_report, \
+        matthews_corrcoef, cohen_kappa_score as coh_kap
+
+    if target is "CNV":
+        labels = ["GAIN", "NEUT", "LOSS"]
+    else:
+        labels = ["UPREG", "NEUTRAL", "DOWNREG"]
+    cancer = filename.split('.')[0]
+
+    Summary = pd.DataFrame(columns=['CV', 'Accuracy', 'Sigma', 'Mean', 'Kappa', 'F1', 'MCC'
+                                            'Precision', 'Recall', 'UPREG/GAIN Precision',
+                                            'DOWNREG/LOSS Precision', 'UPREG/GAIN Recall',
+                                            'DOWNREG/LOSS Recall', 'T-score', 'P-value'])
+    count = 0
+    while(count <= iterations):
+        Xtrain, Xtest, Ytrain, Ytest = DataPreparation.processDataFromFile(filename, target, exclude)
+        _, Ypred, OOBAccuracy, CVAccuracy = Classifier.random_forest(Xtrain, Ytrain, Xtest, Ytest)
+
+        report = classification_report(Ytest, Ypred, output_dict=True)
+        report = pd.DataFrame.from_dict(report).round(2)
+
+        Summary[count, 'Accuracy'] = OOBAccuracy
+        Summary[count, 'CV'] = CVAccuracy
+        Summary[count, 'Kappa'] = coh_kap(Ytest, Ypred)
+        Summary[count, 'F1'] = f1_score(Ytest, Ypred, average='micro')
+        Summary[count, 'MCC'] = matthews_corrcoef(Ytest, Ypred)
+
+        Summary[count, 'Precision'] = report.loc[['precision'], ['micro avg']].values[0])
+        Summary[count, 'UPREG/GAIN Precision'] = report.loc[['precision'], [labels[0]]].values[0]
+        Summary[count, 'DOWNREG/LOSS Precision'] = report.loc[['precision'], [labels[2]]].values[0]
+
+        Summary[count, 'Recall'] = report.loc[['recall'], ['micro avg']].values[0]
+        Summary[count, 'UPREG/GAIN Recall'] = report.loc[['recall'], [labels[0]]].values[0]
+        Summary[count, 'DOWNREG/LOSS Recall'] = report.loc[['recall'], [labels[2]]].values[0]
+
+        count += 1
+
+    sigma = Summary['Accuracy'].std(axis=1)
+    mu = Summary['Accuracy'].mean(axis=1)
+    tscore, pvalue = scipy.stats.ttest_1samp(Summary['Accuracy'], mu)
+    if pvalue < 1E-50:
+        pvalue = 1E-50
+
+    Summary = Summary.mean(axis=1)
+    Summary['T-score'] = tscore
+    Summary['P-Value'] = pvalue
+    Summary['Sigma'] = sigma
+    Summary['Mean'] = mu
+    Summary['Cancer'] = cancer
+
+    return Summary
 
 
-def precisionAccuracyRecall():
+def PearsonCorrelation(diffExpDFs, target):
     """
+    PearsonCorrelation returns a dictionary of pearson correlation coefficients that correspond to the features in
+    the up / neutral / down dataframes stored in the diffExpDFs dictionary.
+
+    :params:
+        diffExpDFs: A dictionary containing pandas dataframes that correspond to unique target labels.
+        target:     A pandas series containing the labels corresponding to a specific target variable.
+
+    :return:
+        pearsonCorrelationDict: A dictionary corresponding to particular features and pearson correlation coefficients.
+
     """
-    return None
+    from scipy.stats import pearsonr
+
+    pearsonCorrelationDict = dict()
+    for df in diffExpDFs:
+        count = 0
+        corr = dict()
+        median = dict()
+
+        df = df.pop(target)
+        for col in df.columns:
+            median = df[col].median()
+            gradient = [1.0, 0.0, -1.0]
+            correlation = pearsonr(median, gradient)
+
+            if np.isnan(correlation) != True:
+                corr[col] = correlation
+            else:
+                corr[col] = 0.0
+
+        pearsonCorrelationDict[count] = corr
+        count += 1
+
+    return pearsonCorrelationDict
 
 
-def Ztest():
+def computeAUROC(filename, target, exclude):
     """
-    """
+    Calculates the score for the Area Under the Receiver Operating Characteristic Curve
+    from the MetOncoFit models.
 
-
-def pearsonCorrelation():
-    """
-    """
-
-
-def summary_statistics(rfc, rfc_pred, data, classes, orig_classes, orig_data, targ, excl_targ, mean_acc, canc):
-    """
-    summary_statistics takes in the classes and creates a precision probability distribution. This distribution is used to calculate several values of interest.
-
-    INPUTS:
-        clf_pred: the prediction array from the trained model.
-        data: the training data.
-        classes: the training label.
-        orig_classes: the test labels.
-        orig_data: the test data.
+    :params:
+        filename:   The path to the .csv file containing the rows as observations and the columns as features.
+        target:     A string denoting the target variable of interest.
+        exclude:    A string denoting which features to keep in the dataset.
 
     OUTPUTS:
-        cv_score: 10-fold cross validation score
-        cm: confusion matrix (for visualization)
-        ave: mean of the random precision score distribution.
-        std: the standard deviation of the random precision score distribution.
-        kap: Cohen's kappa coefficient
-        f1: F1 score or harmonic average of the precision and recall
-        prec: the average precision score across all classes
-        rec: the average recall score across all classes
-        prec_incr, prec_decr: the precision score for the upregulated/gain and downregulated/loss class
-        rec_incr, rec_decr: the recall score for the upregulated/gain and downregulated/loss class
-        zscore: the Z score of accuracy
-        pvalue: the p-value of accuracy using a one-tailed T-test
-
+        AUROC: A pandas dataframe containing the AUROC curve with respect to each class.
     """
+    from sklearn.preprocessing import label_binarize
+    from sklearn.metrics import roc_curve, auc
 
-    # Create a distribution to measure the p-value associated with the accuracies obtained from MetOncoFit
-    accuracyDistribution = []
-    x = 0
-    while(x <= 1000):
-        temp_classes = list(classes)
-        shuffle(temp_classes)
-        accuracyDistribution.append(precision_score(
-            temp_classes, classes, average='micro'))
-        x = x+1
-    dist = np.array(accuracyDistribution)
-
-    # Basic statistical measures from the model
-    ave = np.mean(np.array(accuracyDistribution))
-    std = np.std(dist)
-    kap = coh_kap(orig_classes, rfc_pred)
-    f1 = f1_score(orig_classes, rfc_pred, average='micro')
-    cv_score = np.round(np.mean(cross_val_score(
-        rfc, data, classes, scoring='accuracy', cv=10))*100, 2)
-    mean_acc = np.round(mean_acc*100, 2)
-
-    # Calculate the confusion matrix after 10 fold cross validation with new random forest classifier
-    feat = 130
-    while(feat < 140):
-        trees = 5
-        while(trees <= 500):
-            x = 0
-            while(x < 10):
-                X_train, X_test, y_train, y_test = train_test_split(
-                    data, classes, test_size=0.3)
-                new_rfc = RandomForestClassifier(
-                    n_estimators=trees, max_features=feat)
-                new_rfc.fit(X_train, y_train)
-                cm_pred = new_rfc.predict(X_test)
-                if x == 0:
-                    cm = confusion_matrix(y_test, cm_pred)
-                elif x > 1:
-                    cm = np.add(cm, confusion_matrix(y_test, cm_pred))
-                x = x+1
-            trees = trees + 1500
-        feat = feat + 20
-
-    mcc = matthews_corrcoef(y_test, cm_pred)
-    report = classification_report(y_test, cm_pred, output_dict=True)
-    report = pd.DataFrame.from_dict(report).round(2)
-
-    # Calculating the upper tailed p-value from the cumulative distribution function
-    average_precision = report.loc[['precision'], ['micro avg']].values[0]
-    zscore = np.round((average_precision - ave)/std, 2)
-    cdf = scipy.stats.norm.cdf(average_precision, ave, std)
-    pvalue = 1 - cdf
-    if(pvalue < 1e-50):
-        pvalue = 1e-50
-
-    if(targ == "CNV"):
-        targ_labels = ["GAIN", "NEUT", "LOSS"]
+    if targ is "CNV":
+        labels = {"GAIN", "NEUT", "LOSS"}
     else:
-        targ_labels = ["UPREG", "NEUTRAL", "DOWNREG"]
-    dat = {"Average Hold-Out Accuracy (%)": mean_acc, "10-fold CV Accuracy (%)": cv_score, "Average Precision": (report.loc[['precision'], ['micro avg']].values[0]), "UPREG/GAIN Precision": (report.loc[['precision'], [targ_labels[0]]].values[0]), "DOWNREG/LOSS Precision": (report.loc[['precision'], [targ_labels[2]]].values[0]), "Average Recall": (
-        report.loc[['recall'], ['micro avg']].values[0]), "UPREG/GAIN Recall": (report.loc[['recall'], [targ_labels[0]]].values[0]), "DOWNREG/LOSS Recall": (report.loc[['recall'], [targ_labels[2]]].values[0]), "P-value": pvalue, "Z-score": zscore, "F1-Score": (report.loc[['f1-score'], ['micro avg']].values[0]), "MCC": mcc}
-
-    summary = pd.DataFrame.from_dict(
-        dict([(k, pd.Series(v)) for k, v in dat.items()])).T
-    summary = summary.rename(columns={0: (canc+' Cancer')})
-    summary = summary.T
-    return cm, pvalue, zscore, cv_score, summary
-
-
-def area_under_curve_calc(df1, canc, targ):
-    """
-    Calculates the score for the Area Under the Curve for MetOncoFit. This is to be compared to Auslander et al., 2016, specifically for
-
-    INPUTS:
-        data: the training data
-        classes: the training targets
-        orig_data: the test data
-        orig_classes: the test targets
-
-    OUTPUTS:
-        auroc: the area under the receiever operating characteristic curve comparing the test dataset with the model's predictions.
-    """
-
-    if(targ == "CNV"):
-        targ_labels = ["GAIN", "NEUT", "LOSS"]
-    else:
-        targ_labels = ["UPREG", "NEUTRAL", "DOWNREG"]
+        labels = {"UPREG", "NEUTRAL", "DOWNREG"}
 
     # Pop out the classification labels & binarize the array. This is necessary for calculating the auroc using sklearn.
-    cls = df1.pop(targ)
+    model, cancer = DataPreparation.load_data(filename)
+    label_encoded_model = DataPreparation.label_encode(model)
+    prune_models, cls = DataPreparation.prune_targets(label_encoded_model, target, exclude)
     cls = label_binarize(
-        cls, classes=[targ_labels[0], targ_labels[1], targ_labels[2]])
+        cls, classes=[labels[0], labels[1], labels[2]]
+    )
+    robust_model = DataPreparation.robust_scaler(prune_models)
+    Xtrain, Xtest, Ytrain, Ytest = DataPreparation.randomOversampling(robust_model, cls, testSize=0.2)
+    _, Ypred, OOBAccuracy, CVAccuracy = Classifier.random_forest(Xtrain, Ytrain, Xtest, Ytest)
 
-    data = np.array(df1).astype(np.float)
-    #data = RobustScaler().fit_transform(data)
-
-    # MetOncoFit Random Forest Classifier with specifications to the method used by Auslander et al
-    new_data, orig_data, new_classes, orig_classes = train_test_split(
-        data, cls, test_size=0.2)
-    feat = (data.shape[1]-10)
-    while(feat < data.shape[1]-1):
-        trees = 5
-        while(trees <= 500):
-            rfc = RandomForestClassifier()
-            rfc.fit(new_data, new_classes)
-            trees = trees + 1500
-        feat = feat + 20
-    rfc_pred = rfc.predict(orig_data)
-    #rfc_score = np.asarray(rfc.predict_proba(orig_data)[:,1])
-    #rfc_score = np.transpose(rfc_score[:,:,0])
-
-    # Calculate AUROC, averaged by taking into consideration label imbalance
-    fpr, tpr, _ = roc_curve(orig_classes.ravel(), rfc_pred.ravel())
-    auroc = auc(fpr, tpr)
-    dat = {"Cancer": [canc], "Target": [targ], "AUROC": [auroc]}
-    df = pd.DataFrame.from_dict(dat)
-    return df
+    FPR, TPR, _ = roc_curve(Ytest.ravel(), Ypred.ravel())
+    auroc = auc(FPR, TPR)
+    data = {"Cancer": [cancer],
+            "Target": [target],
+            "AUROC": [auroc]}
+    AUROC = pd.DataFrame.from_dict(data)
+    return AUROC
 
 
-def leave_one_feat_out(df, canc, targ):
+def leave_one_feat_out(filename, target, exclude):
     """
     Leave one feature out reports the accuracy obtained from removing the following features:
 
@@ -224,13 +220,16 @@ def leave_one_feat_out(df, canc, targ):
     """
 
     # create 4 dataframes that will be used for each of the features after robust scaler
-    df = df.reset_index()
-    df = df.drop(columns=['Genes', 'Cell Line'])
-    classes = df.pop(targ)
-    num = RobustScaler().fit_transform(np.array(df).astype(np.float))
-    df = pd.DataFrame(num, columns=df.columns, index=df.index)
+    model, cancer = DataPreparation.load_data(filename)
+    label_encoded_model = DataPreparation.label_encode(model)
+    prune_models, classes = DataPreparation.prune_targets(label_encoded_model, target, exclude)
+    prune_models = prune_models.drop(columns=['Genes', 'Cell Line'])
+    robust_model = DataPreparation.robust_scaler(prune_models)
+    df = pd.DataFrame(robust_model,
+                      columns=model.columns,
+                      index=model.index)
 
-    dynm = df.drop(df.columns[0:52], axis=1)
+dynm = df.drop(df.columns[0:52], axis=1)
     topo = df.drop(df.columns[53:132], axis=1)
     kexp = df.drop(df.columns[132:], axis=1)
     genexp = df.drop(df.columns[133:], axis=1)
@@ -272,7 +271,9 @@ def leave_one_feat_out(df, canc, targ):
 
     # Return data frame to be saved
     lofo_df = pd.DataFrame(output, columns=[
-                           "Cancer", "Target", "Held-out feature set", "Mean class accuracy"])
+                           "Cancer", "Target",
+                            "Held-out feature set",
+                            "Mean class accuracy"])
     return lofo_df
 
 
