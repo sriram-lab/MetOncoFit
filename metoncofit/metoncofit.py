@@ -12,7 +12,7 @@
 
 import sys
 import process
-import random_forest
+import RandomForest
 import validator
 import visualizations
 import save
@@ -22,10 +22,10 @@ from openpyxl import load_workbook
 
 # Create data structures that will be used in the analysis
 df, df1, header, canc, targ, data, classes, orig_data, orig_classes, excl_targ, freq = process.preprocess(
-    datapath='./../data/median/', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3])
+    datapath='./../data/geneko/', fil=sys.argv[1], targ=sys.argv[2], exclude=sys.argv[3])
 
 # Random Forest Classifier, prediction, and hold out accuracy
-rfc, rfc_pred, mean_acc = random_forest.random_forest(
+rfc, rfc_pred, mean_acc = RandomForest.random_forest(
     canc, targ, data, classes, orig_data, orig_classes)
 
 # Model performance and statistical measures. THIS FUNCTION IS ALSO NECESSARY TO GENERATE THE FIGURES.

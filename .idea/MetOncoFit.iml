@@ -6,7 +6,24 @@
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">
+<<<<<<< HEAD
     <option name="format" value="PLAIN" />
     <option name="myDocStringFormat" value="Plain" />
+=======
+    <option name="format" value="NUMPY" />
+    <option name="myDocStringFormat" value="NumPy" />
+    <option name="renderExternalDocumentation" value="true" />
+  </component>
+  <component name="TemplatesService">
+    <option name="TEMPLATE_CONFIGURATION" value="Jinja2" />
+    <option name="TEMPLATE_FOLDERS">
+      <list>
+        <option value="$MODULE_DIR$/env/lib/python3.7/site-packages/bokeh/core/_templates" />
+      </list>
+    </option>
+  </component>
+  <component name="TestRunnerService">
+    <option name="PROJECT_TEST_RUNNER" value="pytest" />
+>>>>>>> c5de3c66923617ec9763fbc839a11c480d8fd648
   </component>
 </module>
