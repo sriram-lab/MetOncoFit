@@ -7,7 +7,7 @@ backcall==0.1.0
 Beaker==1.10.0
 beautifulsoup4==4.6.3
 biopython==1.76
-bleach==3.0.2
+bleach==3.1.4
 certifi==2020.4.5.1
 cffi==1.11.5
 chardet==3.0.4
