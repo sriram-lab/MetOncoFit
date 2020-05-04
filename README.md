@@ -28,5 +28,5 @@ To run MetOncoFit with the nine tumor models, you can run the `runMetOncoFit.sh`
 Contributions are welcome! Please read the contributions guide to get started. Also feel free to submit bugs, feature requests, and pull requests.
 
 Otherwise, you can support the MetOncoFit project by citing our publication:
-Oruganty, K., Campit, S.E., Mamde, S., & Chandrasekaran, S. Common biochemical and topological attributes of metabolic genes recurrently dysregulated in tumors. *in preparation*
+Oruganty K*, Campit S*, Mamde S, Lyssiotis C, Chandrasekaran S, Common biochemical properties of metabolic genes recurrently dysregulated in tumors, Cancer and Metabolism, 2020 (in press)
 
