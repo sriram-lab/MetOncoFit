@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/MetOncoFit.iml" filepath="$PROJECT_DIR$/.idea/MetOncoFit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../github-tutorials/.idea/github-tutorials.iml" filepath="$PROJECT_DIR$/../github-tutorials/.idea/github-tutorials.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../metoncofit-website/.idea/metoncofit-website.iml" filepath="$PROJECT_DIR$/../metoncofit-website/.idea/metoncofit-website.iml" />
+      <module fileurl="file://$USER_HOME$/projects/.idea/projects.iml" filepath="$USER_HOME$/projects/.idea/projects.iml" />
     </modules>
   </component>
 </project>
