@@ -49,11 +49,11 @@ for (i in 1:33) {
   p_values[[i]] <- p__value
   
   data_storage <- data.frame(
-    gene_name <- gene_names_keep,
-    fold_change <- fold_change_keep,
-    log2_fold_change <- fold_change_log2_keep,
-    z_score <- z__score,
-    p_value <- p__value)
+    gene_name <- c(gene_names_keep, gene_names_inf),
+    fold_change <- c(fold_change_keep, rep(max(fold_change_keep),length(gene_names_inf))),
+    log2_fold_change <- c(fold_change_log2_keep, rep(max(fold_change_log2_keep),length(gene_names_inf))),
+    z_score <- c(z__score, rep(max(z__score),length(gene_names_inf))),
+    p_value <- c(p__value, rep(10^(-50),length(gene_names_inf))))
   
   all_data[[i]] <- data_storage
   fold_changes_log2[[i]] <- fold_change_log2_keep
@@ -65,6 +65,7 @@ for (i in 1:33) {
   
   i = i + 1}
 
+export(all_data, 'CCLE.xlsx')
 
 ##figure out why cell line 1 and 2 have weird distributions
 ##could be modeled with an exponential distribution?
