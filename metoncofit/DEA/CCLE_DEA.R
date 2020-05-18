@@ -20,7 +20,6 @@ fold_changes <- list()
 fold_changes_log2 <- list()
 noninf_gene_names <- list()
 inf_gene_names <- list()
-z_scores <- list()
 p_values <- list()
 all_data <- list()
 i = 1
@@ -40,18 +39,13 @@ for (i in 1:length(mut_vals)) {
   bool_inf <- is.infinite(fold_change_log2)
   gene_names_inf <- gene_names[bool_inf]
   
-  
-  z__score <- scale(fold_change_log2_keep)
-  z_scores[[i]] <- z__score
-  
-  p__value <- 2*pnorm(-abs(z__score))
+  p__value <- 2*pnorm(-abs(fold_change_log2_keep))
   p_values[[i]] <- p__value
   
   data_storage <- data.frame(
     gene_name <- c(gene_names_keep, gene_names_inf),
     fold_change <- c(fold_change_keep, rep(max(fold_change_keep),length(gene_names_inf))),
     log2_fold_change <- c(fold_change_log2_keep, rep(max(fold_change_log2_keep),length(gene_names_inf))),
-    z_score <- c(z__score, rep(max(z__score),length(gene_names_inf))),
     p_value <- c(p__value, rep(10^(-50),length(gene_names_inf))))
   
   all_data[[i]] <- data_storage
