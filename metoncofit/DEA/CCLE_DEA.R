@@ -24,7 +24,7 @@ z_scores <- list()
 p_values <- list()
 all_data <- list()
 i = 1
-for (i in 1:33) {
+for (i in 1:length(mut_vals)) {
   
   
   fold_change <- mut_vals[ ,i]/WT_mean
