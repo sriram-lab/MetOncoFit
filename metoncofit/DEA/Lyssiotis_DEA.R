@@ -32,7 +32,6 @@ gene_names_list <- list()
 cell_fold_changes <- list()
 inf_gene_names <- list()
 all_p_values <- list()
-z_scores <- list()
 p_values <- list()
 genes_sig_list <- list()
 
@@ -70,12 +69,8 @@ for (cell in cells) {
   fold_change_comb <- c(fold_change_real, rep(max(fold_change_real),length(genes_inf)))
   fold_change_log2_comb <- c(fold_change_log2_real, rep(max(fold_change_log2_real),length(genes_inf)))
   
-  #calculate z score and p value for non inf values
-  z_score <- scale(fold_change_log2_real)
-  z_score <- c(z_score, rep(max(z_score), length(genes_inf)))
-  z_scores[[count]] <- z_score
-  
-  p_value <- 2*pnorm(-abs(z_score))
+  p_value <- 2*pnorm(fold_change_log2_real)
+  p_value <- c(p_value, rep(10^(-50),length(genes_inf)))
   p_values_all <- p_value
   p_values[[count]] <- p_value
   
@@ -84,7 +79,6 @@ for (cell in cells) {
     gene_name <- genes_real,
     fold_change <- fold_change_comb,
     log2_fold_change <- fold_change_log2_comb,
-    z_score <- z_scores[[count]],
     p_value <- p_value)
   
   #find which values are significant and sort out necessary parameters
