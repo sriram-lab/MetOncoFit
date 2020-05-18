@@ -1,15 +1,15 @@
-function [ genes_and_fcs ] = average_repeats( gene_names, fold_changes )
+function [ genes_and_fcs ] = average_repeats( gene, fold_changes )
 
 %alphebetize matches
-[~,i] = sort(gene_names); 
+[~,i] = sort(gene); 
 
 %sort fc in same order
 fc_sorted = fold_changes(i); 
 
 
-matches_joined = join(gene_names); 
+matches_joined = join(gene); 
 matches_joined = strcat({' '}, matches_joined,{' '}); 
-unique_matches = unique(gene_names);
+unique_matches = unique(gene);
 
 duplicates = cell(length(unique_matches),1);
 bool = zeros(length(unique_matches),1);
