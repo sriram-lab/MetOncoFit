@@ -5,6 +5,27 @@ gene_names <- ccle[,2]
 wt_vals <- ccle[ ,3:4]
 mut_vals <- ccle[ ,-(1:4)]
 
+#### plot titles ####
+titles <- list("Log2 distribution of DAN-G","Log2 distribution of HPAC",
+               "Log2 distribution of HUP-T3","Log2 distribution of HUP-T4",
+               "Log2 distribution of Hs 766T","Log2 distribution of PA-TU-8902",
+               "Log2 distribution of PA-TU-8988S","Log2 distribution of PA-TU-8988T",
+               "Log2 distribution of PSN1","Log2 distribution of Panc 02.03",
+               "Log2 distribution of Panc 02.13","Log2 distribution of Panc 03.27",
+               "Log2 distribution of SNU-213","Log2 distribution of SNU-324",
+               "Log2 distribution of SNU-410","Log2 distribution of SU.86.86",
+               "Log2 distribution of SW 1990","Log2 distribution of TCC-PAN2",
+               "Log2 distribution of AsPC-1","Log2 distribution of BxPC-3",
+               "Log2 distribution of CFPAC-1","Log2 distribution of Capan-1",
+               "Log2 distribution of Capan-2","Log2 distribution of HPAF-II",
+               "Log2 distribution of MIA PaCa-2","Log2 distribution of PANC-1",
+               "Log2 distribution of PK-1","Log2 distribution of Panc 04",
+               "Log2 distribution of Panc 05", "Log2 distribution of Panc 08",
+               "Log2 distribution of Panc 10","Log2 distribution of SUIT-2",
+               "Log2 distribution of T3M-4")
+
+pdf("CCLE_DEA_histograms.pdf")
+
 #### analysis ####
 
 #fill in NA values with 0 - database excluded 0 values
@@ -54,11 +75,13 @@ for (i in 1:length(mut_vals)) {
   inf_gene_names[[i]] <- gene_names_inf
   
   hist(fold_change_log2_keep, probability = T, breaks = 50,
-       main = i)
+        main = titles[[i]],
+       xlab = 'Log2 of Fold Change')
   
   i = i + 1}
 
 export(all_data, 'CCLE.xlsx')
+dev.off()
 
 ##figure out why cell line 1 and 2 have weird distributions
 ##could be modeled with an exponential distribution?
