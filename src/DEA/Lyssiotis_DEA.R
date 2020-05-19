@@ -32,10 +32,13 @@ gene_names_list <- list()
 cell_fold_changes <- list()
 inf_gene_names <- list()
 all_p_values <- list()
+z_scores <- list()
 p_values <- list()
 genes_sig_list <- list()
 
 count <- 1
+
+pdf("Lyssiotis_DEA_histograms.pdf")
 
 for (cell in cells) {
   #separate out gene names
@@ -105,8 +108,13 @@ for (cell in cells) {
   
   count <- count + 1}
 
+dev.off()
+
 #exports to use data in matlab or python
 export(all_data, 'lyossiotis.xlsx')
 export(genes_sig_list, 'genes_sig.xlsx')
 export(all_p_values, 'p_values.xlsx')
 export(cell_fold_changes, 'fold_change.xlsx')
+
+
+
