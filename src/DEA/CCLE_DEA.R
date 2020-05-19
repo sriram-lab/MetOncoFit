@@ -35,7 +35,6 @@ mut_vals[is.na(mut_vals)] <- 0
 #calculate WT mean from 2 WT cell lines
 WT_mean <- (mut_vals[,1] + mut_vals[,2])/2
 
-
 #determine fold change for all cell lines
 fold_changes <- list()
 fold_changes_log2 <- list()
@@ -60,7 +59,7 @@ for (i in 1:length(mut_vals)) {
   bool_inf <- is.infinite(fold_change_log2)
   gene_names_inf <- gene_names[bool_inf]
   
-  p__value <- 2*pnorm(-abs(fold_change_log2_keep))
+  p__value <- 2*pnorm(fold_change_log2_keep)
   p_values[[i]] <- p__value
   
   data_storage <- data.frame(
@@ -75,7 +74,7 @@ for (i in 1:length(mut_vals)) {
   inf_gene_names[[i]] <- gene_names_inf
   
   hist(fold_change_log2_keep, probability = T, breaks = 50,
-        main = titles[[i]],
+       main = titles[[i]],
        xlab = 'Log2 of Fold Change')
   
   i = i + 1}
@@ -86,3 +85,4 @@ dev.off()
 ##figure out why cell line 1 and 2 have weird distributions
 ##could be modeled with an exponential distribution?
 ##ignore first two MUT samples
+
