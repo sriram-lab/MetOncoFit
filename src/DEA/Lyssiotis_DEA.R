@@ -2,19 +2,19 @@
 
 library(rio)
 # import BxPC3 data as bx
-bx <- import("~jennadiegel/Documents/SURE/DES/CCLs_BxPC3.csv")
+bx <- import("~jennadiegel/Documents/SURE/DES/data/CCLs_BxPC3.csv")
 # import Capan1 data as cp
-cp <- import("~jennadiegel/Documents/SURE/DES/CCLs_Capan1.csv")
+cp <- import("~jennadiegel/Documents/SURE/DES/data/CCLs_Capan1.csv")
 # import PANC1 data as pn
-pn <- import("~jennadiegel/Documents/SURE/DES/CCLs_PANC1.csv")
+pn <- import("~jennadiegel/Documents/SURE/DES/data/CCLs_PANC1.csv")
 # import TU8902 data as tu
-tu <- import("~jennadiegel/Documents/SURE/DES/CCLs_TU8902.csv")
+tu <- import("~jennadiegel/Documents/SURE/DES/data/CCLs_TU8902.csv")
 # import TU8988T data as tut
-tut <- import("~jennadiegel/Documents/SURE/DES/CCLs_TU8988T.csv")
+tut <- import("~jennadiegel/Documents/SURE/DES/data/CCLs_TU8988T.csv")
 # import UM2 data as um2
-um2 <- import("~jennadiegel/Documents/SURE/DES/CCLs_UM2.csv")
+um2 <- import("~jennadiegel/Documents/SURE/DES/data/CCLs_UM2.csv")
 # import UM90 data as um90
-um90 <- import("~jennadiegel/Documents/SURE/DES/CCLs_UM90.csv")
+um90 <- import("~jennadiegel/Documents/SURE/DES/data/CCLs_UM90.csv")
 
 #### analysis ####
 
@@ -30,7 +30,8 @@ all_data <- list()
 all_fold_changes_log2 <- list()
 gene_names_list <- list()
 cell_fold_changes <- list()
-inf_gene_names <- list()
+upreg_inf_genes <- list()
+downreg_inf_genes <- list()
 all_p_values <- list()
 z_scores <- list()
 p_values <- list()
@@ -38,7 +39,7 @@ genes_sig_list <- list()
 
 count <- 1
 
-pdf("Lyssiotis_DEA_histograms.pdf")
+pdf("~jennadiegel/Documents/SURE/DES/figures/Lyssiotis_DEA_histograms.pdf")
 
 for (cell in cells) {
   #separate out gene names
@@ -59,21 +60,26 @@ for (cell in cells) {
   fold_change_log2 <- log2(fold_change)
   
   #separate out inf values 
-  bool_inf <- is.infinite(fold_change_log2)
-  genes_inf <- genes[bool_inf]
+  bool_inf_pos <- (is.infinite(fold_change_log2) & sign(fold_change_log2 == 1))
+  bool_inf_neg <- (is.infinite(fold_change_log2) & sign(fold_change_log2 == -1))
+  genes_pos_inf <- genes[bool_inf_pos]
+  genes_neg_inf <- genes[bool_inf_neg]
   
   #find NaN and inf values and keep only the non-NaN and non-inf values
   bool <- (is.nan(fold_change_log2)|is.infinite(fold_change_log2))
   fold_change_real <- fold_change[!bool]
   fold_change_log2_real <- fold_change_log2[!bool]
-  genes_real <- c(genes[!bool], genes_inf)
+  genes_real <- c(genes[!bool], genes_pos_inf, genes_neg_inf)
   
   #set fold change of inf genes to the max fold change and combine with real values
-  fold_change_comb <- c(fold_change_real, rep(max(fold_change_real),length(genes_inf)))
-  fold_change_log2_comb <- c(fold_change_log2_real, rep(max(fold_change_log2_real),length(genes_inf)))
+  fold_change_comb <- c(fold_change_real, rep(max(fold_change_real),length(genes_pos_inf)), rep(min(fold_change_real),length(genes_neg_inf)))
+  fold_change_log2_comb <- c(fold_change_log2_real, rep(max(fold_change_log2_real),length(genes_pos_inf)), rep(min(fold_change_log2_real),length(genes_neg_inf)))
   
-  p_value <- 2*pnorm(fold_change_log2_real)
-  p_value <- c(p_value, rep(10^(-50),length(genes_inf)))
+  ################# need to specify mean and standard deviation
+  mean_fc <- mean(fold_change_log2_real)
+  stddev <- sd(fold_change_log2_real)
+  p_value <- 2*pnorm(fold_change_log2_real, mean_fc, stddev)
+  p_value <- c(p_value, rep(10^(-50), (length(genes_pos_inf)+length(genes_neg_inf))))
   p_values_all <- p_value
   p_values[[count]] <- p_value
   
@@ -98,7 +104,8 @@ for (cell in cells) {
   all_data[[count]] <- data_storage
   cell_fold_changes[[count]] <- fold_change_sig
   gene_names_list[[count]] <- genes_real
-  inf_gene_names[[count]] <- genes_inf
+  upreg_inf_genes[[count]] <- genes_pos_inf
+  downreg_inf_genes[[count]] <- genes_neg_inf
   genes_sig_list[[count]] <- genes_sig
   all_p_values[[count]] <- p_values_keep
   
@@ -111,10 +118,10 @@ for (cell in cells) {
 dev.off()
 
 #exports to use data in matlab or python
-export(all_data, 'lyossiotis.xlsx')
-export(genes_sig_list, 'genes_sig.xlsx')
-export(all_p_values, 'p_values.xlsx')
-export(cell_fold_changes, 'fold_change.xlsx')
+export(all_data, '~jennadiegel/Documents/SURE/DES/Lyssiotis_data/lyossiotis.xlsx')
+export(genes_sig_list, '~jennadiegel/Documents/SURE/DES/Lyssiotis_data/genes_sig.xlsx')
+export(all_p_values, '~jennadiegel/Documents/SURE/DES/Lyssiotis_data/p_values.xlsx')
+export(cell_fold_changes, '~jennadiegel/Documents/SURE/DES/Lyssiotis_data/fold_change.xlsx')
 
 
 

@@ -8,13 +8,13 @@ fc = cell(1,7);
 
 for sheet = 1:7
 
-    [~,genes{1, sheet},~] = xlsread('map_genes.xlsx',sheets{sheet},'A:A');
-    [fc{1, sheet},~ ,~] = xlsread('fold_change.xlsx', sheets{sheet}, 'A:A');
+    [~,genes{1, sheet},~] = xlsread(fullfile('..','Lyssiotis_data','genes_sig.xlsx'),sheets{sheet},'A:A');
+    [fc{1, sheet},~ ,~] = xlsread(fullfile('..','Lyssiotis_data','fold_change.xlsx'), sheets{sheet}, 'A:A');
     
 end 
 
 %metabolic model
-[~, model_genes, ~] = xlsread('gene_name_conversion.xlsx','A:A');
+[~, model_genes, ~] = xlsread(fullfile('gene_name_info','gene_name_conversion.xlsx'),'A:A');
 
 %% matching
 
