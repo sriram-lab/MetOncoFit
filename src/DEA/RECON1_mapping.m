@@ -1,25 +1,29 @@
 %% Import gene names and fold change values
 
 sheets = {'Sheet 1', 'Sheet 2', 'Sheet 3', 'Sheet 4', 'Sheet 5', 'Sheet 6', 'Sheet 7'};
+
 %bx_genes,cp_genes,pn_genes,tu_genes,tut_genes,um2_genes,um90_genes
-genes = cell(1,7);
+genes = cell(1,length(sheets));
+
 %bx_fc,cp_fc,pn_fc,tu_fc,tut_fc,um2_fc,um90_fc
-fc = cell(1,7);
+fc = cell(1,length(sheets));
 
-for sheet = 1:7
+for sheet = 1:length(sheets)
 
-    [~,genes{1, sheet},~] = xlsread('map_genes.xlsx',sheets{sheet},'A:A');
-    [fc{1, sheet},~ ,~] = xlsread('fold_change.xlsx', sheets{sheet}, 'A:A');
+    [~,genes{1, sheet},~] = xlsread(fullfile('..','Lyssiotis_data','genes_sig.xlsx'),sheets{sheet},'A:A');
+    [fc{1, sheet},~ ,~] = xlsread(fullfile('..','Lyssiotis_data','fold_change.xlsx'), sheets{sheet}, 'A:A');
     
 end 
 
 %metabolic model
+load(fullfile('..','models','model_human_duarte.mat'));
 model_genes = metabolicmodel.genes;
 
 
 %% matching
 
 gene_str = join(model_genes);
+
 %add space at beginning to use as an indicator of a new word
 gene_str = strcat({' '}, gene_str, {' '});
 
@@ -54,10 +58,10 @@ end
 all_matches = [];
 all_fc = [];
 
-for a = 1:length(matches)
+for c = 1:length(matches)
     
-    all_matches = [all_matches; matches{1,a}];
-    all_fc = [all_fc; matches{2,a}];
+    all_matches = [all_matches; matches{1,c}];
+    all_fc = [all_fc; matches{2,c}];
     
 end
 
@@ -80,25 +84,25 @@ duplicates = cell(length(unique_matches),1);
 bool = zeros(length(unique_matches),1);
 num_rep = zeros(length(unique_matches),1);
 
-for b = 1:length(unique_matches)
+for d = 1:length(unique_matches)
    
-    reg = strcat('\s',unique_matches(b),'\s');
-    duplicates(b,1) = regexp(all_matches_joined,reg,'match');
+    reg = strcat('\s',unique_matches(d),'\s');
+    duplicates(d,1) = regexp(all_matches_joined,reg,'match');
     
     %locate where there are duplicates
-    bool(b,1) = (length(duplicates{b,1}) > 1);
-    num_rep(b,1) = length(duplicates{b,1});
+    bool(d,1) = (length(duplicates{d,1}) > 1);
+    num_rep(d,1) = length(duplicates{d,1});
     
 end
 
 index1 = 1;
 index2 = 0;
 fc_averaged = zeros(length(unique_matches),1);
-for c = 1:length(unique_matches)
+for e = 1:length(unique_matches)
     
-    index2 = index2 + num_rep(c,1);
-    fc_average = sum(all_fc_sorted(index1:index2,1))./num_rep(c,1);
-    fc_averaged(c,1) = fc_average;
+    index2 = index2 + num_rep(e,1);
+    fc_average = sum(all_fc_sorted(index1:index2,1))./num_rep(e,1);
+    fc_averaged(e,1) = fc_average;
     
     index1 = index2 + 1;
 end

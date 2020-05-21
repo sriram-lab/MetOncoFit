@@ -1,5 +1,6 @@
 #### imports ####
-ccle = import("~jennadiegel/Documents/SURE/DES/CCLE_data.csv")
+library(rio)
+ccle = import("~jennadiegel/Documents/SURE/DES/data/CCLE_data.csv")
 
 gene_names <- ccle[,2]
 wt_vals <- ccle[ ,3:4]
@@ -24,7 +25,7 @@ titles <- list("Log2 distribution of DAN-G","Log2 distribution of HPAC",
                "Log2 distribution of Panc 10","Log2 distribution of SUIT-2",
                "Log2 distribution of T3M-4")
 
-pdf("CCLE_DEA_histograms.pdf")
+pdf("~jennadiegel/Documents/SURE/DES/figures/CCLE_DEA_histograms.pdf")
 
 #### analysis ####
 
@@ -39,7 +40,8 @@ WT_mean <- (mut_vals[,1] + mut_vals[,2])/2
 fold_changes <- list()
 fold_changes_log2 <- list()
 noninf_gene_names <- list()
-inf_gene_names <- list()
+upreg_inf_genes <- list()
+downreg_inf_genes <- list()
 p_values <- list()
 all_data <- list()
 i = 1
@@ -55,23 +57,28 @@ for (i in 1:length(mut_vals)) {
   fold_change_log2_keep <- fold_change_log2[!bool]
   gene_names_keep <- gene_names[!bool]
   
-  #separate out inf values 
-  bool_inf <- is.infinite(fold_change_log2)
-  gene_names_inf <- gene_names[bool_inf]
+  #separate out inf values, +inf = upregulation, -inf = downregulation
+  bool_inf_pos <- (is.infinite(fold_change_log2) & sign(fold_change_log2 == 1))
+  bool_inf_neg <- (is.infinite(fold_change_log2) & sign(fold_change_log2 == -1))
+  gene_names_pos_inf <- gene_names[bool_inf_pos]
+  gene_names_neg_inf <- gene_names[bool_inf_neg]
   
-  p__value <- 2*pnorm(fold_change_log2_keep)
+  mean_fc <- mean(fold_change_log2_keep)
+  stddev <- sd(fold_change_log2_keep)
+  p__value <- 2*pnorm(fold_change_log2_keep,mean_fc,stddev)
   p_values[[i]] <- p__value
   
   data_storage <- data.frame(
-    gene_name <- c(gene_names_keep, gene_names_inf),
-    fold_change <- c(fold_change_keep, rep(max(fold_change_keep),length(gene_names_inf))),
-    log2_fold_change <- c(fold_change_log2_keep, rep(max(fold_change_log2_keep),length(gene_names_inf))),
-    p_value <- c(p__value, rep(10^(-50),length(gene_names_inf))))
+    gene_name <- c(gene_names_keep, gene_names_pos_inf, gene_names_neg_inf),
+    fold_change <- c(fold_change_keep, rep(max(fold_change_keep),length(gene_names_pos_inf)), rep(min(fold_change_keep),length(gene_names_neg_inf))),
+    log2_fold_change <- c(fold_change_log2_keep, rep(max(fold_change_log2_keep),length(gene_names_pos_inf)),rep(min(fold_change_log2_keep),length(gene_names_neg_inf))),
+    p_value <- c(p__value, rep(10^(-50),(length(gene_names_pos_inf) + length(gene_names_neg_inf)))))
   
   all_data[[i]] <- data_storage
   fold_changes_log2[[i]] <- fold_change_log2_keep
   fold_changes[[i]] <- fold_change_keep
-  inf_gene_names[[i]] <- gene_names_inf
+  upreg_inf_genes[[i]] <- gene_names_pos_inf
+  downreg_inf_genes[[i]] <- gene_names_neg_inf
   
   hist(fold_change_log2_keep, probability = T, breaks = 50,
        main = titles[[i]],
@@ -79,7 +86,7 @@ for (i in 1:length(mut_vals)) {
   
   i = i + 1}
 
-export(all_data, 'CCLE.xlsx')
+export(all_data, '~jennadiegel/Documents/SURE/DES/CCLE_data/CCLE.xlsx')
 dev.off()
 
 ##figure out why cell line 1 and 2 have weird distributions

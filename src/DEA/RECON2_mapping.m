@@ -1,3 +1,37 @@
+%% finding names of genes in RECON2
+load(fullfile('models','Recon2.v05.mat')); 
+genes = modelR205.genes;
+
+%convert to new style of naming
+for a = 1:length(genes)
+    
+    genes{a} = replace(genes{a},".","_AT");
+
+end
+
+%import list of RECON3D genes with bigg ids and names
+[~, bigg_id, ~] = xlsread(fullfile('gene_name_info','BiGG_ID_to_Name.xlsx'),'A:A');
+[~, name, ~] = xlsread(fullfile('gene_name_info','BiGG_ID_to_Name.xlsx'),'B:B');
+
+gene_str = join(genes); 
+%add space at beginning to use as an indicator of a new word
+gene_str = strcat({' '}, gene_str, {' '}); 
+
+%initialize an empty cell array to input name matches
+matches = cell(1, length(bigg_id));
+
+for a = 1:length(bigg_id)
+        
+    reg = strcat('\s',bigg_id{a},'\s');
+    %find matches and for genes listed more than once, take only one match
+    matches(1, a) = regexp(gene_str,reg,'match','once');
+    
+end
+
+%remove empty cell contents
+unmatched = name(cellfun('isempty', matches)); 
+model_matches = name(~cellfun('isempty', matches)); 
+
 %% Import gene names and fold change values
 
 sheets = {'Sheet 1', 'Sheet 2', 'Sheet 3', 'Sheet 4', 'Sheet 5', 'Sheet 6', 'Sheet 7'};
@@ -13,13 +47,9 @@ for sheet = 1:7
     
 end 
 
-%metabolic model
-[~,BiGG_ID,~] = xlsread(fullfile('gene_name_info','BiGG_ID_to_Name.xlsx'),'A:A');
-[~,model_genes,~] = xlsread(fullfile('gene_name_info','BiGG_ID_to_Name.xlsx'),'B:B');
-
 %% matching
 
-gene_str = join(model_genes);
+gene_str = join(model_matches);
 %add space at beginning to use as an indicator of a new word
 gene_str = strcat({' '}, gene_str, {' '});
 
@@ -54,10 +84,10 @@ end
 all_matches = [];
 all_fc = [];
 
-for a = 1:length(matches)
+for c = 1:length(matches)
     
-    all_matches = [all_matches; matches{1,a}];
-    all_fc = [all_fc; matches{2,a}];
+    all_matches = [all_matches; matches{1,c}];
+    all_fc = [all_fc; matches{2,c}];
     
 end
 
@@ -80,28 +110,27 @@ duplicates = cell(length(unique_matches),1);
 bool = zeros(length(unique_matches),1);
 num_rep = zeros(length(unique_matches),1);
 
-for b = 1:length(unique_matches)
+for d = 1:length(unique_matches)
    
-    reg = strcat('\s',unique_matches(b),'\s');
-    duplicates(b,1) = regexp(all_matches_joined,reg,'match');
+    reg = strcat('\s',unique_matches(d),'\s');
+    duplicates(d,1) = regexp(all_matches_joined,reg,'match');
     
     %locate where there are duplicates
-    bool(b,1) = (length(duplicates{b,1}) > 1);
-    num_rep(b,1) = length(duplicates{b,1});
+    bool(d,1) = (length(duplicates{d,1}) > 1);
+    num_rep(d,1) = length(duplicates{d,1});
     
 end
 
 index1 = 1;
 index2 = 0;
 fc_averaged = zeros(length(unique_matches),1);
-for c = 1:length(unique_matches)
+for e = 1:length(unique_matches)
     
-    index2 = index2 + num_rep(c,1);
-    fc_average = sum(all_fc_sorted(index1:index2,1))./num_rep(c,1);
-    fc_averaged(c,1) = fc_average;
+    index2 = index2 + num_rep(e,1);
+    fc_average = sum(all_fc_sorted(index1:index2,1))./num_rep(e,1);
+    fc_averaged(e,1) = fc_average;
     
     index1 = index2 + 1;
 end
 
 genes_and_fcs = table(unique_matches, fc_averaged);
-
