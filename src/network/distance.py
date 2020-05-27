@@ -16,8 +16,12 @@ model = cobra.io.load_matlab_model(modelFile)
 
 # Get genes, reactions, metabolite names, and biomass components from the metabolic model
 reactionNames = []
+tmp = []
+rxnGeneObj = []
 for rxn in model.reactions:
     reactionNames.append(rxn.id)
+    tmp.append(rxn.gene_reaction_rule)
+print(tmp)
 
 metaboliteNames = []
 for met in model.metabolites:
@@ -26,12 +30,19 @@ for met in model.metabolites:
 geneNames = []
 for gene in model.genes:
     geneNames.append(gene.id)
-print(geneNames)
+#print(geneNames)
 
-biomassComponents = [] # <-- QUERY
-biomassReactants = model.reactions.get_by_id('biomass_objective').reactants
-for biocmp in biomassReactants:
-    biomassComponents.append(biocmp.id)
+
+# Get list to query
+#with open('/home/scampit/software/MetOncoFit/srv/biomass.txt') as f:
+#    biomass = f.readlines()
+#biomass = [x.strip() for x in biomass]
+
+#with open('/home/scampit/software/MetOncoFit/srv/media.txt') as f:
+#    media = f.readlines()
+#media = [x.strip() for x in media]
+#to_query = biomass + media
+
 
 # Get model stoichiometric matrix as an array
 #stoich_matrix = cobra.util.create_stoichiometric_matrix(model)
