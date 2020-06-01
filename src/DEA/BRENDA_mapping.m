@@ -6,47 +6,12 @@ km = xlsread('km.xlsx','B:B');
 km_ec = km_ec(km>0);
 km = km(km>0);
 
-%sort km in the order unique will sort ec
-[km_ec,i] = sort(km_ec);
-km = km(i);
+%to export non negative values for data visualization in R
+km_tab = table(km_ec, km);
+writetable(km_tab, 'brenda_km.xlsx','FileType', 'spreadsheet');
 
-% join into one string to search through
-ec_joined = join(km_ec);
-
-%get list of unique ec numbers
-unique_ec = unique(km_ec);
-
-%initializing empty cells and matricies to hold data
-duplicates = cell(length(unique_ec),1);
-num_rep = zeros(length(unique_ec),1);
-    
-for a = 1:length(unique_ec)
-    
-    reg = strcat('\s',unique_ec(a),'\s');
-    duplicates(a,1) = regexp(ec_joined,reg,'match');
-    
-    %locate where there are duplicates
-    num_rep(a,1) = length(duplicates{a,1});
-    
-end
-
-index1 = 1;
-index2 = 0;
-    
-%average km value if there are multiple entries
-km_averaged = zeros(length(unique_ec),1);
-for b = 1:length(unique_ec)
-
-    index2 = index2 + num_rep(b,1);
-    km_average = sum(km(index1:index2,1))./num_rep(b,1);
-    km_averaged(b,1) = km_average;
-
-    index1 = index2 + 1;
-end
-
-%store data in a cell array
-km_averaged = num2cell(km_averaged);
-ecs_kms = [unique_ec, km_averaged];
+ecs_kms = average_repeats(km_ec, km);
+ecs_kms = table2cell(ecs_kms);
 
 %% averaging repeated kcat values
 
@@ -57,46 +22,12 @@ kcat = xlsread('kcat.xlsx','F:F');
 kcat_ec = kcat_ec(kcat>0);
 kcat = kcat(kcat>0);
 
-%sort km in the order unique will sort ec
-[kcat_ec,i] = sort(kcat_ec);
-kcat = kcat(i);
+%to export non negative values for data visualization in R
+kcat_tab = table(kcat_ec, kcat);
+writetable(kcat_tab, 'brenda_kcat.xlsx','FileType', 'spreadsheet');
 
-% join into one string to search through
-ec_joined = join(kcat_ec);
-
-% get list of unique ec numbers
-unique_ec = unique(kcat_ec);
-
-%initializing empty cells and matricies to hold data
-duplicates = cell(length(unique_ec),1);
-num_rep = zeros(length(unique_ec),1);
-    
-for a = 1:length(unique_ec)
-    
-    reg = strcat('\s',unique_ec(a),'\s');
-    duplicates(a,1) = regexp(ec_joined,reg,'match');
-    
-    %locate where there are duplicates
-    num_rep(a,1) = length(duplicates{a,1});
-    
-end
-
-index1 = 1;
-index2 = 0;
-    
-kcat_averaged = zeros(length(unique_ec),1);
-for b = 1:length(unique_ec)
-
-    index2 = index2 + num_rep(b,1);
-    kcat_average = sum(kcat(index1:index2,1))./num_rep(b,1);
-    kcat_averaged(b,1) = kcat_average;
-
-    index1 = index2 + 1;
-end
-
-kcat_averaged = num2cell(kcat_averaged);
-unique_ec = strtrim(unique_ec);
-ecs_kcats = [unique_ec, kcat_averaged];
+ecs_kcats = average_repeats(kcat_ec, kcat);
+ecs_kcats = table2cell(ecs_kcats);
 
 %% ec number to gene symbol
 
