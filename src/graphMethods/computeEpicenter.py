@@ -123,8 +123,8 @@ print(biomass_df)
 
 # Pivot so that genes are rows and medium components are columns
 print("Construct final array and save to file")
-biomass_df = biomass_df.pivot(index='Gene', columns='Biomass', values=0)
-medium_df = medium_df.pivot(index='Gene', columns='Medium', values=0)
+#biomass_df = biomass_df.pivot(index='Gene', columns='Biomass', values=0)
+#medium_df = medium_df.pivot(index='Gene', columns='Medium', values=0)
 biomass_df.to_csv('/home/scampit/software/MetOncoFit/srv/biomass_distances.csv')
 medium_df.to_csv('/home/scampit/software/MetOncoFit/srv/medium_distances.csv')
 
