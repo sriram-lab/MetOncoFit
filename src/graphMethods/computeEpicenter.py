@@ -1,9 +1,6 @@
 """
 Compute topological and medium epicenter distances by transforming a COBRA model into a network graph.
 
-TODO:
-  * Map reactions back to genes
-
 @author: Scott Campit
 """
 
