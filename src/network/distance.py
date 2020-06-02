@@ -20,8 +20,8 @@ tmp = []
 rxnGeneObj = []
 for rxn in model.reactions:
     reactionNames.append(rxn.id)
-    tmp.append(rxn.gene_reaction_rule)
-print(tmp)
+#    tmp.append(rxn.gene_reaction_rule)
+#print(tmp)
 
 metaboliteNames = []
 for met in model.metabolites:
@@ -45,25 +45,25 @@ for gene in model.genes:
 
 
 # Get model stoichiometric matrix as an array
-#stoich_matrix = cobra.util.create_stoichiometric_matrix(model)
+stoich_matrix = cobra.util.create_stoichiometric_matrix(model)
 
-#import networkx as nx
-#import matplotlib.pyplot as plt
+import networkx as nx
+import matplotlib.pyplot as plt
 
 # Construct vertices for reactants and products
-#import numpy as np
-#product_rows, product_cols = np.where(stoich_matrix == 1)
-#product_edges = zip(product_rows.tolist(), product_cols.tolist())
+import numpy as np
+product_rows, product_cols = np.where(stoich_matrix == 1)
+product_edges = zip(product_rows.tolist(), product_cols.tolist())
 
-#reactant_rows, reactant_cols = np.where(stoich_matrix == -1)
-#reactant_edges = zip(reactant_rows.tolist(), reactant_cols.tolist())
+reactant_rows, reactant_cols = np.where(stoich_matrix == -1)
+reactant_edges = zip(reactant_rows.tolist(), reactant_cols.tolist())
 
 # Construct a directed graph for reactants and products
-#prodGraph = nx.DiGraph(products=metaboliteNames, reactions=reactionNames)
-#prodGraph.add_edges_from(product_edges)
+prodGraph = nx.DiGraph(products=metaboliteNames, reactions=reactionNames)
+prodGraph.add_edges_from(product_edges)
 
-#reactGraph = nx.DiGraph()
-#reactGraph.add_edges_from(reactant_edges)
+reactGraph = nx.DiGraph()
+reactGraph.add_edges_from(reactant_edges)
 
 # Visualize the directed graphs
 #nx.draw(prodGraph, node_size=5)
@@ -75,7 +75,7 @@ for gene in model.genes:
 #shortestBiomassPath = []
 #for i in biomassComponents:
 #    shortestBiomassPath[i] = nx.shortest_path_length(prodGraph, source=i, target=j)
-
+print([p for p in nx.all_shortest_paths(prodGraph, source=1, target=2)])
 
 #dijkstra_length = nx.shortest_path(gr)
 
