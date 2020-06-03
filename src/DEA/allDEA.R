@@ -1,20 +1,92 @@
+#### DEA function ####
+DEA <- function(symbols, WT_mean, KO_mean, other_IDs) {
+  
+  if(missing(other_IDs)) {
+    other_IDs <- symbols
+    missing_IDS <- TRUE
+  } else {
+    missing_IDS <- FALSE
+  }
+  
+  FC = KO_mean/WT_mean
+  log2FC = log2(FC)
+  bool_inf_pos <- (is.infinite(log2FC) & (sign(log2FC) == 1))
+  bool_inf_neg <- (is.infinite(log2FC) & (sign(log2FC) == -1))
+  
+  symbols_pos_inf <- symbols[bool_inf_pos]
+  IDS_pos_inf <- other_IDs[bool_inf_pos]
+  symbols_neg_inf <- symbols[bool_inf_neg]
+  IDS_neg_inf <- other_IDs[bool_inf_neg]
+  
+  non_sig_symbols <- symbols[is.nan(log2FC)]
+  non_sig_FC <- FC[is.nan(log2FC)]
+  non_sig_log2FC <- log2FC[is.nan(log2FC)]
+  non_sig_IDS <- other_IDs[is.nan(log2FC)]
+  
+  bool <- (is.nan(log2FC)|is.infinite(log2FC))
+  FC_real <- FC[!bool]
+  log2FC_real <- log2FC[!bool]
+  symbols_real <- symbols[!bool]
+  IDS_real <- other_IDs[!bool]
+  
+  mean_fc <- mean(log2FC_real)
+  stddev <- sd(log2FC_real)
+  p_value <- 2*pnorm(log2FC_real, mean_fc, stddev)
+  
+  p_value_comb <- c(p_value, rep(10^(-50), (length(symbols_pos_inf)+length(symbols_neg_inf))))
+  FC_comb <- c(FC_real, rep(max(FC_real),length(symbols_pos_inf)), rep(min(FC_real),length(symbols_neg_inf)))
+  log2FC_comb <- c(log2FC_real, rep(max(log2FC_real),length(symbols_pos_inf)), rep(min(log2FC_real),length(symbols_neg_inf)))
+  symbols_comb <- c(symbols_real, symbols_pos_inf, symbols_neg_inf)
+  IDS_comb <- c(IDS_real, IDS_pos_inf, IDS_neg_inf)
+  
+  bool_p <- (p_value_comb <= 0.05)
+  
+  non_sig_p_values <- c(rep(max(p_value_comb), length(non_sig_symbols)), p_value_comb[!bool_p])
+  non_sig_symbols <- c(non_sig_symbols, symbols_comb[!bool_p])
+  non_sig_FC <- c(non_sig_FC, FC_comb[!bool_p])
+  non_sig_log2FC <- c(non_sig_log2FC, log2FC_comb[!bool_p])
+  non_sig_IDS <- c(non_sig_IDS, IDS_comb[!bool_p])
+  
+  non_sig_FC[is.nan(non_sig_FC)] = 1
+  non_sig_log2FC[is.nan(non_sig_log2FC)] = 0
+  
+  p_values_sig <- p_value_comb[bool_p]
+  symbols_sig <- symbols_comb[bool_p]
+  FC_sig <- FC_comb[bool_p]
+  log2FC_sig <- log2FC_comb[bool_p]
+  sig_IDS <- IDS_comb[bool_p]
+  
+  if(missing_IDS) {
+    sig_data = data.frame("Symbols" = symbols_sig, "FC" = FC_sig, "log2FC" = log2FC_sig,
+                          "Pvalues" = p_values_sig)
+    
+    non_sig_data = data.frame("Symbols" = non_sig_symbols, "FC" = non_sig_FC, "log2FC" = non_sig_log2FC,
+                              "Pvalues" = non_sig_p_values)
+    
+  } else {
+    sig_data = data.frame("Symbols" = symbols_sig, "FC" = FC_sig, "log2FC" = log2FC_sig,
+                          "Pvalues" = p_values_sig, "otherID" = sig_IDS)
+    
+    non_sig_data = data.frame("Symbols" = non_sig_symbols, "FC" = non_sig_FC, "log2FC", non_sig_log2FC,
+                              "Pvalues" = non_sig_p_values, "otherID" = non_sig_IDS)
+  }
+  
+  return(list(sig_data = sig_data, non_sig_data = non_sig_data))
+  
+}
+
 #### Lyssiotis Imports ####
 
-library(rio)
-# import BxPC3 data as bx
-bx <- import("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/CCLs_BxPC3.csv")
-# import Capan1 data as cp
-cp <- import("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/CCLs_Capan1.csv")
-# import PANC1 data as pn
-pn <- import("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/CCLs_PANC1.csv")
-# import TU8902 data as tu
-tu <- import("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/CCLs_TU8902.csv")
-# import TU8988T data as tut
-tut <- import("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/CCLs_TU8988T.csv")
-# import UM2 data as um2
-um2 <- import("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/CCLs_UM2.csv")
-# import UM90 data as um90
-um90 <- import("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/CCLs_UM90.csv")
+library("rio")
+library("readxl")
+sheets = list('Sheet1','Sheet2','Sheet3','Sheet4','Sheet5','Sheet6','Sheet7')
+bx <- as.data.frame(read_excel("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/TPM_lyss.xlsx", sheet = 'Sheet1'))
+cp <- as.data.frame(read_excel("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/TPM_lyss.xlsx", sheet = 'Sheet2'))
+pn <- as.data.frame(read_excel("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/TPM_lyss.xlsx", sheet = 'Sheet3'))
+tu<- as.data.frame(read_excel("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/TPM_lyss.xlsx", sheet = 'Sheet4'))
+tut <- as.data.frame(read_excel("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/TPM_lyss.xlsx", sheet = 'Sheet5'))
+um2<- as.data.frame(read_excel("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/TPM_lyss.xlsx", sheet = 'Sheet6'))
+um90 <- as.data.frame(read_excel("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/TPM_lyss.xlsx", sheet = 'Sheet7'))
 
 #### Lyssiotis analysis ####
 
@@ -26,20 +98,13 @@ titles <- list("Log2 distribution of BxPC3","Log2 distribution of Capan1",
 cell_names <- list("BxPC3","Capan1","PANC1","TU8902","TU8988T","UM2","UM90")
 
 #initiate lists to store data 
-all_data <- list()
-all_fold_changes_log2 <- list()
-gene_names_list <- list()
-cell_fold_changes <- list()
-all_p_values <- list()
-z_scores <- list()
-p_values <- list()
-genes_sig_list <- list()
+Lyssiotis_data_sig <- list()
+Lyssiotis_data_non_sig <- list()
 
 count <- 1
 
-pdf("~jennadiegel/Documents/SURE/DES/figures/Lyssiotis_DEA_histograms.pdf")
-
 for (cell in cells) {
+  
   #separate out gene names
   genes <- cell[ ,1]
   
@@ -48,73 +113,26 @@ for (cell in cells) {
   cell_WT <- cell[ ,5:7]
   
   #get row-wise means for KO and WT samples
-  KO_mean <- rowMeans(cell_KO)  
+  KO_mean <- rowMeans(cell_KO)
   WT_mean <- rowMeans(cell_WT)  
   
-  #get fold change KO/WT
-  fold_change <- KO_mean/WT_mean #getting NaN with WT = 0 - set to max log 2 fold change - P value is arbitrarily large number - add after pvalue calculation
-  
-  #transform fold change to get normal distribution using log2
-  fold_change_log2 <- log2(fold_change)
-  
-  #separate out inf values 
-  bool_inf_pos <- (is.infinite(fold_change_log2) & sign(fold_change_log2) == 1)
-  bool_inf_neg <- (is.infinite(fold_change_log2) & sign(fold_change_log2) == -1)
-  genes_pos_inf <- genes[bool_inf_pos]
-  genes_neg_inf <- genes[bool_inf_neg]
-  
-  #find NaN and inf values and keep only the non-NaN and non-inf values
-  bool <- (is.nan(fold_change_log2)|is.infinite(fold_change_log2))
-  fold_change_real <- fold_change[!bool]
-  fold_change_log2_real <- fold_change_log2[!bool]
-  genes_real <- c(genes[!bool], genes_pos_inf, genes_neg_inf)
-  
-  #set fold change of inf genes to the max fold change and combine with real values
-  fold_change_comb <- c(fold_change_real, rep(max(fold_change_real),length(genes_pos_inf)), rep(min(fold_change_real),length(genes_neg_inf)))
-  fold_change_log2_comb <- c(fold_change_log2_real, rep(max(fold_change_log2_real),length(genes_pos_inf)), rep(min(fold_change_log2_real),length(genes_neg_inf)))
-  
-  ################# need to specify mean and standard deviation
-  mean_fc <- mean(fold_change_log2_real)
-  stddev <- sd(fold_change_log2_real)
-  p_value <- 2*pnorm(fold_change_log2_real, mean_fc, stddev)
-  p_value <- c(p_value, rep(10^(-50), (length(genes_pos_inf)+length(genes_neg_inf))))
-  
-  #find which values are significant and sort out necessary parameters
-  bool_p <- (p_value <= 0.05)
-  genes_sig <- genes_real[bool_p]
-  p_values_keep <- p_value[bool_p]
-  fold_change_sig <- fold_change_comb[bool_p]
-
-  #put data frames and vectors into lists for storage
-  cell_fold_changes[[count]] <- fold_change_sig
-  genes_sig_list[[count]] <- genes_sig
-  all_p_values[[count]] <- p_values_keep
-  
-  #visualize distribution of values as histograms
-  hist(fold_change_log2_real, probability = T, breaks = 50,
-       main = titles[[count]],
-       xlab = 'Log2 of Fold Change')
+  temp_data <- DEA(genes,WT_mean,KO_mean)
+  Lyssiotis_data_sig[[count]] <- temp_data[[1]]
+  Lyssiotis_data_non_sig[[count]] <- temp_data[[2]]
   
   count <- count + 1}
 
-dev.off()
-
-#exports to use data in matlab or python
-export(genes_sig_list, '~jennadiegel/Documents/SURE/DES/Lyssiotis_data/genes_sig.xlsx')
-export(all_p_values, '~jennadiegel/Documents/SURE/DES/Lyssiotis_data/p_values.xlsx')
-export(cell_fold_changes, '~jennadiegel/Documents/SURE/DES/Lyssiotis_data/fold_change.xlsx')
-
-
-
-
+export(Lyssiotis_data_sig, '~jennadiegel/Documents/SURE/DES/Lyssiotis_data/Lyssiotis_data_sig.xlsx')
+export(Lyssiotis_data_non_sig, '~jennadiegel/Documents/SURE/DES/Lyssiotis_data/Lyssiotis_data_non_sig.xlsx')
 
 #### CCLE Imports ####
 library(rio)
-ccle = import("~jennadiegel/Documents/SURE/DES/data/CCLE_data.csv")
+ccle = import("~jennadiegel/Documents/SURE/DES/CCLE_data/CCLE_data.csv")
 
 gene_names <- ccle[,2]
 wt_vals <- ccle[ ,3:4]
 mut_vals <- ccle[ ,-(1:4)]
+ENSGs <- ccle[ ,1]
 
 #### CCLE plot titles ####
 titles <- list("Log2 distribution of DAN-G","Log2 distribution of HPAC",
@@ -135,8 +153,6 @@ titles <- list("Log2 distribution of DAN-G","Log2 distribution of HPAC",
                "Log2 distribution of Panc 10","Log2 distribution of SUIT-2",
                "Log2 distribution of T3M-4")
 
-pdf("~jennadiegel/Documents/SURE/DES/figures/CCLE_DEA_histograms.pdf")
-
 #### CCLE analysis ####
 
 #fill in NA values with 0 - database excluded 0 values
@@ -144,78 +160,28 @@ wt_vals[is.na(wt_vals)] <- 0
 mut_vals[is.na(mut_vals)] <- 0
 
 #calculate WT mean from 2 WT cell lines
-WT_mean <- (mut_vals[,1] + mut_vals[,2])/2
+WT_mean <- (wt_vals[,1] + wt_vals[,2])/2
 
-#determine fold change for all cell lines
-fold_changes <- list()
-fold_changes_log2 <- list()
-noninf_gene_names <- list()
-upreg_inf_genes <- list()
-downreg_inf_genes <- list()
-sig_genes <- list()
-p_values <- list()
-all_data <- list()
-# starting at 3 to exclude first two cell lines that are not normally distributed
-for (i in 3:length(mut_vals)) {
+CCLE_data_sig <- list()
+CCLE_data_non_sig <- list()
+
+count = 1
+for (i in 1:length(mut_vals)) {
   
   
-  fold_change <- mut_vals[ ,i]/WT_mean
-  fold_change_log2 <- log2(fold_change)
-  
-  #find NaN and inf values and keep only the non-NaN and non-inf values
-  bool <- (is.nan(fold_change_log2)|is.infinite(fold_change_log2))
-  fold_change_keep <- fold_change[!bool]
-  fold_change_log2_keep <- fold_change_log2[!bool]
-  gene_names_keep <- gene_names[!bool]
-  
-  #separate out inf values, +inf = upregulation, -inf = downregulation
-  bool_inf_pos <- (is.infinite(fold_change_log2) & (sign(fold_change_log2) == 1))
-  bool_inf_neg <- (is.infinite(fold_change_log2) & (sign(fold_change_log2) == -1))
-  gene_names_pos_inf <- gene_names[bool_inf_pos]
-  gene_names_neg_inf <- gene_names[bool_inf_neg]
-  
-  #determine p values for each fold change
-  mean_fc <- mean(fold_change_log2_keep)
-  stddev <- sd(fold_change_log2_keep)
-  p_value <- 2*pnorm(fold_change_log2_keep,mean_fc,stddev)
-  p_values[[i]] <- p_value
-  
-  data_storage <- data.frame(
-    gene_name <- c(gene_names_keep, gene_names_pos_inf, gene_names_neg_inf),
-    fold_change <- c(fold_change_keep, rep(max(fold_change_keep),length(gene_names_pos_inf)), rep(min(fold_change_keep),length(gene_names_neg_inf))),
-    log2_fold_change <- c(fold_change_log2_keep, rep(max(fold_change_log2_keep),length(gene_names_pos_inf)),rep(min(fold_change_log2_keep),length(gene_names_neg_inf))),
-    p_value <- c(p_value, rep(10^(-50),(length(gene_names_pos_inf) + length(gene_names_neg_inf)))))
-  
-  all_data[[i]] <- data_storage
-  fold_changes_log2[[i]] <- fold_change_log2_keep
-  fold_changes[[i]] <- fold_change_keep
-  upreg_inf_genes[[i]] <- gene_names_pos_inf
-  downreg_inf_genes[[i]] <- gene_names_neg_inf
-  
-  sig_genes[[i]] <- c(gene_names_keep, gene_names_pos_inf, gene_names_neg_inf)
-  
-  hist(fold_change_log2_keep, probability = T, breaks = 50,
-       main = titles[[i]],
-       xlab = 'Log2 of Fold Change')
-  
+  mut <- mut_vals[ ,i]
+  temp_data <- DEA(gene_names,WT_mean,mut,ENSGs)
+  CCLE_data_sig[[count]] <- temp_data[[1]]
+  CCLE_data_non_sig[[count]] <- temp_data[[2]]
+
+  count = count + 1
   i = i + 1}
 
-export(all_data, '~jennadiegel/Documents/SURE/DES/CCLE_data/CCLE.xlsx')
-export(fold_changes, '~jennadiegel/Documents/SURE/DES/CCLE_data/fold_changes.xlsx')
-export(sig_genes, '~jennadiegel/Documents/SURE/DES/CCLE_data/sig_genes.xlsx')
-dev.off()
-
-##figure out why cell line 1 and 2 have weird distributions
-##could be modeled with an exponential distribution?
-##ignore first two MUT samples
-
-
+export(CCLE_data_sig, '~jennadiegel/Documents/SURE/DES/CCLE_data/CCLE_data_sig.xlsx')
+export(CCLE_data_non_sig, '~jennadiegel/Documents/SURE/DES/CCLE_data/CCLE_data_non_sig.xlsx')
 
 #### TCGA Imports ####
 library("readxl")
-
-#pdf to store histograms
-pdf("~jennadiegel/Documents/SURE/DES/figures/TCGA_DEA_histograms.pdf")
 
 # make list of sheet names that correspond with sheet names in excel file with organized TCGA data
 sheet_names <- list() #fill in file names here - preferably with a loop
@@ -248,7 +214,7 @@ mut_count = 1
 count = 1
 for (sheet in sheet_names) {
   if (count <= 6) {
-    TCGA_wt_data[[wt_count]] <- read_excel("~jennadiegel/Documents/SURE/DES/TCGA_TPM_data.xlsx", sheet = sheet_names[[count]])
+    TCGA_wt_data[[wt_count]] <- read_excel("~jennadiegel/Documents/SURE/DES/TCGA_data/TCGA_TPM_data.xlsx", sheet = sheet_names[[count]])
     if (count == 1) {
       wt_TPM = matrix(NA, nrow = dim(TCGA_wt_data[[1]])[1], ncol = 6)
     }
@@ -256,7 +222,7 @@ for (sheet in sheet_names) {
     wt_count = wt_count + 1
   }
   else {
-    TCGA_mut_data[[mut_count]] <- read_excel("~jennadiegel/Documents/SURE/DES/TCGA_TPM_data.xlsx", sheet = sheet_names[[count]])
+    TCGA_mut_data[[mut_count]] <- read_excel("~jennadiegel/Documents/SURE/DES/TCGA_data/TCGA_TPM_data.xlsx", sheet = sheet_names[[count]])
     if (count == 7) {
       mut_TPM = matrix(NA, nrow = dim(TCGA_mut_data[[1]])[1], ncol = 32)
     }
@@ -269,65 +235,30 @@ for (sheet in sheet_names) {
 
 #### TCGA analysis ####
 
-FCS <- list()
-log2FCS <- list()
-p_vals <- list()
-sig_FCS <- list()
-genes_sig_list <- list()
+TCGA_data_sig <- list()
+TCGA_data_non_sig <- list()
 
 wt_mean <- rowMeans(wt_TPM)
+
 count = 1
-
-
 for(CL in TCGA_mut_data) {
   
   genes = TCGA_mut_data[[count]]$symbol
-  FC = mut_TPM[ ,count] / wt_mean
+  mut = mut_TPM[ ,count]
+  ENSG = TCGA_mut_data[[count]]$ensID
   
-  log2FC = log2(FC)
-  bool_inf_pos <- (is.infinite(log2FC) & (sign(log2FC) == 1))
-  bool_inf_neg <- (is.infinite(log2FC) & (sign(log2FC) == -1))
-  
-  genes_pos_inf <- genes[bool_inf_pos]
-  genes_neg_inf <- genes[bool_inf_neg]
-  
-  #find NaN and inf values and keep only the non-NaN and non-inf values
-  bool <- (is.nan(log2FC)|is.infinite(log2FC))
-  FC_real <- FC[!bool]
-  log2FC_real <- log2FC[!bool]
-  genes_real <- c(genes[!bool], genes_pos_inf, genes_neg_inf)
-  
-  #set fold change of inf genes to the max fold change and combine with real values
-  FC_comb <- c(FC_real, rep(max(FC_real),length(genes_pos_inf)), rep(min(FC_real),length(genes_neg_inf)))
-  log2FC_comb <- c(log2FC_real, rep(max(log2FC_real),length(genes_pos_inf)), rep(min(log2FC_real),length(genes_neg_inf)))
-  FCS[[count]] <- FC_comb
-  log2FCS[[count]] <- log2FC_comb
-  
-  #need to specify mean and standard deviation
-  mean_fc <- mean(log2FC_real)
-  stddev <- sd(log2FC_real)
-  p_value <- 2*pnorm(log2FC_real, mean_fc, stddev)
-  p_value <- c(p_value, rep(10^(-50), (length(genes_pos_inf)+length(genes_neg_inf))))
-  p_vals[[count]] <- p_value
-  
-  bool_p <- (p_value <= 0.05)
-  genes_sig <- genes_real[bool_p]
-  p_values_keep <- p_vals[bool_p]
-  fold_change_sig <- FC_comb[bool_p]
-  
-  sig_FCS[[count]] <- fold_change_sig
-  genes_sig_list[[count]] <- genes_sig
-  
-  hist(log2FC_real, probability = T, breaks = 50,
-       main = count,
-       xlab = 'Log2 of Fold Change')
+  temp_data <- DEA(genes,wt_mean,mut,ENSG)
+  TCGA_data_sig[[count]] <- temp_data[[1]]
+  TCGA_data_non_sig[[count]] <- temp_data[[2]]
   
   count = count + 1
 }
 
-dev.off()
+export(TCGA_data_sig, '~jennadiegel/Documents/SURE/DES/TCGA_data/TCGA_data_sig.xlsx')
+export(TCGA_data_non_sig, '~jennadiegel/Documents/SURE/DES/TCGA_data/TCGA_data_non_sig.xlsx')
 
-export(genes_sig_list, '~jennadiegel/Documents/SURE/DES/TCGA_data/genes_sig.xlsx')
-export(sig_FCS, '~jennadiegel/Documents/SURE/DES/TCGA_data/fold_change.xlsx')
+
+
+
 
 
