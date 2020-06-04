@@ -1,4 +1,16 @@
 #### DEA function ####
+# This function is copied from the file DEA.R for use in this script
+
+#DEA: diffential expression analysis 
+
+# Perform differential expression analysis using RNAseq data. Determines fold change values, 
+# log2 of fold change values, and displays data with up to 2 different naming schemes if 
+# provided in the data.
+
+# DEA separates out significant and non-significant genes using a p-value of 0.05 after 
+# transforming the data using log2 of the fold changes.
+
+# @author: Jenna Diegel
 DEA <- function(symbols, WT_mean, KO_mean, other_IDs) {
   
   if(missing(other_IDs)) {
