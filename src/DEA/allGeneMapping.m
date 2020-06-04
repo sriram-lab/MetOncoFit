@@ -41,11 +41,13 @@ genes = cell(2,length(sheets));
 fcs = cell(2,length(sheets));
 
 for sheet = 1:length(sheets)
-
-    [~,genes{1, sheet},~] = xlsread(fullfile('..','Lyssiotis_data','Lyssiotis_data_sig.xlsx'),sheets{sheet},'A:A');
-    [~,genes{2, sheet},~] = xlsread(fullfile('..','Lyssiotis_data','Lyssiotis_data_non_sig.xlsx'),sheets{sheet},'A:A');
-    [fcs{1, sheet},~ ,~] = xlsread(fullfile('..','Lyssiotis_data','Lyssiotis_data_sig.xlsx'), sheets{sheet}, 'B:B');
-    [fcs{2, sheet},~ ,~] = xlsread(fullfile('..','Lyssiotis_data','Lyssiotis_data_non_sig.xlsx'), sheets{sheet}, 'B:B');
+    
+    Lyss_sig = readcell(fullfile('..','Lyssiotis_data','Lyssiotis_data_sig.xlsx'),'Sheet',sheets{sheet},'Range',2);
+    Lyss_non_sig = readcell(fullfile('..','Lyssiotis_data','Lyssiotis_data_non_sig.xlsx'),'Sheet',sheets{sheet},'Range',2);
+    genes{1, sheet} = Lyss_sig(:,1);
+    genes{2, sheet} = Lyss_non_sig(:,1);
+    fcs{1, sheet} = cell2mat(Lyss_sig(:,2));
+    fcs{2, sheet} = cell2mat(Lyss_non_sig(:,2));
     
 end 
 
@@ -105,12 +107,15 @@ fcs = cell(2,33);
 for a = 1:33
     sheet = strcat('Sheet', {' '}, num2str(a));
     
-    [~,genes{1,a}] = xlsread(fullfile('..','CCLE_data','CCLE_data_sig.xlsx'),sheet{1}, 'A:A');
-    [~,genes{2,a}] = xlsread(fullfile('..','CCLE_data','CCLE_data_non_sig.xlsx'),sheet{1}, 'A:A');
-    fcs{1,a} = xlsread(fullfile('..','CCLE_data','CCLE_data_sig.xlsx'),sheet{1}, 'B:B');
-    fcs{2,a} = xlsread(fullfile('..','CCLE_data','CCLE_data_non_sig.xlsx'),sheet{1}, 'B:B');    
-    [~,ENSGs{1,a}] = xlsread(fullfile('..','CCLE_data','CCLE_data_sig.xlsx'),sheet{1}, 'E:E');
-    [~,ENSGs{2,a}] = xlsread(fullfile('..','CCLE_data','CCLE_data_non_sig.xlsx'),sheet{1}, 'E:E');
+    CCLE_sig = readcell(fullfile('..','CCLE_data','CCLE_data_sig.xlsx'),'Sheet',sheet{1},'Range',2);
+    CCLE_non_sig = readcell(fullfile('..','CCLE_data','CCLE_data_non_sig.xlsx'),'Sheet',sheet{1},'Range',2);
+    genes{1, a} = CCLE_sig(:,1);
+    genes{2, a} = CCLE_non_sig(:,1);
+    fcs{1, a} = cell2mat(CCLE_sig(:,2));
+    fcs{2, a} = cell2mat(CCLE_non_sig(:,2));
+    ENSGs{1, a} = CCLE_sig(:,5);
+    ENSGs{2,a} = CCLE_sig(:,5);
+    
 end
 
 % Recon1
@@ -137,8 +142,8 @@ end
 [C_RECON3_CL_matches_NS, ~] = mapping(RECON3_genes, all_BIGG(2,:), all_FC(2,:));
 
 % Human1
-[C_human1_CL_matches, C_human1_pan] = mapping(Human1_genes, ENSGs(1,:), fcs);
-[C_human1_CL_matches_NS] = mapping_temp(Human1_genes, ENSGs(2,:));
+[C_human1_CL_matches, C_human1_pan] = mapping(Human1_genes, ENSGs(1,:), fcs(1,:));
+[C_human1_CL_matches_NS] = mapping(Human1_genes, ENSGs(2,:),fcs(2,:));
 
 %% TCGA %%
 
@@ -150,13 +155,14 @@ for a = 1:32
     
     sheet = strcat('Sheet', {' '}, num2str(a));
     
-    [~,genes{1, a},~] = xlsread(fullfile('..','TCGA_data','TCGA_data_sig.xlsx'),sheet{1} ,'A:A');
-    [~,genes{2, a},~] = xlsread(fullfile('..','TCGA_data','TCGA_data_non_sig.xlsx'),sheet{1} ,'A:A');
-    [fcs{1, a},~ ,~] = xlsread(fullfile('..','TCGA_data','TCGA_data_sig.xlsx'), sheet{1}, 'B:B');
-    [fcs{2, a},~ ,~] = xlsread(fullfile('..','TCGA_data','TCGA_data_non_sig.xlsx'), sheet{1}, 'B:B');
-    [~,ENSGs{1,a},~] = xlsread(fullfile('..','TCGA_data','TCGA_data_sig.xlsx'), sheet{1}, 'E:E');
-    [~,ENSGs{2,a},~] = xlsread(fullfile('..','TCGA_data','TCGA_data_non_sig.xlsx'),sheet{1}, 'E:E');
-
+    TCGA_sig = readcell(fullfile('..','TCGA_data','TCGA_data_sig.xlsx'),'Sheet',sheet{1},'Range',2);
+    TCGA_non_sig = readcell(fullfile('..','TCGA_data','TCGA_data_non_sig.xlsx'),'Sheet',sheet{1},'Range',2);
+    genes{1, a} = TCGA_sig(:,1);
+    genes{2, a} = TCGA_non_sig(:,1);
+    fcs{1, a} = cell2mat(TCGA_sig(:,2));
+    fcs{2, a} = cell2mat(TCGA_non_sig(:,2));
+    ENSGs{1, a} = TCGA_sig(:,5);
+    ENSGs{2,a} = TCGA_sig(:,5);
 end 
 
 % RECON1
