@@ -79,7 +79,6 @@ DEA <- function(symbols, WT_mean, KO_mean, other_IDs) {
 
 library("rio")
 library("readxl")
-sheets = list('Sheet1','Sheet2','Sheet3','Sheet4','Sheet5','Sheet6','Sheet7')
 bx <- as.data.frame(read_excel("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/TPM_lyss.xlsx", sheet = 'Sheet1'))
 cp <- as.data.frame(read_excel("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/TPM_lyss.xlsx", sheet = 'Sheet2'))
 pn <- as.data.frame(read_excel("~jennadiegel/Documents/SURE/DES/Lyssiotis_data/TPM_lyss.xlsx", sheet = 'Sheet3'))
