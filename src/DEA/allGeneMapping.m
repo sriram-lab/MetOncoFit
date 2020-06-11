@@ -51,12 +51,14 @@ for sheet = 1:length(sheets)
     
 end 
 
-%RECON1
+%% RECON1
 
-[L_RECON1_CL_matches, L_RECON1_pan] = mapping(RECON1_genes, genes(1,:), fcs(1,:));
-[L_RECON1_CL_matches_NS, ~] = mapping(RECON1_genes, genes(2,:), fcs(2,:));
+[L_RECON1_CL_matches, L_RECON1_pan] = mapping(RECON1_genes, genes(1,:), fcs(1,:), true);
+[L_RECON1_CL_matches_NS, L_RECON1_pan_NS] = mapping(RECON1_genes, genes(2,:), fcs(2,:), false);
 
-% RECON2
+
+
+%% RECON2
 
 all_BIGG = cell(2,length(genes));
 all_FC = cell(2,length(genes));
@@ -70,14 +72,15 @@ for b = 1:2
     end
 end
 
-[L_RECON2_CL_matches, L_RECON2_pan] = mapping(RECON2_genes, all_BIGG(1,:), all_FC(1,:));
-[L_RECON2_CL_matches_NS, ~] = mapping(RECON2_genes, all_BIGG(2,:), all_FC(2,:));
+%% 
+[L_RECON2_CL_matches, L_RECON2_pan] = mapping(RECON2_genes, all_BIGG(1,:), all_FC(1,:), true);
+[L_RECON2_CL_matches_NS, L_RECON2_pan_NS] = mapping(RECON2_genes, all_BIGG(2,:), all_FC(2,:), false);
 
-% RECON3D
-[L_RECON3_CL_matches, L_RECON3_pan] = mapping(RECON3_genes, all_BIGG(1,:), all_FC(1,:));
-[L_RECON3_CL_matches_NS, ~] = mapping(RECON3_genes, all_BIGG(2,:), all_FC(2,:));
+%% RECON3D
+[L_RECON3_CL_matches, L_RECON3_pan] = mapping(RECON3_genes, all_BIGG(1,:), all_FC(1,:), true);
+[L_RECON3_CL_matches_NS, L_RECON3_pan_NS] = mapping(RECON3_genes, all_BIGG(2,:), all_FC(2,:), false);
 
-% Human1 
+%% Human1 
 ENSG_to_sym = readtable(fullfile('gene_name_info','ENS_to_symbol.txt'));
 ENSG = ENSG_to_sym.ENSG_ID;
 symbol = ENSG_to_sym.symbol;
@@ -93,8 +96,8 @@ for b = 1:2
     end
 end
 
-[L_Human1_CL_matches, L_Human1_pan] = mapping(Human1_genes, all_ENSG(1,:), all_FC(1,:));
-[L_Human1_CL_matches_NS, ~] = mapping(Human1_genes, all_ENSG(2,:), all_FC(2,:));
+[L_human1_CL_matches, L_human1_pan] = mapping(Human1_genes, all_ENSG(1,:), all_FC(1,:), true);
+[L_human1_CL_matches_NS, L_human1_pan_NS] = mapping(Human1_genes, all_ENSG(2,:), all_FC(2,:), false);
 
 %% CCLE %%
 
@@ -119,8 +122,8 @@ for a = 1:33
 end
 
 % Recon1
-[C_RECON1_CL_matches, C_RECON1_pan] = mapping(RECON1_genes, genes(1,:), fcs(1,:));
-[C_RECON1_CL_matches_NS] = mapping(RECON1_genes, genes(2,:), fcs(2,:));
+[C_RECON1_CL_matches, C_RECON1_pan] = mapping(RECON1_genes, genes(1,:), fcs(1,:), true);
+[C_RECON1_CL_matches_NS, C_RECON1_pan_NS] = mapping(RECON1_genes, genes(2,:), fcs(2,:), false);
 
 % Recon2
 all_BIGG = cell(2,length(genes));
@@ -134,16 +137,16 @@ for b = 1:2
     end
 end
 
-[C_RECON2_CL_matches, C_RECON2_pan] = mapping(RECON2_genes, all_BIGG(1,:), all_FC(1,:));
-[C_RECON2_CL_matches_NS, ~] = mapping(RECON2_genes, all_BIGG(2,:), all_FC(2,:));
+[C_RECON2_CL_matches, C_RECON2_pan] = mapping(RECON2_genes, all_BIGG(1,:), all_FC(1,:), true);
+[C_RECON2_CL_matches_NS, C_RECON2_pan_NS] = mapping(RECON2_genes, all_BIGG(2,:), all_FC(2,:), false);
 
 % Recon 3
-[C_RECON3_CL_matches, C_RECON3_pan] = mapping(RECON3_genes, all_BIGG(1,:), all_FC(1,:));
-[C_RECON3_CL_matches_NS, ~] = mapping(RECON3_genes, all_BIGG(2,:), all_FC(2,:));
+[C_RECON3_CL_matches, C_RECON3_pan] = mapping(RECON3_genes, all_BIGG(1,:), all_FC(1,:), true);
+[C_RECON3_CL_matches_NS, C_RECON3_pan_NS] = mapping(RECON3_genes, all_BIGG(2,:), all_FC(2,:), false);
 
 % Human1
-[C_human1_CL_matches, C_human1_pan] = mapping(Human1_genes, ENSGs(1,:), fcs(1,:));
-[C_human1_CL_matches_NS] = mapping(Human1_genes, ENSGs(2,:),fcs(2,:));
+[C_human1_CL_matches, C_human1_pan] = mapping(Human1_genes, ENSGs(1,:), fcs(1,:), true);
+[C_human1_CL_matches_NS, C_human1_pan_NS] = mapping(Human1_genes, ENSGs(2,:),fcs(2,:), false);
 
 %% TCGA %%
 
@@ -166,8 +169,8 @@ for a = 1:32
 end 
 
 % RECON1
-[T_RECON1_CL_matches, T_RECON1_pan] = mapping(RECON1_genes, genes(1,:), fcs(1,:));
-[T_RECON1_CL_matches_NS, ~] = mapping(RECON1_genes, genes(1,:), fcs(2,:));
+[T_RECON1_CL_matches, T_RECON1_pan] = mapping(RECON1_genes, genes(1,:), fcs(1,:), true);
+[T_RECON1_CL_matches_NS, T_RECON1_pan_NS] = mapping(RECON1_genes, genes(1,:), fcs(2,:), false);
 
 % Recon2
 all_BIGG = cell(1,length(genes));
@@ -181,13 +184,13 @@ for b = 1:2
     end
 end
 
-[T_RECON2_CL_matches, T_RECON2_pan] = mapping(RECON2_genes, all_BIGG(1,:), all_FC(1,:));
-[T_RECON2_CL_matches_NS, ~] = mapping(RECON2_genes, all_BIGG(2,:), all_FC(2,:));
+[T_RECON2_CL_matches, T_RECON2_pan] = mapping(RECON2_genes, all_BIGG(1,:), all_FC(1,:), true);
+[T_RECON2_CL_matches_NS, T_RECON2_pan_NS] = mapping(RECON2_genes, all_BIGG(2,:), all_FC(2,:), false);
 
 % Recon3
-[T_RECON3_CL_matches, T_RECON3_pan] = mapping(RECON3_genes, all_BIGG(1,:), all_FC(1,:));
-[T_RECON3_CL_matches_NS, ~] = mapping(RECON3_genes, all_BIGG(2,:), all_FC(2,:));
+[T_RECON3_CL_matches, T_RECON3_pan] = mapping(RECON3_genes, all_BIGG(1,:), all_FC(1,:), true);
+[T_RECON3_CL_matches_NS, T_RECON3_pan_NS] = mapping(RECON3_genes, all_BIGG(2,:), all_FC(2,:), false);
 
-% Human1
-[T_human1_CL_matches, T_human1_pan] = mapping(Human1_genes, ENSGs(1,:), fcs(1,:));
-[T_human1_CL_matches_NS, ~] = mapping(Human1_genes, ENSGs(2,:), fcs(2,:));
+ % Human1
+[T_human1_CL_matches, T_human1_pan] = mapping(Human1_genes, ENSGs(1,:), fcs(1,:), true);
+[T_human1_CL_matches_NS, T_human1_pan_NS] = mapping(Human1_genes, ENSGs(2,:), fcs(2,:), false);
