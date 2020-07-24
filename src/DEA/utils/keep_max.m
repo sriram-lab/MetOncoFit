@@ -1,10 +1,10 @@
-function [ averaged_values ] = average_repeats( names, values )
+function [ max_values ] = keep_max( names, values )
 
 %{ 
 This function takes in mapped names and values that may contain duplicate
-names where you want to take the average of the values the same 
-name is mapped to (rather than max, etc) and outputs a table with 
-unique names mapped to its average value
+names where you want to keep the max value out of all the values the same 
+name is mapped to (rather than averaging, etc) and outputs a table with 
+unique names mapped to its respective max value
 
 ex. 
 input:
@@ -15,23 +15,23 @@ c 2
 c 1
 
 output:
-a 1.5
+a 2
 b 3 
-c 1.5
+c 2
 
 Inputs: 
 names: a cell array containing names that are mapped to values
 values: a vector containing values that are mapped to names
 
 Outputs: 
-average_values: a table that contains unique names and their respective
-average values
+max_values: a table that contains unique names and their respective
+max values
 %}
 
-    %alphebetize names
+    %alphebetize matches
     [~,i] = sort(names); 
 
-    %sort values in same order
+    %sort fc in same order
     values_sorted = values(i); 
 
     %combine all names into one string for searching
@@ -45,7 +45,7 @@ average values
     num_rep = zeros(length(unique_names),1);
 
     for b = 1:length(unique_names)
-
+        
         %create a regular expression to find if there is a match within the
         %names string
         %the spaces added to the beginning and end ensure a substring will
@@ -65,21 +65,21 @@ average values
     %if index1=index2 there are no duplicated entries
     index1 = 1;
     index2 = 0;
-    values_averaged = zeros(length(unique_names),1);
+    values_max = zeros(length(unique_names),1);
 
     for c = 1:length(unique_names)
 
         %set index2 based on number of repeated entries and find max value
         %from entries
         index2 = index2 + num_rep(c,1);
-        value_average = sum(values_sorted(index1:index2,1))./num_rep(c,1); 
-        values_averaged(c,1) = value_average;
+        value_max = max(values_sorted(index1:index2,1)); 
+        values_max(c,1) = value_max;
 
         %reset index1 based on index2
         index1 = index2 + 1;
     end
-
-    %convert to table
-    averaged_values = table(unique_names, values_averaged);
     
-end
+    %convert to table
+    max_values = table(unique_names, values_max);
+    
+end 
