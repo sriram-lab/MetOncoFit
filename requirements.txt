@@ -16,7 +16,7 @@ coloredlogs==10.0
 colorlover==0.3.0
 constantly==15.1.0
 coverage==4.5.1
-cryptography==2.6.1
+cryptography==3.2
 cson==0.7
 cssselect==0.9.2
 cycler==0.10.0
