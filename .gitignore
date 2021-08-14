@@ -118,11 +118,5 @@ app/
 .mypy_cache/
 
 # scampit
-metoncofit/accessory
-metoncofit/__pycache__
-data/
-output/
-void/
-GeneKO/
 ./idea
 .github
