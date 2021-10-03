@@ -217,7 +217,7 @@ def one_gene_only(df, targ, header, rfc, canc):
     corr = []
 
     x = 0
-    while(x < 137):  # Get the first 10 features
+    while(x < 10):  # Get the first 10 features
         tempa = sorted_d[x]
         feat.append(tempa[0])
         gini.append(tempa[1])
@@ -226,15 +226,14 @@ def one_gene_only(df, targ, header, rfc, canc):
 
     importance = pd.DataFrame({"Feature": feat, "Gini": gini, "R": corr})
     supp_fig = importance.copy(deep=True)
-    importance = importance.head(137)
+    importance = importance.head(10)
 
     if targ == "CNV":
-        export_csv = importance.to_csv (r'/Users/kirksmith/Documents/GitHub.nosync/MetOncoFit/metoncofit/ImpCNV.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
+        importance.to_csv (r'./ImpCNV.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
     elif targ == "SURV":
-        export_csv = importance.to_csv (r'/Users/kirksmith/Documents/GitHub.nosync/MetOncoFit/metoncofit/ImpSurv.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
+        importance.to_csv (r'./ImpSurv.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
     else:
-        export_csv = importance.to_csv (r'/Users/kirksmith/Documents/GitHub.nosync/MetOncoFit/metoncofit/ImpTCGA.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
-
+        importance.to_csv (r'./ImpTCGA.csv', index = None, header=True) #Don't forget to add '.csv' at the end of the path
 
     # Map to label
     if targ == 'CNV':
